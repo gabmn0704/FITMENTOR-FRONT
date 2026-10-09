@@ -160,6 +160,7 @@ export default function App() {
   const [knee, setKnee] = useState<number | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
   const { sendPose, feedback, connected } = usePoseFeedback();
+  const remoteConnected = useRef(connected);
   const displayedScore = feedback?.score ?? score;
   const displayedNote = feedback?.message ?? note;
   const video = useRef<HTMLVideoElement>(null),
@@ -171,7 +172,11 @@ export default function App() {
     lastKnee = useRef<number | null>(null),
     phase = useRef("ready"),
     count = useRef(0),
-    spoken = useRef(0);
+    spoken = useRef(0),
+    lastSpoken = useRef("");
+  useEffect(() => {
+    remoteConnected.current = connected;
+  }, [connected]);
   useEffect(() => {
     try {
       setHistory(JSON.parse(localStorage.getItem("fitmentor-history") ?? "[]"));
@@ -185,12 +190,19 @@ export default function App() {
   const say = (text: string, force = false) => {
     if (!voice || !("speechSynthesis" in window)) return;
     const now = Date.now();
-    if (!force && now - spoken.current < 3500) return;
+    const message = text.trim();
+    if (
+      !message ||
+      (!force && message === lastSpoken.current) ||
+      (!force && now - spoken.current < 4500)
+    )
+      return;
     spoken.current = now;
+    lastSpoken.current = message;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    const u = new SpeechSynthesisUtterance(message);
     u.lang = "es-ES";
-    u.rate = 1.02;
+    u.rate = 0.92;
     window.speechSynthesis.speak(u);
   };
   useEffect(() => {
@@ -283,7 +295,7 @@ export default function App() {
         setStatus("IA activa: analizando cada movimiento.");
         draw(points);
         countRep(data);
-        say(text);
+        if (!remoteConnected.current) say(text);
       } else setStatus("Buscando una pose completa y estable...");
       last.current = now;
     }
@@ -349,6 +361,8 @@ export default function App() {
     stream.current?.getTracks().forEach((t) => t.stop());
     stream.current = undefined;
     window.speechSynthesis?.cancel();
+    spoken.current = 0;
+    lastSpoken.current = "";
     setOn(false);
     setStatus("Sesión pausada.");
     phase.current = "ready";
@@ -391,6 +405,11 @@ export default function App() {
     setVoice(next);
     localStorage.setItem("fitmentor-voice", next ? "on" : "off");
     if (next) say("Correcciones por voz activadas", true);
+    else {
+      window.speechSynthesis?.cancel();
+      spoken.current = 0;
+      lastSpoken.current = "";
+    }
   };
   const nav: Array<{ label: View; icon: typeof Activity }> = [
     { label: "Resumen", icon: LayoutDashboard },
