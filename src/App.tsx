@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Activity,
   Bell,
@@ -672,7 +672,10 @@ export default function App() {
                   <strong>{reps}</strong>
                   <span>/{exercises[exercise].target} reps</span>
                 </div>
-                <div className="score-ring">
+                <div
+                  className="score-ring"
+                  style={{ "--score-progress": `${displayedScore}%` } as CSSProperties}
+                >
                   <div>
                     <strong>{displayedScore}</strong>
                     <span>/ 100</span>
