@@ -10,7 +10,9 @@ type FeedbackPayload = {
   feedback?: unknown;
 };
 const environment = (
-  import.meta as ImportMeta & { env: { VITE_API_URL?: string } }
+  import.meta as ImportMeta & {
+    env: { VITE_API_URL?: string; PROD: boolean };
+  }
 ).env;
 
 const jointNames = [
@@ -35,7 +37,9 @@ export function usePoseFeedback() {
   const lastSent = useRef(0);
 
   useEffect(() => {
-    const apiUrl = environment.VITE_API_URL;
+    const apiUrl =
+      environment.VITE_API_URL ||
+      (environment.PROD ? "https://fitmentor-backend.onrender.com" : "");
     if (!apiUrl) return;
 
     const brokerUrl = new URL(apiUrl);
