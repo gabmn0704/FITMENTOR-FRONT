@@ -1,0 +1,247 @@
+@media (max-width: 680px) {
+  .sidebar {
+    display: block;
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    width: 100%;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: #1f2d29;
+    box-shadow: 0 -8px 24px #14221c1a;
+  }
+
+  .brand,
+  .side-label,
+  .side-bottom {
+    display: none;
+  }
+
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    overflow: visible;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    min-height: 54px;
+    margin: 0;
+    padding: 5px 2px;
+    font-size: 10px;
+  }
+
+  .nav-item span {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .main-content {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  }
+
+  .welcome {
+    padding-top: 30px;
+  }
+
+  .camera-frame,
+  .camera-frame video,
+  .camera-placeholder {
+    height: min(64vh, 390px);
+    min-height: 250px;
+  }
+
+  .session-controls .primary-button {
+    flex: 1;
+    min-width: 190px;
+  }
+
+  .session-panel,
+  .insight-panel {
+    padding: 16px;
+  }
+
+  .top-actions {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .nav-item {
+    font-size: 9px;
+  }
+
+  .main-content {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .welcome h1 {
+    font-size: 30px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #e6ece8;
+    --muted: #a3b1aa;
+    --line: #35443d;
+  }
+
+  body,
+  .app-shell {
+    background: #121a17;
+    color: var(--ink);
+  }
+
+  .main-content {
+    color: var(--ink);
+  }
+
+  .topbar {
+    border-color: var(--line);
+  }
+
+  .breadcrumb,
+  .icon-button {
+    color: #a3b1aa;
+  }
+
+  .welcome h1,
+  .section-heading h2,
+  .metric strong,
+  .rep-display strong,
+  .settings-page h1,
+  .progress-page h1 {
+    color: var(--ink);
+  }
+
+  .week-card,
+  .metric,
+  .session-panel,
+  .insight-panel,
+  .progress-overview > div {
+    background: #1c2722;
+    border-color: var(--line);
+    color: var(--ink);
+  }
+
+  .week-card select {
+    background: #25332c;
+    color: var(--ink);
+    border-color: #435249;
+  }
+
+  .score-ring {
+    background: conic-gradient(#b7d865 0 87%, #344139 87%);
+  }
+
+  .score-ring::after {
+    background: #1c2722;
+  }
+
+  .insight-bar {
+    background: #354139;
+  }
+
+  .insight-bar span {
+    background: #b7d865;
+  }
+
+  .insight-foot strong,
+  .history-score {
+    color: #c4df7a;
+  }
+
+  .history-date {
+    border-color: var(--line);
+  }
+
+  .setting-icon {
+    background: #293a2f;
+    color: #c5df8e;
+  }
+
+  .finish-button {
+    background: #d8e2dc;
+    color: #20302a;
+  }
+
+  .status-line {
+    color: #b1beb7;
+  }
+
+  .camera-error {
+    background: #492d2b;
+    color: #ffd9d3;
+  }
+
+  .empty-state {
+    border-color: #53635a;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes live-pulse {
+  50% {
+    box-shadow: 0 0 0 7px #ee806911;
+  }
+}
+
+.welcome,
+.settings-page,
+.progress-page {
+  animation: rise-in 520ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.metrics .metric {
+  animation: rise-in 480ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.metrics .metric:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.metrics .metric:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+.dashboard-grid {
+  animation: rise-in 560ms 100ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.bottom-row {
+  animation: rise-in 560ms 180ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.live-dot {
+  animation: live-pulse 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
