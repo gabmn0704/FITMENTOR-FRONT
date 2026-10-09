@@ -161,7 +161,7 @@ export default function App() {
   const [history, setHistory] = useState<Session[]>([]);
   const { sendPose, feedback, connected } = usePoseFeedback();
   const displayedScore = feedback?.score ?? score;
-  const displayedNote = feedback?.feedback ?? note;
+  const displayedNote = feedback?.message ?? note;
   const video = useRef<HTMLVideoElement>(null),
     canvas = useRef<HTMLCanvasElement>(null),
     stream = useRef<MediaStream>(),
@@ -194,7 +194,7 @@ export default function App() {
     window.speechSynthesis.speak(u);
   };
   useEffect(() => {
-    if (feedback) say(feedback.feedback);
+    if (feedback) say(feedback.message);
   }, [feedback, voice]);
   const draw = (points: Point[]) => {
     const c = canvas.current,
@@ -475,7 +475,8 @@ export default function App() {
                 <span>
                   <strong>Privacidad</strong>
                   <small>
-                    El video se analiza aquí; solo enviamos puntos de postura a la IA cuando está conectada.
+                    El video se procesa en tu dispositivo; solo se envían puntos
+                    de postura al servidor de IA.
                   </small>
                 </span>
               </div>
@@ -597,7 +598,7 @@ export default function App() {
                 <div>
                   <span>Cámara</span>
                   <strong>{on ? "En vivo" : "Lista"}</strong>
-                  <small>Video local · postura en IA</small>
+                  <small>Procesamiento local</small>
                 </div>
               </div>
             </section>
@@ -655,7 +656,7 @@ export default function App() {
                   </button>
                 </div>
                 <p className="status-line">
-                  {connected ? "IA remota conectada." : status}
+                  {connected ? "Feedback remoto conectado." : "Feedback local activo."}
                 </p>
                 {error && <div className="camera-error">{error}</div>}
               </div>

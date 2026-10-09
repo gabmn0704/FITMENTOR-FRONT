@@ -3,11 +3,14 @@ import { useEffect, useRef, useState } from "react";
 
 type Exercise = "squat" | "push_up" | "plank" | "deadlift";
 type Landmark = { x: number; y: number; visibility?: number };
-type PoseFeedback = { score: number; feedback: string };
+type PoseFeedback = { score: number; message: string };
+type FeedbackPayload = {
+  score?: unknown;
+  message?: unknown;
+  feedback?: unknown;
+};
 const environment = (
-  import.meta as ImportMeta & {
-    env: { VITE_API_URL?: string; PROD: boolean };
-  }
+  import.meta as ImportMeta & { env: { VITE_API_URL?: string } }
 ).env;
 
 const jointNames = [
@@ -32,14 +35,14 @@ export function usePoseFeedback() {
   const lastSent = useRef(0);
 
   useEffect(() => {
-    const apiUrl =
-      environment.VITE_API_URL ||
-      (environment.PROD ? "https://fitmentor-backend.onrender.com" : "");
+    const apiUrl = environment.VITE_API_URL;
     if (!apiUrl) return;
 
     const brokerUrl = new URL(apiUrl);
     brokerUrl.protocol = brokerUrl.protocol === "https:" ? "wss:" : "ws:";
     brokerUrl.pathname = "/ws";
+    brokerUrl.search = "";
+    brokerUrl.hash = "";
 
     const connection = new Client({
       brokerURL: brokerUrl.toString(),
@@ -52,12 +55,17 @@ export function usePoseFeedback() {
       setConnected(true);
       connection.subscribe("/topic/feedback", (message) => {
         try {
-          const result = JSON.parse(message.body) as Partial<PoseFeedback>;
-          if (
-            typeof result.score === "number" &&
-            typeof result.feedback === "string"
-          ) {
-            setFeedback({ score: result.score, feedback: result.feedback });
+          const result = JSON.parse(message.body) as FeedbackPayload;
+          const messageText =
+            typeof result.message === "string"
+              ? result.message
+              : typeof result.feedback === "string"
+                ? result.feedback
+                : Array.isArray(result.feedback)
+                  ? result.feedback.filter((item) => typeof item === "string").join(" ")
+                  : "";
+          if (typeof result.score === "number" && messageText) {
+            setFeedback({ score: result.score, message: messageText });
           }
         } catch {
           setFeedback(null);
