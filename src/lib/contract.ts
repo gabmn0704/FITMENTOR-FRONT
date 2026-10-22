@@ -63,10 +63,11 @@ export function goalLabel(value: string | null | undefined): string {
 }
 
 /**
- * Invitado: el backend no marca el usuario como invitado; lo deducimos del
- * correo, que es nulo o sintético (dominio reservado) para invitados.
+ * Invitado: usa el campo `guest` del backend. Si no llega, se deduce del
+ * correo, que es nulo o sintético (dominio reservado) en cuentas de invitado.
  */
-export function isGuest(user: Pick<User, "email"> | null | undefined): boolean {
+export function isGuest(user: Pick<User, "email" | "guest"> | null | undefined): boolean {
+  if (typeof user?.guest === "boolean") return user.guest;
   const email = user?.email?.trim().toLowerCase();
   if (!email) return true;
   const domain = email.split("@")[1] ?? "";

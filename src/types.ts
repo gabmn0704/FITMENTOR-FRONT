@@ -14,6 +14,8 @@ export interface User {
   picture?: string;
   level: Level;
   goal?: string;
+  /** Verdadero para cuentas de invitado (el backend lo envía). */
+  guest?: boolean;
   createdAt?: string;
 }
 
