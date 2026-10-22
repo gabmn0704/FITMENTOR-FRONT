@@ -173,7 +173,7 @@
   }
 
   .brand__text,
-  .nav-link__label,
+  .sidebar .nav-link__label,
   .sidebar__footer .profile__text {
     display: none;
   }
