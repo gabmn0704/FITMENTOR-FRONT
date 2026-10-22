@@ -1,7 +1,11 @@
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 
-/** Versión fijada del runtime y del modelo de MediaPipe. */
-const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm";
+/**
+ * Versión fijada de MediaPipe: debe coincidir con la dependencia de package.json
+ * (JS y wasm de la misma release). Nunca "latest".
+ */
+export const MEDIAPIPE_VERSION = "0.10.35";
+const WASM_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task";
 
