@@ -3,8 +3,9 @@ import { advanceRepPhase, analyzePose, AngleSmoother, angle, coachingCue, POSE, 
 import { VoiceCoach, type SpeechSynthesisLike, type SpeechSynthesisUtteranceLike } from "./speech";
 import { storage } from "./storage";
 import { buildApiUrl } from "./api";
-import { formatDuration, normalizeProgress } from "./format";
+import { formatDuration } from "./format";
 import { exerciseLabel } from "./exercises";
+import { progressPercent } from "./contract";
 import type { Point } from "../types";
 
 const pt = (x: number, y: number, visibility = 1): Point => ({ x, y, visibility });
@@ -140,12 +141,13 @@ describe("api helpers", () => {
 });
 
 describe("format", () => {
-  it("formatea duraciones y normaliza progreso", () => {
+  it("formatea duraciones y normaliza progreso entero 0-100", () => {
     expect(formatDuration(65)).toBe("1:05");
     expect(formatDuration(3725)).toBe("1:02:05");
-    expect(normalizeProgress(50)).toBe(0.5);
-    expect(normalizeProgress(0.25)).toBe(0.25);
-    expect(normalizeProgress(250)).toBe(1);
+    expect(progressPercent({ progress: 50, unlocked: false })).toBe(50);
+    expect(progressPercent({ progress: 250, unlocked: false })).toBe(100);
+    expect(progressPercent({ progress: -4, unlocked: false })).toBe(0);
+    expect(progressPercent({ progress: 10, unlocked: true })).toBe(100);
   });
 
   it("muestra etiquetas en español para ejercicios conocidos", () => {

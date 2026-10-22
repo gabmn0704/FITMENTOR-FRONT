@@ -61,7 +61,6 @@ export function computeLocalStats(sessions: SessionRecord[], now = new Date()): 
     streakDays,
     weekly,
     byExercise,
-    level: "",
   };
 }
 

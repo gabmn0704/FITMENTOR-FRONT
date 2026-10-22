@@ -2,14 +2,19 @@ export type ExerciseId = "squat" | "push_up" | "plank" | "deadlift" | "lunge";
 
 export type Point = { x: number; y: number; visibility?: number };
 
+/** Niveles del backend (enum). La interfaz muestra etiquetas en español. */
+export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+
+/** Forma pública del usuario. `picture` y `goal` se omiten cuando no hay valor. */
 export interface User {
-  id?: string;
+  id: string;
   name: string;
-  email?: string;
+  /** Nulo o sintético para invitados. */
+  email?: string | null;
   picture?: string;
-  level?: string;
+  level: Level;
   goal?: string;
-  guest?: boolean;
+  createdAt?: string;
 }
 
 export interface AuthResponse {
@@ -37,7 +42,8 @@ export interface Stats {
   streakDays: number;
   weekly: WeeklyPoint[];
   byExercise: ExerciseStat[];
-  level: string;
+  /** Solo lo envía el backend; las estadísticas locales no lo conocen. */
+  level?: Level;
 }
 
 export interface RoutineItem {
@@ -48,7 +54,7 @@ export interface RoutineItem {
 }
 
 export interface Routine {
-  level: string;
+  level: Level;
   restSeconds: number;
   items: RoutineItem[];
   reason: string;
@@ -59,7 +65,7 @@ export interface Achievement {
   title: string;
   description: string;
   unlocked: boolean;
-  /** Progreso normalizado entre 0 y 1. */
+  /** Avance hacia la meta: entero de 0 a 100. */
   progress: number;
 }
 
@@ -67,7 +73,12 @@ export interface ExerciseInfo {
   id: string;
   label: string;
   muscle: string;
-  difficulty: string;
+  difficulty: Level;
+}
+
+/** GET /api/exercises/next: siguientes pasos ordenados por distancia en el grafo. */
+export interface NextExercise extends ExerciseInfo {
+  distance: number;
 }
 
 export interface SessionPayload {
@@ -76,6 +87,19 @@ export interface SessionPayload {
   accuracy: number;
   durationSeconds: number;
   avgAngles?: Record<string, number>;
+}
+
+/** Sesión tal como la devuelve el backend (POST y GET /api/sessions). */
+export interface ServerSession {
+  id: string;
+  userId: string;
+  exercise: string;
+  reps: number;
+  accuracy: number;
+  calories: number;
+  durationSeconds: number;
+  /** ISO 8601. */
+  createdAt: string;
 }
 
 export interface SessionRecord extends SessionPayload {
@@ -103,9 +127,17 @@ export interface FeedbackMessage {
 
 export interface StateMessage {
   type: "state";
+  /** WARMUP | ACTIVE_SET | REST | FINISHED | PAUSED */
   state: string;
+  /** Ejercicio actual de la rutina del servidor, si lo hay. */
+  exercise?: string;
 }
 
-export type ServerMessage = FeedbackMessage | StateMessage;
+export interface ErrorMessage {
+  type: "error";
+  message: string;
+}
+
+export type ServerMessage = FeedbackMessage | StateMessage | ErrorMessage;
 
 export type CommandName = "pause" | "resume" | "skip" | "finish" | "undo";

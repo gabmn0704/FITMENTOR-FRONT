@@ -68,7 +68,15 @@ export function parseServerMessage(raw: string): ServerMessage | null {
   if (!data || typeof data !== "object") return null;
 
   if (data.type === "state" && typeof data.state === "string") {
-    return { type: "state", state: data.state };
+    return {
+      type: "state",
+      state: data.state,
+      ...(typeof data.exercise === "string" ? { exercise: data.exercise } : {}),
+    };
+  }
+
+  if (data.type === "error" && typeof data.message === "string") {
+    return { type: "error", message: data.message };
   }
 
   if (data.type === "feedback" && typeof data.score === "number") {

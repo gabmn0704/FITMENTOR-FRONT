@@ -16,12 +16,6 @@ export function formatDuration(totalSeconds: number): string {
   return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-/** Acepta progreso en 0-1 o en 0-100 y devuelve siempre 0-1. */
-export function normalizeProgress(value: number): number {
-  const ratio = value > 1 ? value / 100 : value;
-  return Math.min(1, Math.max(0, Number.isFinite(ratio) ? ratio : 0));
-}
-
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return "FM";
