@@ -1,29 +1,70 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Client, type StompSubscription } from "@stomp/stompjs";
 import { API_URL } from "../lib/config";
 import {
+  buildBrokerUrl,
   buildCommandMessage,
+  buildConnectHeaders,
   buildPoseMessage,
-  buildWsUrl,
+  COMMAND_DESTINATION,
+  feedbackTopic,
   parseServerMessage,
+  POSE_DESTINATION,
   POSE_INTERVAL_MS,
+  stateTopic,
 } from "../lib/realtime";
 import type { CommandName, ExerciseId, FeedbackMessage, Point } from "../types";
 
 export type RealtimeStatus = "offline" | "connecting" | "open" | "closed";
 
-const MAX_BACKOFF_MS = 10_000;
+/** Reconexión automática: STOMP reintenta a este ritmo tras una caída. */
+const RECONNECT_DELAY_MS = 2_000;
+/** Latido en ambos sentidos para detectar conexiones muertas. */
+const HEARTBEAT_MS = 10_000;
 
 /**
- * Conexión WebSocket nativa con el servicio de pose. Reintenta con backoff
- * exponencial. Sin token o sin conexión, la app sigue en modo local.
+ * Canal STOMP con el backend Java. Con token se envía en el CONNECT
+ * (Authorization: Bearer). La sesión de entrenamiento se suscribe a sus
+ * topics (`/topic/feedback.{id}` y `/topic/state.{id}`). Sin conexión, la
+ * app sigue con el análisis local (modo offline).
  */
 export function useRealtime(token: string | null) {
   const [status, setStatus] = useState<RealtimeStatus>(token ? "connecting" : "offline");
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackMessage | null>(null);
   const [serverState, setServerState] = useState<string | null>(null);
   const [serverExercise, setServerExercise] = useState<string | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
+  const clientRef = useRef<Client | null>(null);
+  const subsRef = useRef<StompSubscription[]>([]);
+  const sessionRef = useRef<string | null>(null);
   const lastSentRef = useRef(0);
+
+  const handleMessage = useCallback((body: string) => {
+    const message = parseServerMessage(body);
+    if (!message) return;
+    if (message.type === "feedback") setFeedback(message);
+    else if (message.type === "state") {
+      setServerState(message.state);
+      if (message.exercise) setServerExercise(message.exercise);
+    }
+    // Los mensajes "error" del canal (frame inválido) no interrumpen la sesión.
+  }, []);
+
+  const dropSubscriptions = useCallback(() => {
+    subsRef.current.forEach((subscription) => subscription.unsubscribe());
+    subsRef.current = [];
+  }, []);
+
+  const subscribeSession = useCallback(
+    (client: Client, id: string) => {
+      dropSubscriptions();
+      subsRef.current = [
+        client.subscribe(feedbackTopic(id), (message) => handleMessage(message.body)),
+        client.subscribe(stateTopic(id), (message) => handleMessage(message.body)),
+      ];
+    },
+    [dropSubscriptions, handleMessage],
+  );
 
   useEffect(() => {
     if (!token) {
@@ -32,86 +73,100 @@ export function useRealtime(token: string | null) {
       return;
     }
 
-    let disposed = false;
-    let attempt = 0;
-    let timer: ReturnType<typeof setTimeout> | undefined;
+    setStatus("connecting");
+    const client = new Client({
+      brokerURL: buildBrokerUrl(API_URL, window.location.origin),
+      connectHeaders: buildConnectHeaders(token),
+      reconnectDelay: RECONNECT_DELAY_MS,
+      heartbeatIncoming: HEARTBEAT_MS,
+      heartbeatOutgoing: HEARTBEAT_MS,
+    });
 
-    const connect = () => {
-      if (disposed) return;
-      setStatus("connecting");
-      const socket = new WebSocket(buildWsUrl(API_URL, token, window.location.origin));
-      socketRef.current = socket;
-
-      socket.onopen = () => {
-        attempt = 0;
-        setStatus("open");
-      };
-      socket.onmessage = (event) => {
-        const message = parseServerMessage(String(event.data));
-        if (!message) return;
-        if (message.type === "feedback") setFeedback(message);
-        else if (message.type === "state") {
-          setServerState(message.state);
-          if (message.exercise) setServerExercise(message.exercise);
-        }
-        // Los mensajes "error" del canal (frame inválido) no interrumpen la sesión.
-      };
-      socket.onclose = () => {
-        if (socketRef.current === socket) socketRef.current = null;
-        if (disposed) return;
-        setStatus("closed");
-        setFeedback(null);
-        const delay = Math.min(MAX_BACKOFF_MS, 1000 * 2 ** attempt);
-        attempt++;
-        timer = setTimeout(connect, delay);
-      };
+    client.onConnect = () => {
+      // Tras una reconexión las suscripciones se pierden: las restauramos.
+      if (sessionRef.current) subscribeSession(client, sessionRef.current);
+      setStatus("open");
     };
+    const onDown = () => {
+      dropSubscriptions();
+      setStatus("closed");
+      setFeedback(null);
+      setServerState(null);
+    };
+    client.onWebSocketClose = onDown;
+    client.onStompError = onDown;
+    client.onWebSocketError = () => setStatus("closed");
 
-    connect();
+    clientRef.current = client;
+    client.activate();
+
     return () => {
-      disposed = true;
-      clearTimeout(timer);
-      const socket = socketRef.current;
-      socketRef.current = null;
-      socket?.close();
+      dropSubscriptions();
+      clientRef.current = null;
+      void client.deactivate();
     };
-  }, [token]);
+  }, [token, dropSubscriptions, subscribeSession]);
 
-  /** Envía landmarks si hay conexión abierta y pasó el intervalo mínimo. */
+  /** Inicia una sesión de entrenamiento: su id identifica topics y envíos. */
+  const startSession = useCallback(
+    (id: string) => {
+      sessionRef.current = id;
+      setSessionId(id);
+      setFeedback(null);
+      setServerState(null);
+      setServerExercise(null);
+      const client = clientRef.current;
+      if (client?.connected) subscribeSession(client, id);
+    },
+    [subscribeSession],
+  );
+
+  /** Cierra la sesión actual en el servidor-cliente: deja de escuchar sus topics. */
+  const endSession = useCallback(() => {
+    dropSubscriptions();
+    sessionRef.current = null;
+    setSessionId(null);
+    setFeedback(null);
+  }, [dropSubscriptions]);
+
+  /** Publica landmarks si hay sesión activa y pasó el intervalo mínimo. */
   const sendPose = useCallback(
-    (
-      exercise: ExerciseId,
-      landmarks: Point[],
-      frameWidth: number,
-      frameHeight: number,
-      sessionId?: string,
-    ): boolean => {
-      const socket = socketRef.current;
+    (exercise: ExerciseId, landmarks: Point[], frameWidth: number, frameHeight: number): boolean => {
+      const client = clientRef.current;
+      const id = sessionRef.current;
+      if (!client?.connected || !id) return false;
       const now = Date.now();
-      if (!socket || socket.readyState !== WebSocket.OPEN) return false;
       if (now - lastSentRef.current < POSE_INTERVAL_MS) return false;
-      const payload = buildPoseMessage(exercise, landmarks, frameWidth, frameHeight, sessionId);
+      const payload = buildPoseMessage(exercise, landmarks, frameWidth, frameHeight, id);
       if (!payload) return false;
       lastSentRef.current = now;
-      socket.send(JSON.stringify(payload));
+      client.publish({ destination: POSE_DESTINATION, body: JSON.stringify(payload) });
       return true;
     },
     [],
   );
 
   const sendCommand = useCallback((name: CommandName): boolean => {
-    const socket = socketRef.current;
-    if (!socket || socket.readyState !== WebSocket.OPEN) return false;
-    socket.send(JSON.stringify(buildCommandMessage(name)));
+    const client = clientRef.current;
+    const id = sessionRef.current;
+    if (!client?.connected || !id) return false;
+    client.publish({ destination: COMMAND_DESTINATION, body: JSON.stringify(buildCommandMessage(name, id)) });
     return true;
   }, []);
 
+  const connected = status === "open";
+
   return {
     status,
-    connected: status === "open",
+    connected,
+    /** Verdadero cuando el servidor cuenta las repeticiones de la sesión activa. */
+    serverCounting: connected && sessionId !== null,
+    sessionId,
     feedback,
     serverState,
     serverExercise,
+    startSession,
+    endSession,
     sendPose,
     sendCommand,
   };
