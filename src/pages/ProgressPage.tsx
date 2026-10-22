@@ -9,8 +9,8 @@ import { DoublyLinkedList, type ListCursor } from "../structures";
 import { exerciseLabel } from "../lib/exercises";
 import { formatDuration, formatShortDate } from "../lib/format";
 import { computeLocalStats } from "../lib/stats";
-import { readLocalSessions, syncPendingSessions } from "../lib/sessions";
-import { statsApi } from "../lib/services";
+import { mergeHistory, readLocalSessions, syncPendingSessions, type HistoryEntry } from "../lib/sessions";
+import { sessionsApi, statsApi } from "../lib/services";
 import type { SessionRecord, Stats } from "../types";
 
 const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
@@ -26,18 +26,19 @@ export function ProgressPage() {
   const [syncing, setSyncing] = useState(false);
   const [localList, setLocalList] = useState<SessionRecord[]>(() => readLocalSessions());
   const stats = useAsync(() => statsApi.get(token!), [token, version], Boolean(token));
+  const serverSessions = useAsync(() => sessionsApi.list(token!, 50), [token, version], Boolean(token));
 
   const data: Stats = stats.data ?? computeLocalStats(localList);
   const pending = localList.filter((s) => !s.synced).length;
 
   // Historial en lista doblemente enlazada: más reciente primero, navegable con cursor.
   const history = useMemo(() => {
-    const list = new DoublyLinkedList<SessionRecord>();
-    [...localList].sort((a, b) => b.date.localeCompare(a.date)).forEach((s) => list.append(s));
+    const list = new DoublyLinkedList<HistoryEntry>();
+    mergeHistory(serverSessions.data, localList).forEach((s) => list.append(s));
     return list;
-  }, [localList]);
-  const [cursor, setCursor] = useState<ListCursor<SessionRecord> | null>(null);
-  const [current, setCurrent] = useState<SessionRecord | undefined>(undefined);
+  }, [serverSessions.data, localList]);
+  const [cursor, setCursor] = useState<ListCursor<HistoryEntry> | null>(null);
+  const [current, setCurrent] = useState<HistoryEntry | undefined>(undefined);
   const [position, setPosition] = useState(0);
 
   useEffect(() => {
@@ -58,10 +59,13 @@ export function ProgressPage() {
   const sync = async () => {
     if (!token) return;
     setSyncing(true);
-    await syncPendingSessions(token);
-    setLocalList(readLocalSessions());
-    setVersion((v) => v + 1);
-    setSyncing(false);
+    try {
+      await syncPendingSessions(token);
+    } finally {
+      setLocalList(readLocalSessions());
+      setVersion((v) => v + 1);
+      setSyncing(false);
+    }
   };
 
   const weekLabels = data.weekly.map((d) => weekdayLabel(d.date));

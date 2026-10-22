@@ -4,6 +4,7 @@ import { Button, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { coachApi } from "../lib/services";
+import { coachSourceLabel, levelLabel } from "../lib/contract";
 import { LRUCache, normalizeText } from "../structures";
 import type { CoachAnswer } from "../types";
 
@@ -31,7 +32,7 @@ const WELCOME: Message = {
 };
 
 export function CoachPage() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -55,8 +56,13 @@ export function CoachPage() {
       let answer = answerCache.get(key);
       if (!answer) {
         if (!token) throw new ApiError(401, "Inicia sesión para hablar con el coach.");
-        answer = await coachApi.ask(token, text);
-        answerCache.set(key, answer);
+        const context = user ? `Nivel del usuario: ${levelLabel(user.level)}. Responde en español.` : undefined;
+        const raw = await coachApi.ask(token, text, context);
+        if (!raw || typeof raw.answer !== "string" || !raw.answer.trim()) {
+          throw new Error("El coach no devolvió una respuesta válida.");
+        }
+        answer = { answer: raw.answer, source: typeof raw.source === "string" ? raw.source : "" };
+        if (answer.source !== "fallback") answerCache.set(key, answer);
       }
       setMessages((list) => [...list, { id: nextId.current++, role: "coach", text: answer!.answer, source: answer!.source }]);
     } catch (err) {
@@ -90,10 +96,8 @@ export function CoachPage() {
           {messages.map((message) => (
             <div key={message.id} className={`bubble bubble--${message.role}`}>
               {message.text}
-              {message.source && (
-                <div className="muted" style={{ fontSize: 11, marginTop: 6 }}>
-                  Fuente: {message.source}
-                </div>
+              {coachSourceLabel(message.source) && (
+                <div className="bubble__source">{coachSourceLabel(message.source)}</div>
               )}
             </div>
           ))}

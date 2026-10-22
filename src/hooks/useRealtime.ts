@@ -21,6 +21,7 @@ export function useRealtime(token: string | null) {
   const [status, setStatus] = useState<RealtimeStatus>(token ? "connecting" : "offline");
   const [feedback, setFeedback] = useState<FeedbackMessage | null>(null);
   const [serverState, setServerState] = useState<string | null>(null);
+  const [serverExercise, setServerExercise] = useState<string | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const lastSentRef = useRef(0);
 
@@ -49,7 +50,11 @@ export function useRealtime(token: string | null) {
         const message = parseServerMessage(String(event.data));
         if (!message) return;
         if (message.type === "feedback") setFeedback(message);
-        else setServerState(message.state);
+        else if (message.type === "state") {
+          setServerState(message.state);
+          if (message.exercise) setServerExercise(message.exercise);
+        }
+        // Los mensajes "error" del canal (frame inválido) no interrumpen la sesión.
       };
       socket.onclose = () => {
         if (socketRef.current === socket) socketRef.current = null;
@@ -106,6 +111,7 @@ export function useRealtime(token: string | null) {
     connected: status === "open",
     feedback,
     serverState,
+    serverExercise,
     sendPose,
     sendCommand,
   };

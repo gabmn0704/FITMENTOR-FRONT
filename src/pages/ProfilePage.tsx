@@ -5,19 +5,11 @@ import { useAuth } from "../hooks/useAuth";
 import { useTheme, type ThemeChoice } from "../hooks/useTheme";
 import { STORAGE_KEYS, storage } from "../lib/storage";
 import { clearApiCache } from "../lib/api";
+import { GOALS, LEVELS, isGuest, levelLabel, toGoal } from "../lib/contract";
+import type { ProfilePatch } from "../lib/services";
+import type { Level } from "../types";
 
-const LEVELS: SegmentOption<string>[] = [
-  { value: "principiante", label: "Principiante" },
-  { value: "intermedio", label: "Intermedio" },
-  { value: "avanzado", label: "Avanzado" },
-];
-
-const GOALS = [
-  { value: "fuerza", label: "Ganar fuerza" },
-  { value: "movilidad", label: "Movilidad" },
-  { value: "resistencia", label: "Resistencia" },
-  { value: "tonificar", label: "Tonificar" },
-];
+const LEVEL_OPTIONS: SegmentOption<Level>[] = LEVELS.map((value) => ({ value, label: levelLabel(value) }));
 
 const THEMES: SegmentOption<ThemeChoice>[] = [
   { value: "dark", label: "Oscuro" },
@@ -37,7 +29,7 @@ export function ProfilePage() {
     if (user?.name) setName(user.name);
   }, [user?.name]);
 
-  const save = async (patch: Partial<{ name: string; level: string; goal: string }>) => {
+  const save = async (patch: ProfilePatch) => {
     setSaving(true);
     setMessage(null);
     try {
@@ -81,7 +73,7 @@ export function ProfilePage() {
         <Card eyebrow="Cuenta" title={user.name}>
           <div className="row" style={{ marginBottom: 16 }}>
             <Avatar name={user.name} picture={user.picture} />
-            <span className="muted">{user.guest ? "Modo invitado · tus datos se guardan en el servidor" : user.email}</span>
+            <span className="muted">{isGuest(user) ? "Modo invitado · tus datos se guardan en el servidor" : user.email}</span>
           </div>
           <form className="stack" onSubmit={onSaveName}>
             <div className="field">
@@ -100,8 +92,8 @@ export function ProfilePage() {
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)" }}>Nivel</span>
               <Segmented
                 label="Nivel de entrenamiento"
-                options={LEVELS}
-                value={user.level ?? "intermedio"}
+                options={LEVEL_OPTIONS}
+                value={user.level}
                 onChange={(level) => void save({ level })}
               />
             </div>
@@ -110,9 +102,10 @@ export function ProfilePage() {
               <select
                 id="profile-goal"
                 className="select"
-                value={user.goal ?? "fuerza"}
-                onChange={(event) => void save({ goal: event.target.value })}
+                value={toGoal(user.goal)}
+                onChange={(event) => void save({ goal: event.target.value || null })}
               >
+                <option value="">Sin objetivo definido</option>
                 {GOALS.map((goal) => (
                   <option key={goal.value} value={goal.value}>
                     {goal.label}

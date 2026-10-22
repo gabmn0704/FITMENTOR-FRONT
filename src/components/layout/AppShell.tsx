@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Activity, Bot, CalendarDays, Dumbbell, LayoutDashboard, Trophy, User, Zap, type LucideIcon } from "lucide-react";
 import { Avatar } from "../ui";
 import { ROUTES, routeHref, type RouteId } from "../../lib/routes";
+import { isGuest, levelLabel } from "../../lib/contract";
 import type { User as UserType } from "../../types";
 
 const ICONS: Record<RouteId, LucideIcon> = {
@@ -71,7 +72,7 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
             <div className="profile__text" style={{ minWidth: 0 }}>
               <strong style={{ display: "block", fontSize: 14 }}>{user.name}</strong>
               <span className="muted" style={{ fontSize: 12 }}>
-                {user.guest ? "Modo invitado" : user.level || "Sin nivel"}
+                {isGuest(user) ? `Invitado · ${levelLabel(user.level)}` : levelLabel(user.level)}
               </span>
             </div>
           </div>

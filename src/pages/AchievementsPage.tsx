@@ -4,7 +4,7 @@ import { Card, EmptyState, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { achievementsApi } from "../lib/services";
-import { normalizeProgress } from "../lib/format";
+import { achievementText, progressPercent } from "../lib/contract";
 
 export function AchievementsPage() {
   const { token } = useAuth();
@@ -14,7 +14,7 @@ export function AchievementsPage() {
     () =>
       (achievements.data ?? [])
         .slice()
-        .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || normalizeProgress(b.progress) - normalizeProgress(a.progress)),
+        .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || progressPercent(b) - progressPercent(a)),
     [achievements.data],
   );
   const unlocked = sorted.filter((a) => a.unlocked).length;
@@ -46,7 +46,8 @@ export function AchievementsPage() {
 
       <div className="grid-cards">
         {sorted.map((achievement, index) => {
-          const ratio = normalizeProgress(achievement.progress);
+          const percent = progressPercent(achievement);
+          const text = achievementText(achievement);
           return (
             <Card
               as="article"
@@ -54,7 +55,7 @@ export function AchievementsPage() {
               interactive
               className={`achievement rise ${achievement.unlocked ? "achievement--unlocked" : "achievement--locked"}`}
               style={{ ["--i" as string]: Math.min(index, 8) } as CSSProperties}
-              aria-label={`${achievement.title}, ${achievement.unlocked ? "desbloqueado" : `${Math.round(ratio * 100)} por ciento`}`}
+              aria-label={`${text.title}, ${achievement.unlocked ? "desbloqueado" : `${percent} por ciento`}`}
             >
               <div className="row" style={{ justifyContent: "space-between" }}>
                 <span className="achievement__icon" aria-hidden="true">
@@ -65,16 +66,16 @@ export function AchievementsPage() {
                 </span>
               </div>
               <div>
-                <h2 style={{ fontSize: 20 }}>{achievement.title}</h2>
+                <h2 style={{ fontSize: 20 }}>{text.title}</h2>
                 <p className="muted" style={{ fontSize: 14, marginTop: 4 }}>
-                  {achievement.description}
+                  {text.description}
                 </p>
               </div>
               <div className="bar" aria-hidden="true">
-                <div className="bar__fill" style={{ width: `${ratio * 100}%` }} />
+                <div className="bar__fill" style={{ width: `${percent}%` }} />
               </div>
               <span className="muted tabular" style={{ fontSize: 12 }}>
-                {Math.round(ratio * 100)}%
+                {percent}%
               </span>
             </Card>
           );

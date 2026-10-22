@@ -7,6 +7,7 @@ import { SinglyLinkedList, type SinglyNode } from "../structures";
 import { routineApi } from "../lib/services";
 import { exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
+import { levelLabel, routineNote, routineReason } from "../lib/contract";
 import type { RouteId } from "../lib/routes";
 import type { Routine, RoutineItem } from "../types";
 
@@ -48,7 +49,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
       <header className="page-header">
         <p className="eyebrow">Plan adaptativo</p>
         <h1>Tu rutina de hoy</h1>
-        <p>{routine.data?.reason ?? "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}</p>
+        <p>{routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}</p>
       </header>
 
       {!token && <Notice tone="info">Inicia sesión para generar tu rutina personalizada.</Notice>}
@@ -72,7 +73,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
                 <span className="stat__label">descanso</span>
               </div>
             </div>
-            <p style={{ fontSize: 16 }}>{current.note}</p>
+            <p style={{ fontSize: 16 }}>{routineNote(current.note)}</p>
             <div className="row">
               <Button variant="primary" onClick={() => onNavigate("entrenar")} icon={<Dumbbell size={16} />}>
                 Entrenar este ejercicio
@@ -83,7 +84,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
             </div>
           </Card>
 
-          <Card eyebrow="Plan completo" title={`Nivel ${routine.data.level || "personal"}`} as="div">
+          <Card eyebrow="Plan completo" title={`Nivel ${levelLabel(routine.data.level).toLowerCase()}`} as="div">
             <ol className="stack" style={{ gap: 10, padding: 0, margin: 0, listStyle: "none" }}>
               {list.toArray().map((item, index) => (
                 <li key={`${item.exercise}-${index}`}>
@@ -103,7 +104,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
                     <span style={{ minWidth: 0 }}>
                       <strong>{exerciseLabel(item.exercise)}</strong>
                       <span className="routine-item__meta" style={{ display: "block" }}>
-                        {item.sets} × {item.reps} · {item.note}
+                        {item.sets} × {item.reps} · {routineNote(item.note)}
                       </span>
                     </span>
                     <Timer size={16} aria-hidden="true" />

@@ -8,7 +8,7 @@ import { readLocalSessions } from "../lib/sessions";
 import { computeLocalStats, weeklyProgress, WEEKLY_GOAL_REPS } from "../lib/stats";
 import { suggestNextExercise } from "../lib/suggest";
 import { exerciseLabel } from "../lib/exercises";
-import { normalizeProgress } from "../lib/format";
+import { achievementText, progressPercent, routineNote, routineReason } from "../lib/contract";
 import type { RouteId } from "../lib/routes";
 import type { Stats } from "../types";
 
@@ -36,7 +36,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const name = user?.name?.split(" ")[0] ?? "";
   const topAchievements = (achievements.data ?? [])
     .slice()
-    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.progress - a.progress)
+    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || progressPercent(b) - progressPercent(a))
     .slice(0, 3);
 
   return (
@@ -122,12 +122,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   <div style={{ minWidth: 0 }}>
                     <strong>{exerciseLabel(item.exercise)}</strong>
                     <div className="routine-item__meta">
-                      {item.sets} × {item.reps} · {item.note}
+                      {item.sets} × {item.reps} · {routineNote(item.note)}
                     </div>
                   </div>
                 </div>
               ))}
-              <p className="muted" style={{ fontSize: 13 }}>{routine.data.reason}</p>
+              <p className="muted" style={{ fontSize: 13 }}>{routineReason(routine.data.reason, routine.data.level)}</p>
             </div>
           )}
         </Card>
@@ -152,11 +152,11 @@ export function HomePage({ onNavigate }: HomePageProps) {
               {topAchievements.map((achievement) => (
                 <div key={achievement.id}>
                   <div className="row" style={{ justifyContent: "space-between", fontSize: 14 }}>
-                    <strong>{achievement.title}</strong>
-                    <span className="muted tabular">{Math.round(normalizeProgress(achievement.progress) * 100)}%</span>
+                    <strong>{achievementText(achievement).title}</strong>
+                    <span className="muted tabular">{progressPercent(achievement)}%</span>
                   </div>
                   <div className="bar" style={{ marginTop: 6 }}>
-                    <div className="bar__fill" style={{ width: `${normalizeProgress(achievement.progress) * 100}%` }} />
+                    <div className="bar__fill" style={{ width: `${progressPercent(achievement)}%` }} />
                   </div>
                 </div>
               ))}
