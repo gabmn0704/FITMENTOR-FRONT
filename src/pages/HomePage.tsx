@@ -1,0 +1,169 @@
+import { useMemo, type CSSProperties } from "react";
+import { ArrowRight, Flame, Sparkles } from "lucide-react";
+import { Button, Card, EmptyState, ProgressRing } from "../components/ui";
+import { useAuth } from "../hooks/useAuth";
+import { useAsync } from "../hooks/useAsync";
+import { achievementsApi, routineApi, statsApi } from "../lib/services";
+import { readLocalSessions } from "../lib/sessions";
+import { computeLocalStats, weeklyProgress, WEEKLY_GOAL_REPS } from "../lib/stats";
+import { suggestNextExercise } from "../lib/suggest";
+import { exerciseLabel } from "../lib/exercises";
+import { normalizeProgress } from "../lib/format";
+import type { RouteId } from "../lib/routes";
+import type { Stats } from "../types";
+
+function greeting(hour: number): string {
+  if (hour < 13) return "Buenos días";
+  if (hour < 20) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+interface HomePageProps {
+  onNavigate: (route: RouteId) => void;
+}
+
+export function HomePage({ onNavigate }: HomePageProps) {
+  const { token, user } = useAuth();
+  const local = useMemo(() => computeLocalStats(readLocalSessions()), []);
+
+  const stats = useAsync(() => statsApi.get(token!), [token], Boolean(token));
+  const routine = useAsync(() => routineApi.get(token!), [token], Boolean(token));
+  const achievements = useAsync(() => achievementsApi.list(token!), [token], Boolean(token));
+
+  const data: Stats = stats.data ?? local;
+  const goal = weeklyProgress(data);
+  const suggestion = suggestNextExercise(data.byExercise);
+  const name = user?.name?.split(" ")[0] ?? "";
+  const topAchievements = (achievements.data ?? [])
+    .slice()
+    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.progress - a.progress)
+    .slice(0, 3);
+
+  return (
+    <div className="stack">
+      <section className="hero rise" style={{ "--i": 0 } as CSSProperties} aria-labelledby="home-title">
+        <div className="hero__grid">
+          <div className="stack" style={{ gap: 14 }}>
+            <p className="eyebrow">
+              {greeting(new Date().getHours())}
+              {name ? `, ${name}` : ""}
+            </p>
+            <h1 id="home-title">
+              Hoy es buen día para <span style={{ color: "var(--lime)" }}>moverte</span>.
+            </h1>
+            <p className="muted">
+              {data.streakDays > 0
+                ? `Llevas ${data.streakDays} ${data.streakDays === 1 ? "día" : "días"} seguidos. No la rompas.`
+                : "Tu racha empieza con una sesión. Te acompañamos con la técnica."}
+            </p>
+            <div className="row">
+              <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={18} />}>
+                Entrenar ahora
+              </Button>
+              {data.streakDays > 0 && (
+                <span className="streak" aria-label={`Racha de ${data.streakDays} días`}>
+                  <Flame size={20} aria-hidden="true" /> {data.streakDays} días
+                </span>
+              )}
+            </div>
+          </div>
+          <ProgressRing value={goal.percent} size={164} stroke={14} label={`Meta semanal ${goal.percent} por ciento`}>
+            <strong className="tabular">{goal.percent}%</strong>
+            <span>
+              {goal.reps} / {WEEKLY_GOAL_REPS} reps
+            </span>
+          </ProgressRing>
+        </div>
+      </section>
+
+      {stats.error && (
+        <p className="muted" style={{ fontSize: 13 }}>
+          Mostramos tus datos guardados en este dispositivo: no pudimos actualizar el servidor.
+        </p>
+      )}
+
+      <section className="stats-row" aria-label="Resumen">
+        <Card as="div" className="rise" style={{ "--i": 1 } as CSSProperties}>
+          <div className="stat">
+            <span className="stat__value tabular">{data.totalSessions}</span>
+            <span className="stat__label">sesiones</span>
+          </div>
+        </Card>
+        <Card as="div" className="rise" style={{ "--i": 2 } as CSSProperties}>
+          <div className="stat">
+            <span className="stat__value tabular">{data.totalReps}</span>
+            <span className="stat__label">repeticiones</span>
+          </div>
+        </Card>
+        <Card as="div" className="rise" style={{ "--i": 3 } as CSSProperties}>
+          <div className="stat">
+            <span className="stat__value tabular">{data.avgAccuracy}%</span>
+            <span className="stat__label">precisión media</span>
+          </div>
+        </Card>
+        <Card as="div" className="rise" style={{ "--i": 4 } as CSSProperties}>
+          <div className="stat">
+            <span className="stat__value tabular">{data.totalCalories}</span>
+            <span className="stat__label">kcal estimadas</span>
+          </div>
+        </Card>
+      </section>
+
+      <div className="home-split">
+        <Card title="Rutina de hoy" eyebrow="Plan IA" action={<Button variant="ghost" onClick={() => onNavigate("rutina")}>Ver rutina</Button>}>
+          {!token && <EmptyState title="Inicia sesión para ver tu rutina">Tu plan se adapta a tu nivel y progreso.</EmptyState>}
+          {token && routine.loading && <div className="skeleton" style={{ height: 160 }} aria-label="Cargando rutina" />}
+          {token && routine.error && <EmptyState title="Rutina no disponible">Vuelve a intentarlo más tarde.</EmptyState>}
+          {routine.data && (
+            <div className="stack" style={{ gap: 10 }}>
+              {routine.data.items.slice(0, 4).map((item, index) => (
+                <div className="routine-item" key={`${item.exercise}-${index}`}>
+                  <span className="routine-item__index">{index + 1}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <strong>{exerciseLabel(item.exercise)}</strong>
+                    <div className="routine-item__meta">
+                      {item.sets} × {item.reps} · {item.note}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <p className="muted" style={{ fontSize: 13 }}>{routine.data.reason}</p>
+            </div>
+          )}
+        </Card>
+
+        <div className="stack">
+          <Card title="Siguiente ejercicio" eyebrow="Sugerencia">
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 600 }}>
+              {exerciseLabel(suggestion.exercise)}
+            </p>
+            <p className="muted" style={{ marginTop: 6 }}>
+              {suggestion.reason}
+            </p>
+            <Button variant="ghost" block style={{ marginTop: 16 }} onClick={() => onNavigate("entrenar")} icon={<Sparkles size={16} />}>
+              Probar ahora
+            </Button>
+          </Card>
+
+          <Card title="Logros" eyebrow="Tu progreso" action={<Button variant="ghost" onClick={() => onNavigate("logros")}>Todos</Button>}>
+            {!token && <p className="muted">Inicia sesión para ver tus logros.</p>}
+            {token && achievements.loading && <div className="skeleton" style={{ height: 120 }} />}
+            <div className="stack" style={{ gap: 12 }}>
+              {topAchievements.map((achievement) => (
+                <div key={achievement.id}>
+                  <div className="row" style={{ justifyContent: "space-between", fontSize: 14 }}>
+                    <strong>{achievement.title}</strong>
+                    <span className="muted tabular">{Math.round(normalizeProgress(achievement.progress) * 100)}%</span>
+                  </div>
+                  <div className="bar" style={{ marginTop: 6 }}>
+                    <div className="bar__fill" style={{ width: `${normalizeProgress(achievement.progress) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
