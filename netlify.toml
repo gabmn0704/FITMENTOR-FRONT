@@ -2,8 +2,17 @@
   command = "npm run build"
   publish = "dist"
 
+# Variables de entorno (VITE_API_URL, VITE_GOOGLE_CLIENT_ID) se definen en
+# Netlify: Site configuration > Environment variables. No hay URLs fijas aquí.
 [build.environment]
-  VITE_API_URL = "https://fitmentor-backend-vhnq.onrender.com"
+  NODE_VERSION = "22"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
 
 [[redirects]]
   from = "/*"

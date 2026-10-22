@@ -1,6 +1,14 @@
 node_modules/
 dist/
+coverage/
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
 .DS_Store
+
+# Variables locales y secretos: nunca se suben.
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
