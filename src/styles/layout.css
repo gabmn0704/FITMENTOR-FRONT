@@ -162,7 +162,8 @@
 .auth-shell {
   min-height: 100dvh;
   display: grid;
-  place-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
   padding: var(--space-5);
   background: var(--gradient-hero), var(--bg);
 }
