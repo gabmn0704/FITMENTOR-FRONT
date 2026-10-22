@@ -4,11 +4,20 @@ import type {
   AuthResponse,
   CoachAnswer,
   ExerciseInfo,
+  Level,
+  NextExercise,
   Routine,
+  ServerSession,
   SessionPayload,
   Stats,
   User,
 } from "../types";
+
+export interface ProfilePatch {
+  name?: string;
+  level?: Level;
+  goal?: string | null;
+}
 
 /** Llamadas tipadas al backend. Todas las rutas protegidas reciben el Bearer token. */
 
@@ -24,15 +33,16 @@ export const authApi = {
 
 export const meApi = {
   get: (token: string) => apiRequest<User>("/api/me", { token }),
-  update: (token: string, patch: Partial<Pick<User, "name" | "level" | "goal">>) =>
+  update: (token: string, patch: ProfilePatch) =>
     apiRequest<User>("/api/me", { method: "PATCH", body: patch, token }),
 };
 
 export const sessionsApi = {
   create: (token: string, payload: SessionPayload) =>
-    apiRequest<{ id?: string } | undefined>("/api/sessions", { method: "POST", body: payload, token }),
+    apiRequest<ServerSession>("/api/sessions", { method: "POST", body: payload, token }),
+  /** El backend acepta limit entre 1 y 100. */
   list: (token: string, limit = 20) =>
-    apiRequest<SessionPayload[]>(`/api/sessions?limit=${limit}`, { token }),
+    apiRequest<ServerSession[]>(`/api/sessions?limit=${Math.min(100, Math.max(1, Math.round(limit)))}`, { token }),
 };
 
 export const statsApi = {
@@ -51,10 +61,14 @@ export const exercisesApi = {
   /** Búsqueda remota con caché LRU; el filtrado fino se hace con el Trie en cliente. */
   search: (token: string, query = "") =>
     cachedGet<ExerciseInfo[]>(`/api/exercises?q=${encodeURIComponent(query)}`, token),
+  /** Progresiones desde un ejercicio (array con `distance`). */
+  next: (token: string, from: string) =>
+    cachedGet<NextExercise[]>(`/api/exercises/next?from=${encodeURIComponent(from)}`, token),
 };
 
 export const coachApi = {
-  ask: (token: string, question: string, context?: Record<string, unknown>) =>
+  /** El backend acepta `context` como texto (máx. 4000) y la pregunta hasta 1000 caracteres. */
+  ask: (token: string, question: string, context?: string) =>
     apiRequest<CoachAnswer>("/api/coach", {
       method: "POST",
       body: context ? { question, context } : { question },

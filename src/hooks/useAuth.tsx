@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { clearApiCache, setUnauthorizedHandler } from "../lib/api";
-import { authApi, meApi } from "../lib/services";
+import { normalizeUser } from "../lib/contract";
+import { authApi, meApi, type ProfilePatch } from "../lib/services";
 import { STORAGE_KEYS, storage } from "../lib/storage";
 import type { User } from "../types";
 
@@ -9,7 +10,7 @@ interface AuthContextValue {
   user: User | null;
   loginWithGoogle: (credential: string) => Promise<void>;
   loginAsGuest: (name?: string) => Promise<void>;
-  updateUser: (patch: Partial<Pick<User, "name" | "level" | "goal">>) => Promise<void>;
+  updateUser: (patch: ProfilePatch) => Promise<void>;
   logout: () => void;
 }
 
@@ -17,9 +18,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => storage.getString(STORAGE_KEYS.token));
-  const [user, setUser] = useState<User | null>(() => storage.getJSON<User | null>(STORAGE_KEYS.user, null));
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = storage.getJSON<User | null>(STORAGE_KEYS.user, null);
+    return saved && typeof saved === "object" && typeof saved.name === "string" ? normalizeUser(saved) : null;
+  });
 
-  const persist = useCallback((nextToken: string, nextUser: User) => {
+  const persist = useCallback((nextToken: string, rawUser: User) => {
+    const nextUser = normalizeUser(rawUser);
     storage.setString(STORAGE_KEYS.token, nextToken);
     storage.setJSON(STORAGE_KEYS.user, nextUser);
     setToken(nextToken);
@@ -47,8 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .get(token)
       .then((fresh) => {
         if (active) {
-          setUser(fresh);
-          storage.setJSON(STORAGE_KEYS.user, fresh);
+          const normalized = normalizeUser(fresh);
+          setUser(normalized);
+          storage.setJSON(STORAGE_KEYS.user, normalized);
         }
       })
       .catch(() => {
@@ -76,11 +82,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const updateUser = useCallback(
-    async (patch: Partial<Pick<User, "name" | "level" | "goal">>) => {
+    async (patch: ProfilePatch) => {
       if (!token) return;
-      const fresh = await meApi.update(token, patch);
+      const fresh = normalizeUser(await meApi.update(token, patch));
       setUser(fresh);
       storage.setJSON(STORAGE_KEYS.user, fresh);
+      // La rutina y las estadísticas dependen del nivel: invalidamos la caché.
+      clearApiCache();
     },
     [token],
   );

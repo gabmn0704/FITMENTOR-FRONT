@@ -23,6 +23,29 @@ export function buildApiUrl(path: string, base = API_URL): string {
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/**
+ * Mensaje legible en español. El backend responde `{ error, message }`; no
+ * mostramos su texto técnico (inglés, detalles de validación) al usuario.
+ */
+export function errorMessageFor(status: number, body = ""): string {
+  let code = "";
+  try {
+    const parsed = JSON.parse(body) as { error?: unknown };
+    if (typeof parsed.error === "string") code = parsed.error;
+  } catch {
+    /* cuerpo no JSON */
+  }
+  if (code === "INVALID_CREDENTIAL") return "No pudimos verificar tu cuenta de Google. Inténtalo de nuevo.";
+  if (status === 401) return "Tu sesión caducó. Vuelve a iniciar sesión.";
+  if (status === 403) return "No tienes permiso para esta acción.";
+  if (status === 404) return "No encontramos lo que buscabas.";
+  if (status === 429) return "Demasiadas solicitudes. Espera un momento.";
+  if (status === 503 && code === "GOOGLE_NOT_CONFIGURED") return "El acceso con Google no está disponible ahora.";
+  if (status === 400 || code === "VALIDATION_ERROR") return "Algunos datos no son válidos. Revísalos e inténtalo de nuevo.";
+  if (status >= 500) return "El servidor tuvo un problema. Inténtalo de nuevo en unos minutos.";
+  return `El servidor respondió ${status}.`;
+}
+
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
@@ -52,10 +75,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   if (response.status === 401 && token) onUnauthorized?.();
   if (!response.ok) {
     const text = await response.text().catch(() => "");
-    throw new ApiError(
-      response.status,
-      text || `El servidor respondió ${response.status}.`,
-    );
+    throw new ApiError(response.status, errorMessageFor(response.status, text));
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
