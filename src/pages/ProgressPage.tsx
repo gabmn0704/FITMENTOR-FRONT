@@ -65,7 +65,7 @@ export function ProgressPage() {
   };
 
   const weekLabels = data.weekly.map((d) => weekdayLabel(d.date));
-  const accuracyValues = data.weekly.map((d) => d.accuracy);
+  const accuracyValues = data.weekly.map((d) => (d.reps > 0 ? d.accuracy : null));
   const maxExerciseReps = Math.max(1, ...data.byExercise.map((e) => e.reps));
 
   return (

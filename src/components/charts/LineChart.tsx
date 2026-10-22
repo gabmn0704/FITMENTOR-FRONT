@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
 
 interface LineChartProps {
-  values: number[];
+  /** null marca un día sin datos: no se dibuja punto y la línea salta el hueco. */
+  values: Array<number | null>;
   labels: string[];
   label: string;
   height?: number;
@@ -18,12 +19,19 @@ export function LineChart({ values, labels, label, height = 180 }: LineChartProp
   const innerW = width - padX * 2;
   const step = values.length > 1 ? innerW / (values.length - 1) : 0;
 
-  const points = values.map((value, index) => ({
-    x: padX + index * step,
-    y: padTop + (1 - Math.min(100, Math.max(0, value)) / 100) * innerH,
-  }));
+  const points = values.flatMap((value, index) =>
+    value === null
+      ? []
+      : [
+          {
+            index,
+            x: padX + index * step,
+            y: padTop + (1 - Math.min(100, Math.max(0, value)) / 100) * innerH,
+          },
+        ],
+  );
   const line = points.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-  const area = points.length
+  const area = points.length > 1
     ? `${line} L${points[points.length - 1].x.toFixed(1)},${height - padBottom} L${points[0].x.toFixed(1)},${height - padBottom} Z`
     : "";
 
@@ -53,9 +61,9 @@ export function LineChart({ values, labels, label, height = 180 }: LineChartProp
       </defs>
       {area && <path d={area} fill="url(#area-grad)" />}
       {line && <path ref={pathRef} className="line-path" d={line} />}
-      {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={4} fill="var(--bg-elevated)" stroke="var(--lime)" strokeWidth={2}>
-          <title>{`${labels[i] ?? ""}: ${values[i]}%`}</title>
+      {points.map((p) => (
+        <circle key={p.index} cx={p.x} cy={p.y} r={4} fill="var(--bg-elevated)" stroke="var(--lime)" strokeWidth={2}>
+          <title>{`${labels[p.index] ?? ""}: ${values[p.index]}%`}</title>
         </circle>
       ))}
       {labels.map((text, i) => (
