@@ -17,7 +17,8 @@ import {
   Zap,
 } from "lucide-react";
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
-import { usePoseFeedback } from "./usePoseFeedback";
+import { useRealtime } from "./hooks/useRealtime";
+import { STORAGE_KEYS, storage } from "./lib/storage";
 
 type Exercise = "squat" | "push_up" | "plank" | "deadlift";
 type View = "Resumen" | "Entrenamiento" | "Progreso" | "Configuración";
@@ -159,7 +160,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [knee, setKnee] = useState<number | null>(null);
   const [history, setHistory] = useState<Session[]>([]);
-  const { sendPose, feedback, connected } = usePoseFeedback();
+  const { sendPose, feedback, connected } = useRealtime(storage.getString(STORAGE_KEYS.token));
   const remoteConnected = useRef(connected);
   const displayedScore = feedback?.score ?? score;
   const displayedNote = feedback?.message ?? note;
