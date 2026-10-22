@@ -11,6 +11,7 @@ import { useRealtime } from "../hooks/useRealtime";
 import { useTrainingSession, type FinishedSession } from "../hooks/useTrainingSession";
 import { EXERCISES, exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
+import { serverStateLabel } from "../lib/contract";
 import { saveLocalSession, syncPendingSessions } from "../lib/sessions";
 import type { RouteId } from "../lib/routes";
 import type { SessionPayload } from "../types";
@@ -111,7 +112,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
           <p className="muted row" style={{ fontSize: 13 }} aria-live="polite">
             {realtime.connected ? <Wifi size={15} aria-hidden="true" /> : <WifiOff size={15} aria-hidden="true" />}
             {realtime.connected
-              ? "Feedback remoto conectado."
+              ? `Feedback remoto conectado${serverStateLabel(realtime.serverState) ? ` · ${serverStateLabel(realtime.serverState)}` : ""}.`
               : "Modo local: el análisis funciona sin conexión y la sesión se guarda en tu dispositivo."}
           </p>
         </Card>

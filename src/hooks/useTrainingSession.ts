@@ -13,6 +13,7 @@ import {
 } from "../lib/pose";
 import { createBrowserVoice, type VoiceCoach } from "../lib/speech";
 import { STORAGE_KEYS, storage } from "../lib/storage";
+import { toRepPhase } from "../lib/realtime";
 import { loadPoseDetector } from "./usePoseDetector";
 import type { RealtimeStatus } from "./useRealtime";
 import type { CommandName, ExerciseId, FeedbackMessage, Point, SessionPayload } from "../types";
@@ -25,14 +26,13 @@ const COUNTDOWN_SECONDS = 3;
 
 export interface TrainingRealtime {
   status: RealtimeStatus;
+  connected: boolean;
+  /** Verdadero si el servidor cuenta reps y fase de la sesión activa. */
+  serverCounting: boolean;
   feedback: FeedbackMessage | null;
-  sendPose: (
-    exercise: ExerciseId,
-    landmarks: Point[],
-    frameWidth: number,
-    frameHeight: number,
-    sessionId?: string,
-  ) => boolean;
+  startSession: (sessionId: string) => void;
+  endSession: () => void;
+  sendPose: (exercise: ExerciseId, landmarks: Point[], frameWidth: number, frameHeight: number) => boolean;
   sendCommand: (name: CommandName) => boolean;
 }
 
@@ -40,10 +40,17 @@ export interface FinishedSession extends SessionPayload {
   score: number;
 }
 
-function newSessionId(): string {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `s-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+/** UUID v4 por sesión de entrenamiento; cae a un generador equivalente sin crypto.randomUUID. */
+export function newSessionId(): string {
+  const webCrypto: Crypto | undefined = typeof crypto !== "undefined" ? crypto : undefined;
+  if (webCrypto && typeof webCrypto.randomUUID === "function") return webCrypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  if (webCrypto && typeof webCrypto.getRandomValues === "function") webCrypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 interface Options {
@@ -164,6 +171,15 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     voice.current?.say(`Repetición ${repsRef.current}`, true);
   }, []);
 
+  /** Registra una puntuación en el resumen y en la tendencia reciente. */
+  const recordScore = useCallback((value: number) => {
+    scoreSum.current.total += value;
+    scoreSum.current.count += 1;
+    scoreWindow.current.push(value);
+    setScore(value);
+    setTrend(scoreWindow.current.toArray());
+  }, []);
+
   const detectOnce = useCallback(
     (now: number) => {
       const v = video.current;
@@ -171,46 +187,42 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       if (!v || !det || v.readyState < 2) return;
       const currentExercise = exerciseRef.current;
       const points = det.detectForVideo(v, now).landmarks?.[0] ?? [];
-      realtimeRef.current.sendPose(
-        currentExercise,
-        points,
-        v.videoWidth || 16,
-        v.videoHeight || 9,
-        sessionId.current || undefined,
-      );
+      // Con el servidor conectado, él es la fuente de verdad para reps, fase y feedback.
+      const serverCounting = realtimeRef.current.serverCounting;
+      realtimeRef.current.sendPose(currentExercise, points, v.videoWidth || 16, v.videoHeight || 9);
       drawSkeleton(points);
 
       const data = analyzePose(points, currentExercise);
       if (!data) {
-        setCue("Buscando una pose completa y estable...");
+        if (!serverCounting) setCue("Buscando una pose completa y estable...");
         return;
       }
       const movement = data.movementAngle;
       const smoothed = movement === null ? null : smoother.current.push(movement);
       if (smoothed !== null) {
         setAngle(Math.round(smoothed));
-        const next = advanceRepPhase(phaseRef.current, smoothed, currentExercise);
-        if (next.phase !== phaseRef.current) {
-          phaseRef.current = next.phase;
-          setRepPhase(next.phase);
+        // Modo offline: el análisis local cuenta las repeticiones (sin doble conteo).
+        if (!serverCounting) {
+          const next = advanceRepPhase(phaseRef.current, smoothed, currentExercise);
+          if (next.phase !== phaseRef.current) {
+            phaseRef.current = next.phase;
+            setRepPhase(next.phase);
+          }
+          if (next.completed) registerRep();
         }
-        if (next.completed) registerRep();
       }
       if (data.knee !== null) {
         kneeSum.current.total += data.knee;
         kneeSum.current.count += 1;
       }
-      scoreSum.current.total += data.score;
-      scoreSum.current.count += 1;
-      scoreWindow.current.push(data.score);
-      setScore(data.score);
-      setTrend(scoreWindow.current.toArray());
+      if (serverCounting) return;
 
+      recordScore(data.score);
       const text = coachingCue(currentExercise, data);
       setCue(text);
-      if (realtimeRef.current.status !== "open") voice.current?.say(text);
+      voice.current?.say(text);
     },
-    [drawSkeleton, registerRep, video],
+    [drawSkeleton, recordScore, registerRep, video],
   );
 
   const loop = useCallback(
@@ -263,6 +275,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       return;
     }
     sessionId.current = newSessionId();
+    realtimeRef.current.startSession(sessionId.current);
 
     try {
       setStatusBoth("loading");
@@ -322,9 +335,11 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
 
   /** Deshace la última repetición contada (pila LIFO). */
   const undo = useCallback(() => {
-    if (undoStack.current.isEmpty()) return false;
-    undoStack.current.pop();
-    repsRef.current = Math.max(0, repsRef.current - 1);
+    const serverCounting = realtimeRef.current.serverCounting;
+    if (!serverCounting && undoStack.current.isEmpty()) return false;
+    if (repsRef.current <= 0) return false;
+    if (!serverCounting) undoStack.current.pop();
+    repsRef.current -= 1;
     setReps(repsRef.current);
     setCue("Repetición deshecha.");
     realtimeRef.current.sendCommand("undo");
@@ -338,6 +353,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     setStatusBoth("idle");
     setCountdown(null);
     realtimeRef.current.sendCommand("finish");
+    realtimeRef.current.endSession();
     if (!hadActivity) {
       setCue("Sin actividad registrada.");
       return null;
@@ -386,26 +402,23 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     else voice.current?.cancel();
   }, []);
 
-  // Sin conexión remota, el feedback local ya escribe la frase. Con conexión, el servidor manda.
+  // Con conexión, el feedback del servidor manda: puntuación, consejo, fase y reps.
   useEffect(() => {
     const message = realtime.feedback;
     if (!message || statusRef.current !== "running") return;
-    setScore(message.score);
+    recordScore(message.score);
     setCue(message.message);
-    scoreWindow.current.push(message.score);
-    setTrend(scoreWindow.current.toArray());
-    voice.current?.say(message.message);
-  }, [realtime.feedback]);
-
-  // El servidor puede contar repeticiones; si lo hace, respetamos su contador.
-  useEffect(() => {
-    const message = realtime.feedback;
-    if (!message || typeof message.reps !== "number" || statusRef.current !== "running") return;
-    if (message.reps > repsRef.current) {
+    const phase = toRepPhase(message.phase);
+    if (phase) {
+      phaseRef.current = phase;
+      setRepPhase(phase);
+    }
+    if (typeof message.reps === "number" && message.reps >= 0) {
       repsRef.current = message.reps;
       setReps(message.reps);
     }
-  }, [realtime.feedback]);
+    voice.current?.say(message.message);
+  }, [realtime.feedback, recordScore]);
 
   // Limpieza al desmontar: cámara, bucle y temporizadores.
   useEffect(() => {
