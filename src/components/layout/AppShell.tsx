@@ -53,14 +53,14 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
         Saltar al contenido
       </a>
 
-      <aside className="sidebar" aria-label="Navegación principal">
+      <aside className="sidebar">
         <div className="brand">
           <span className="brand__mark" aria-hidden="true">
             <Zap size={18} fill="currentColor" />
           </span>
           <span className="brand__text">FitMentor</span>
         </div>
-        <nav className="nav-list" aria-label="Secciones">
+        <nav className="nav-list" aria-label="Navegación principal">
           {ROUTES.map((r) => (
             <NavLink key={r.id} id={r.id} current={route} onNavigate={onNavigate} />
           ))}

@@ -5,7 +5,7 @@ export type ThemeChoice = "dark" | "light" | "system";
 
 const THEMES: ThemeChoice[] = ["dark", "light", "system"];
 
-function readTheme(): ThemeChoice {
+export function readStoredTheme(): ThemeChoice {
   const value = storage.getString(STORAGE_KEYS.theme);
   return THEMES.includes(value as ThemeChoice) ? (value as ThemeChoice) : "dark";
 }
@@ -18,7 +18,7 @@ export function applyTheme(choice: ThemeChoice): void {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeChoice>(readTheme);
+  const [theme, setThemeState] = useState<ThemeChoice>(readStoredTheme);
 
   useEffect(() => {
     applyTheme(theme);
