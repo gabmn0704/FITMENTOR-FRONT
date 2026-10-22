@@ -731,6 +731,19 @@
     padding: var(--space-5);
   }
 
+  /* Ajustes: el control segmentado baja a su propia línea en pantallas estrechas. */
+  .setting {
+    flex-wrap: wrap;
+  }
+
+  .setting__text {
+    flex: 1 1 200px;
+  }
+
+  .setting > .segmented {
+    max-width: 100%;
+  }
+
   .hero__grid {
     grid-template-columns: 1fr;
   }
