@@ -1,4 +1,4 @@
-import { TRACKED_JOINTS, type RepPhase } from "./pose";
+import { TRACKED_JOINTS } from "./pose";
 import type { CommandName, ExerciseId, FeedbackMessage, Point, ServerMessage } from "../types";
 
 /**
@@ -15,6 +15,35 @@ export const POSE_DESTINATION = "/app/pose";
 export const COMMAND_DESTINATION = "/app/command";
 export const feedbackTopic = (sessionId: string): string => `/topic/feedback.${sessionId}`;
 export const stateTopic = (sessionId: string): string => `/topic/state.${sessionId}`;
+
+/**
+ * Formato de session_id que acepta el backend (registro y SUBSCRIBE). Un id
+ * que no cumple haría que el servidor descarte los frames y rechace la
+ * suscripción, así que el front lo valida antes de usarlo.
+ */
+const SESSION_ID_PATTERN = /^[A-Za-z0-9_-]{1,100}$/;
+
+export function isValidSessionId(value: unknown): value is string {
+  return typeof value === "string" && SESSION_ID_PATTERN.test(value);
+}
+
+/** El backend cierra la conexión con mensajes STOMP de más de 8 KB. */
+export const MAX_STOMP_MESSAGE_BYTES = 8 * 1024;
+/** Margen para la línea de comando y las cabeceras del frame SEND. */
+const STOMP_FRAME_OVERHEAD_BYTES = 512;
+
+/** Verdadero si el cuerpo cabe en un frame STOMP aceptado por el servidor. */
+export function fitsStompFrame(body: string): boolean {
+  return new TextEncoder().encode(body).length + STOMP_FRAME_OVERHEAD_BYTES <= MAX_STOMP_MESSAGE_BYTES;
+}
+
+/** Rango de coordenadas que acepta el servicio de IA (margen fuera del encuadre). */
+const COORD_MIN = -0.5;
+const COORD_MAX = 1.5;
+
+function clampCoord(value: number): number {
+  return Math.min(COORD_MAX, Math.max(COORD_MIN, value));
+}
 
 /**
  * URL del broker STOMP. Si no hay API configurada (mismo origen), usa el
@@ -49,15 +78,19 @@ export function buildPoseMessage(
   frameHeight: number,
   sessionId: string,
 ): PosePayload | null {
+  if (!isValidSessionId(sessionId)) return null;
   const points = TRACKED_JOINTS.flatMap(([index, name]) => {
     const point = landmarks[index];
-    if (!point) return [];
+    if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return [];
+    const visibility = Number.isFinite(point.visibility) ? (point.visibility as number) : 0;
     return [
       {
         name,
-        x: point.x,
-        y: point.y,
-        confidence: Math.min(1, Math.max(0, point.visibility ?? 0)),
+        // MediaPipe puede devolver puntos fuera del encuadre; la IA rechaza el frame
+        // entero (422) si alguno sale de [-0.5, 1.5], así que se acotan aquí.
+        x: clampCoord(point.x),
+        y: clampCoord(point.y),
+        confidence: Math.min(1, Math.max(0, visibility)),
       },
     ];
   });
@@ -80,12 +113,15 @@ export function buildCommandMessage(name: CommandName, sessionId: string): Comma
   return { session_id: sessionId, name };
 }
 
-const REP_PHASES: readonly RepPhase[] = ["ready", "up", "down", "bottom"];
+/** Fases que envía el servicio de IA. "hold" es la plancha (isométrico, sin reps). */
+export type ServerPhase = "ready" | "up" | "down" | "bottom" | "hold";
 
-/** Fase de repetición válida enviada por el servidor, o undefined. */
-export function toRepPhase(value: unknown): RepPhase | undefined {
-  return typeof value === "string" && (REP_PHASES as readonly string[]).includes(value)
-    ? (value as RepPhase)
+const SERVER_PHASES: readonly ServerPhase[] = ["ready", "up", "down", "bottom", "hold"];
+
+/** Fase de repetición válida enviada por el servidor, o undefined (p. ej. null con la IA caída). */
+export function toRepPhase(value: unknown): ServerPhase | undefined {
+  return typeof value === "string" && (SERVER_PHASES as readonly string[]).includes(value)
+    ? (value as ServerPhase)
     : undefined;
 }
 
@@ -125,9 +161,11 @@ export function parseServerMessage(raw: string): ServerMessage | null {
       score: Math.round(data.score),
       message,
       feedback: list,
-      phase: typeof data.phase === "string" ? data.phase : undefined,
-      reps: typeof data.reps === "number" ? data.reps : undefined,
+      // null cuando la IA no respondió: el backend usó el análisis local y no avanza reps.
+      phase: toRepPhase(data.phase),
+      reps: typeof data.reps === "number" && Number.isFinite(data.reps) && data.reps >= 0 ? Math.floor(data.reps) : undefined,
       state: typeof data.state === "string" ? data.state : undefined,
+      ...(typeof data.exercise === "string" ? { exercise: data.exercise } : {}),
     };
     return feedback;
   }

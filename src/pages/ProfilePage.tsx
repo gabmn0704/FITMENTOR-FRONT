@@ -4,7 +4,7 @@ import { Avatar, Button, Card, Notice, Segmented, Switch, type SegmentOption } f
 import { useAuth } from "../hooks/useAuth";
 import { useTheme, type ThemeChoice } from "../hooks/useTheme";
 import { STORAGE_KEYS, storage } from "../lib/storage";
-import { clearApiCache } from "../lib/api";
+import { ApiError, clearApiCache } from "../lib/api";
 import { GOALS, LEVELS, isGuest, levelLabel, toGoal } from "../lib/contract";
 import type { ProfilePatch } from "../lib/services";
 import type { Level } from "../types";
@@ -35,8 +35,12 @@ export function ProfilePage() {
     try {
       await updateUser(patch);
       setMessage({ tone: "info", text: "Cambios guardados." });
-    } catch {
-      setMessage({ tone: "error", text: "No pudimos guardar los cambios. Revisa tu conexión." });
+    } catch (err) {
+      const text =
+        err instanceof ApiError && err.status !== 0 && err.message
+          ? err.message
+          : "No pudimos guardar los cambios. Revisa tu conexión.";
+      setMessage({ tone: "error", text });
     } finally {
       setSaving(false);
     }

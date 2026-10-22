@@ -13,12 +13,26 @@ import {
 } from "../lib/pose";
 import { createBrowserVoice, type VoiceCoach } from "../lib/speech";
 import { STORAGE_KEYS, storage } from "../lib/storage";
-import { toRepPhase } from "../lib/realtime";
+import { toRepPhase, type ServerPhase } from "../lib/realtime";
 import { loadPoseDetector } from "./usePoseDetector";
 import type { RealtimeStatus } from "./useRealtime";
 import type { CommandName, ExerciseId, FeedbackMessage, Point, SessionPayload } from "../types";
 
 export type TrainingStatus = "idle" | "loading" | "countdown" | "running" | "paused";
+
+/**
+ * Quién analiza la sesión:
+ * - "local": sin conexión; el navegador cuenta y corrige.
+ * - "pending": conectado, esperando el primer feedback del servidor.
+ * - "ai": la IA del servidor cuenta reps y fase.
+ * - "fallback": el servidor responde pero la IA no (phase null): reps locales.
+ * - "silent": conectado pero sin respuestas del servidor: todo local.
+ */
+export type AnalysisMode = "local" | "pending" | "ai" | "fallback" | "silent";
+type ServerMode = Exclude<AnalysisMode, "local">;
+
+/** Tras este tiempo corriendo sin ningún feedback, el análisis local toma el control. */
+const SERVER_SILENCE_MS = 4_000;
 
 const DETECT_INTERVAL_MS = 80;
 const TREND_SIZE = 40;
@@ -67,7 +81,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   const [reps, setReps] = useState(0);
   const [score, setScore] = useState(0);
   const [angle, setAngle] = useState<number | null>(null);
-  const [repPhase, setRepPhase] = useState<RepPhase>("ready");
+  const [repPhase, setRepPhase] = useState<RepPhase | ServerPhase>("ready");
+  const [serverMode, setServerMode] = useState<ServerMode>("pending");
   const [cue, setCue] = useState("Activa la cámara para comenzar.");
   const [elapsed, setElapsed] = useState(0);
   const [trend, setTrend] = useState<number[]>([]);
@@ -86,6 +101,13 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   const exerciseRef = useRef<ExerciseId>("squat");
   const phaseRef = useRef<RepPhase>("ready");
   const repsRef = useRef(0);
+  /** Reps según el servidor (absolutas), reps contadas en local y reps deshechas. */
+  const serverRepsRef = useRef(0);
+  const localRepsRef = useRef(0);
+  const undoneRef = useRef(0);
+  const serverModeRef = useRef<ServerMode>("pending");
+  const runningSince = useRef<number | null>(null);
+  /** Reps contadas en local, para deshacerlas en orden LIFO. */
   const undoStack = useRef(new Stack<number>());
   const smoother = useRef(new AngleSmoother());
   const scoreWindow = useRef(new CircularBuffer<number>(TREND_SIZE));
@@ -106,8 +128,28 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     setStatus(next);
   }, []);
 
+  const setServerModeBoth = useCallback((next: ServerMode) => {
+    if (serverModeRef.current === next) return;
+    serverModeRef.current = next;
+    setServerMode(next);
+  }, []);
+
+  /** Reps visibles: servidor + locales - deshechas (nunca negativas). */
+  const syncReps = useCallback((): number => {
+    const total = Math.max(0, serverRepsRef.current + localRepsRef.current - undoneRef.current);
+    repsRef.current = total;
+    setReps(total);
+    return total;
+  }, []);
+
   const resetCounters = useCallback(() => {
     repsRef.current = 0;
+    serverRepsRef.current = 0;
+    localRepsRef.current = 0;
+    undoneRef.current = 0;
+    runningSince.current = null;
+    serverModeRef.current = "pending";
+    setServerMode("pending");
     phaseRef.current = "ready";
     undoStack.current.clear();
     smoother.current.reset();
@@ -167,11 +209,11 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   );
 
   const registerRep = useCallback(() => {
-    repsRef.current += 1;
-    undoStack.current.push(repsRef.current);
-    setReps(repsRef.current);
-    voice.current?.say(`Repetición ${repsRef.current}`, true);
-  }, []);
+    localRepsRef.current += 1;
+    undoStack.current.push(localRepsRef.current);
+    const total = syncReps();
+    voice.current?.say(`Repetición ${total}`, true);
+  }, [syncReps]);
 
   /** Registra una puntuación en el resumen y en la tendencia reciente. */
   const recordScore = useCallback((value: number) => {
@@ -189,22 +231,36 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       if (!v || !det || v.readyState < 2) return;
       const currentExercise = exerciseRef.current;
       const points = det.detectForVideo(v, now).landmarks?.[0] ?? [];
-      // Con el servidor conectado, él es la fuente de verdad para reps, fase y feedback.
-      const serverCounting = realtimeRef.current.serverCounting;
       realtimeRef.current.sendPose(currentExercise, points, v.videoWidth || 16, v.videoHeight || 9);
       drawSkeleton(points);
 
+      // Sin un solo feedback tras unos segundos, el servidor no está analizando: pasa a local.
+      const connected = realtimeRef.current.serverCounting;
+      if (
+        connected &&
+        serverModeRef.current === "pending" &&
+        runningSince.current !== null &&
+        performance.now() - runningSince.current > SERVER_SILENCE_MS
+      ) {
+        setServerModeBoth("silent");
+      }
+      const mode: AnalysisMode = connected ? serverModeRef.current : "local";
+      // Con la IA del servidor activa, ella es la fuente de verdad para reps y fase.
+      const countLocally = mode === "local" || mode === "fallback" || mode === "silent";
+      // El consejo y la puntuación vienen del servidor siempre que responda.
+      const coachLocally = mode === "local" || mode === "silent";
+
       const data = analyzePose(points, currentExercise);
       if (!data) {
-        if (!serverCounting) setCue("Buscando una pose completa y estable...");
+        if (coachLocally) setCue("Buscando una pose completa y estable...");
         return;
       }
       const movement = data.movementAngle;
       const smoothed = movement === null ? null : smoother.current.push(movement);
       if (smoothed !== null) {
         setAngle(Math.round(smoothed));
-        // Modo offline: el análisis local cuenta las repeticiones (sin doble conteo).
-        if (!serverCounting) {
+        // Sin IA del servidor el análisis local cuenta las repeticiones (sin doble conteo).
+        if (countLocally) {
           const next = advanceRepPhase(phaseRef.current, smoothed, currentExercise);
           if (next.phase !== phaseRef.current) {
             phaseRef.current = next.phase;
@@ -217,14 +273,14 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
         kneeSum.current.total += data.knee;
         kneeSum.current.count += 1;
       }
-      if (serverCounting) return;
+      if (!coachLocally) return;
 
       recordScore(data.score);
       const text = coachingCue(currentExercise, data);
       setCue(text);
       voice.current?.say(text);
     },
-    [drawSkeleton, recordScore, registerRep, video],
+    [drawSkeleton, recordScore, registerRep, setServerModeBoth, video],
   );
 
   const loop = useCallback(
@@ -255,6 +311,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   }, [stopTimers]);
 
   const beginRunning = useCallback(() => {
+    if (runningSince.current === null) runningSince.current = performance.now();
     setStatusBoth("running");
     setCue(`Vamos con la ${EXERCISES[exerciseRef.current].label.toLowerCase()}.`);
     startTimers();
@@ -316,6 +373,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       if (countdownId.current !== null) window.clearInterval(countdownId.current);
       countdownId.current = null;
       setCountdown(null);
+      // La cuenta regresiva es el calentamiento: al terminar empieza la serie (WARMUP -> ACTIVE_SET).
+      realtimeRef.current.sendCommand("skip");
       beginRunning();
     }, 1000);
   }, [beginRunning, ensureDetector, resetCounters, setStatusBoth, video]);
@@ -342,18 +401,25 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     if (canvas.current && ctx) ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
   }, [canvas, stopLoop, stopTimers, video]);
 
-  /** Deshace la última repetición contada (pila LIFO). */
+  /**
+   * Deshace la última repetición. Se resuelve en el cliente: el comando
+   * "undo" del backend revierte el último comando de control (pausa,
+   * reanudar...), no una repetición, y la IA volvería a enviar su cuenta.
+   * Por eso las reps del servidor se compensan con un contador de deshechas.
+   */
   const undo = useCallback(() => {
-    const serverCounting = realtimeRef.current.serverCounting;
-    if (!serverCounting && undoStack.current.isEmpty()) return false;
     if (repsRef.current <= 0) return false;
-    if (!serverCounting) undoStack.current.pop();
-    repsRef.current -= 1;
-    setReps(repsRef.current);
+    const mode: AnalysisMode = realtimeRef.current.serverCounting ? serverModeRef.current : "local";
+    if (mode !== "ai" && !undoStack.current.isEmpty() && localRepsRef.current > 0) {
+      undoStack.current.pop();
+      localRepsRef.current -= 1;
+    } else {
+      undoneRef.current += 1;
+    }
+    syncReps();
     setCue("Repetición deshecha.");
-    realtimeRef.current.sendCommand("undo");
     return true;
-  }, []);
+  }, [syncReps]);
 
   /** Termina la sesión y prepara el resumen. Libera la cámara. */
   const finish = useCallback((): FinishedSession | null => {
@@ -411,7 +477,9 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     else voice.current?.cancel();
   }, []);
 
-  // Con conexión, el feedback del servidor manda: puntuación, consejo, fase y reps.
+  // Con conexión, el feedback del servidor manda en puntuación y consejo; reps y
+  // fase solo cuando la IA respondió (phase presente). Con phase null la IA está
+  // caída: el backend no avanza reps y el conteo local toma el relevo.
   useEffect(() => {
     const message = realtime.feedback;
     if (!message || statusRef.current !== "running") return;
@@ -419,15 +487,20 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     setCue(message.message);
     const phase = toRepPhase(message.phase);
     if (phase) {
-      phaseRef.current = phase;
+      setServerModeBoth("ai");
       setRepPhase(phase);
-    }
-    if (typeof message.reps === "number" && message.reps >= 0) {
-      repsRef.current = message.reps;
-      setReps(message.reps);
+      if (phase !== "hold") phaseRef.current = phase;
+      if (typeof message.reps === "number") {
+        const before = repsRef.current;
+        serverRepsRef.current = message.reps;
+        const total = syncReps();
+        if (total > before) voice.current?.say(`Repetición ${total}`, true);
+      }
+    } else {
+      setServerModeBoth("fallback");
     }
     voice.current?.say(message.message);
-  }, [realtime.feedback, recordScore]);
+  }, [realtime.feedback, recordScore, setServerModeBoth, syncReps]);
 
   // Limpieza al desmontar: cámara, bucle y temporizadores.
   useEffect(() => {
@@ -467,6 +540,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     finished,
     voiceOn,
     canUndo: reps > 0,
+    /** Quién analiza ahora mismo (para mostrarlo en la interfaz). */
+    analysisMode: (realtime.serverCounting ? serverMode : "local") as AnalysisMode,
     actions: { start, pause, finish, undo, selectExercise, toggleVoice, dismissSummary },
   };
 }

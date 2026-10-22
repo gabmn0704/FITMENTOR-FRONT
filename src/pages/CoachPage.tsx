@@ -4,7 +4,7 @@ import { Button, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { coachApi } from "../lib/services";
-import { coachSourceLabel, levelLabel } from "../lib/contract";
+import { coachSourceLabel, levelLabel, LIMITS, toCoachSource } from "../lib/contract";
 import { LRUCache, normalizeText } from "../structures";
 import type { CoachAnswer } from "../types";
 
@@ -45,7 +45,7 @@ export function CoachPage() {
   }, [messages, thinking]);
 
   const ask = async (question: string) => {
-    const text = question.trim();
+    const text = question.trim().slice(0, LIMITS.coachQuestion);
     if (!text || thinking) return;
     setError("");
     setDraft("");
@@ -61,8 +61,8 @@ export function CoachPage() {
         if (!raw || typeof raw.answer !== "string" || !raw.answer.trim()) {
           throw new Error("El coach no devolvió una respuesta válida.");
         }
-        answer = { answer: raw.answer, source: typeof raw.source === "string" ? raw.source : "" };
-        if (answer.source !== "fallback") answerCache.set(key, answer);
+        answer = { answer: raw.answer, source: toCoachSource(raw.source) };
+        answerCache.set(key, answer);
       }
       setMessages((list) => [...list, { id: nextId.current++, role: "coach", text: answer!.answer, source: answer!.source }]);
     } catch (err) {
@@ -73,10 +73,14 @@ export function CoachPage() {
             ? err.message
             : "No pude responder ahora mismo.";
       setError(message);
+      // La pregunta no se perdió: vuelve al campo para reintentar.
+      setDraft((current) => current || text);
     } finally {
       setThinking(false);
     }
   };
+
+  const remaining = LIMITS.coachQuestion - draft.length;
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -128,10 +132,18 @@ export function CoachPage() {
             id="coach-input"
             className="input"
             value={draft}
-            maxLength={500}
+            maxLength={LIMITS.coachQuestion}
             placeholder="Escribe tu pregunta…"
+            aria-describedby="coach-count"
             onChange={(event) => setDraft(event.target.value)}
           />
+          <span
+            id="coach-count"
+            className={`chat-form__count tabular${remaining <= 50 ? " chat-form__count--warn" : ""}`}
+            aria-live={remaining <= 50 ? "polite" : "off"}
+          >
+            {remaining <= 100 ? `${remaining} caracteres disponibles` : `${draft.length}/${LIMITS.coachQuestion}`}
+          </span>
           <Button type="submit" variant="primary" disabled={!draft.trim() || thinking} icon={<Send size={16} />}>
             Enviar
           </Button>

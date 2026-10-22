@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Pause, Play, Square, Undo2, Wifi, WifiOff } from "lucide-react";
+import { Pause, Play, RefreshCw, Square, Undo2, Wifi, WifiOff } from "lucide-react";
 import { Button, Card, Notice, ProgressRing } from "../components/ui";
 import { CameraStage } from "../components/training/CameraStage";
 import { ExercisePicker } from "../components/training/ExercisePicker";
@@ -8,7 +8,7 @@ import { SessionSummary } from "../components/training/SessionSummary";
 import { Sparkline } from "../components/charts/Sparkline";
 import { useAuth } from "../hooks/useAuth";
 import { useRealtime } from "../hooks/useRealtime";
-import { useTrainingSession, type FinishedSession } from "../hooks/useTrainingSession";
+import { useTrainingSession, type AnalysisMode, type FinishedSession } from "../hooks/useTrainingSession";
 import { EXERCISES, exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
 import { serverStateLabel } from "../lib/contract";
@@ -21,7 +21,26 @@ const PHASE_LABEL: Record<string, string> = {
   up: "Arriba",
   down: "Bajando",
   bottom: "Abajo",
+  hold: "Sosteniendo",
 };
+
+/** Texto de estado del canal en vivo según quién analiza la sesión. */
+function channelText(mode: AnalysisMode, reconnecting: boolean, serverState: string | undefined): string {
+  if (reconnecting) return "Sin conexión con el servidor. Reintentando… mientras tanto el análisis sigue en tu dispositivo.";
+  const state = serverState ? ` · ${serverState}` : "";
+  switch (mode) {
+    case "ai":
+      return `IA del servidor conectada: cuenta tus reps y corrige tu técnica${state}.`;
+    case "fallback":
+      return `Servidor conectado, IA no disponible: las reps se cuentan en tu dispositivo${state}.`;
+    case "silent":
+      return "El servidor no responde a la postura: análisis en tu dispositivo.";
+    case "pending":
+      return `Servidor conectado. Esperando el análisis de la IA${state}.`;
+    default:
+      return "Modo local: el análisis funciona sin conexión y la sesión se guarda en tu dispositivo.";
+  }
+}
 
 /** Convierte el resumen de la sesión al payload que acepta el backend. */
 function toPayload(summary: FinishedSession): SessionPayload {
@@ -109,11 +128,18 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
             </Button>
           </div>
 
-          <p className="muted row" style={{ fontSize: 13 }} aria-live="polite">
-            {realtime.connected ? <Wifi size={15} aria-hidden="true" /> : <WifiOff size={15} aria-hidden="true" />}
-            {realtime.connected
-              ? `Feedback remoto conectado${serverStateLabel(realtime.serverState) ? ` · ${serverStateLabel(realtime.serverState)}` : ""}.`
-              : "Modo local: el análisis funciona sin conexión y la sesión se guarda en tu dispositivo."}
+          <p
+            className={`channel-status channel-status--${realtime.reconnecting ? "retry" : session.analysisMode}`}
+            role="status"
+          >
+            {realtime.reconnecting ? (
+              <RefreshCw size={15} aria-hidden="true" className="spin" />
+            ) : realtime.connected ? (
+              <Wifi size={15} aria-hidden="true" />
+            ) : (
+              <WifiOff size={15} aria-hidden="true" />
+            )}
+            <span>{channelText(session.analysisMode, realtime.reconnecting, serverStateLabel(realtime.serverState))}</span>
           </p>
         </Card>
 

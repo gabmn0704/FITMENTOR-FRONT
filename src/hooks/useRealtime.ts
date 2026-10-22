@@ -8,6 +8,8 @@ import {
   buildPoseMessage,
   COMMAND_DESTINATION,
   feedbackTopic,
+  fitsStompFrame,
+  isValidSessionId,
   parseServerMessage,
   POSE_DESTINATION,
   POSE_INTERVAL_MS,
@@ -17,8 +19,9 @@ import type { CommandName, ExerciseId, FeedbackMessage, Point } from "../types";
 
 export type RealtimeStatus = "offline" | "connecting" | "open" | "closed";
 
-/** Reconexión automática: STOMP reintenta a este ritmo tras una caída. */
+/** Reconexión automática: primer reintento a los 2 s, luego con espera creciente hasta 30 s. */
 const RECONNECT_DELAY_MS = 2_000;
+const MAX_RECONNECT_DELAY_MS = 30_000;
 /** Latido en ambos sentidos para detectar conexiones muertas. */
 const HEARTBEAT_MS = 10_000;
 
@@ -38,11 +41,15 @@ export function useRealtime(token: string | null) {
   const subsRef = useRef<StompSubscription[]>([]);
   const sessionRef = useRef<string | null>(null);
   const lastSentRef = useRef(0);
+  const failuresRef = useRef(0);
 
   const handleMessage = useCallback((body: string) => {
     const message = parseServerMessage(body);
     if (!message) return;
-    if (message.type === "feedback") setFeedback(message);
+    if (message.type === "feedback") {
+      setFeedback(message);
+      if (message.state) setServerState(message.state);
+    }
     else if (message.type === "state") {
       setServerState(message.state);
       if (message.exercise) setServerExercise(message.exercise);
@@ -83,18 +90,29 @@ export function useRealtime(token: string | null) {
     });
 
     client.onConnect = () => {
+      failuresRef.current = 0;
+      client.reconnectDelay = RECONNECT_DELAY_MS;
       // Tras una reconexión las suscripciones se pierden: las restauramos.
       if (sessionRef.current) subscribeSession(client, sessionRef.current);
       setStatus("open");
     };
     const onDown = () => {
+      // Espera exponencial: un backend caído o un token rechazado no se reintentan cada 2 s.
+      failuresRef.current += 1;
+      client.reconnectDelay = Math.min(
+        MAX_RECONNECT_DELAY_MS,
+        RECONNECT_DELAY_MS * 2 ** Math.min(4, failuresRef.current - 1),
+      );
       dropSubscriptions();
       setStatus("closed");
       setFeedback(null);
       setServerState(null);
     };
     client.onWebSocketClose = onDown;
-    client.onStompError = onDown;
+    client.onStompError = () => {
+      // El servidor rechazó el CONNECT o un frame (ERROR STOMP); la conexión se cerrará.
+      setStatus("closed");
+    };
     client.onWebSocketError = () => setStatus("closed");
 
     clientRef.current = client;
@@ -110,6 +128,7 @@ export function useRealtime(token: string | null) {
   /** Inicia una sesión de entrenamiento: su id identifica topics y envíos. */
   const startSession = useCallback(
     (id: string) => {
+      if (!isValidSessionId(id)) return;
       sessionRef.current = id;
       setSessionId(id);
       setFeedback(null);
@@ -139,8 +158,11 @@ export function useRealtime(token: string | null) {
       if (now - lastSentRef.current < POSE_INTERVAL_MS) return false;
       const payload = buildPoseMessage(exercise, landmarks, frameWidth, frameHeight, id);
       if (!payload) return false;
+      const body = JSON.stringify(payload);
+      // Un frame de más de 8 KB haría que el servidor cierre la conexión.
+      if (!fitsStompFrame(body)) return false;
       lastSentRef.current = now;
-      client.publish({ destination: POSE_DESTINATION, body: JSON.stringify(payload) });
+      client.publish({ destination: POSE_DESTINATION, body });
       return true;
     },
     [],
@@ -159,6 +181,8 @@ export function useRealtime(token: string | null) {
   return {
     status,
     connected,
+    /** Hay token pero el canal cayó: STOMP está reintentando en segundo plano. */
+    reconnecting: Boolean(token) && status === "closed",
     /** Verdadero cuando el servidor cuenta las repeticiones de la sesión activa. */
     serverCounting: connected && sessionId !== null,
     sessionId,

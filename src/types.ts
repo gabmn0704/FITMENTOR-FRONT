@@ -5,15 +5,15 @@ export type Point = { x: number; y: number; visibility?: number };
 /** Niveles del backend (enum). La interfaz muestra etiquetas en español. */
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
-/** Forma pública del usuario. `picture` y `goal` se omiten cuando no hay valor. */
+/** Forma pública del usuario. `picture` y `goal` llegan nulos cuando no hay valor. */
 export interface User {
   id: string;
   name: string;
   /** Nulo o sintético para invitados. */
   email?: string | null;
-  picture?: string;
+  picture?: string | null;
   level: Level;
-  goal?: string;
+  goal?: string | null;
   /** Verdadero para cuentas de invitado (el backend lo envía). */
   guest?: boolean;
   createdAt?: string;
@@ -112,9 +112,12 @@ export interface SessionRecord extends SessionPayload {
   synced: boolean;
 }
 
+/** "claude": respuesta del modelo; "rules": guía de técnica basada en reglas (sin clave o IA caída). */
+export type CoachSource = "claude" | "rules";
+
 export interface CoachAnswer {
   answer: string;
-  source: string;
+  source: CoachSource;
 }
 
 export interface FeedbackMessage {
@@ -122,9 +125,16 @@ export interface FeedbackMessage {
   score: number;
   message: string;
   feedback: string[];
+  /**
+   * Fase de la IA ("ready" | "up" | "down" | "bottom" | "hold"). Ausente cuando
+   * la IA no respondió: entonces el backend no avanza las repeticiones.
+   */
   phase?: string;
+  /** Repeticiones acumuladas de la sesión según el servidor. */
   reps?: number;
+  /** WARMUP | ACTIVE_SET | REST | FINISHED | PAUSED */
   state?: string;
+  exercise?: string;
 }
 
 export interface StateMessage {

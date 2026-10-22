@@ -19,7 +19,7 @@ function errorMessage(error: unknown): string {
 }
 
 export function LoginPage() {
-  const { loginWithGoogle, loginAsGuest } = useAuth();
+  const { loginWithGoogle, loginAsGuest, authNotice } = useAuth();
   const googleSlot = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -102,7 +102,7 @@ export function LoginPage() {
           ))}
         </ul>
 
-        {error && <Notice tone="error">{error}</Notice>}
+        {error ? <Notice tone="error">{error}</Notice> : authNotice && <Notice tone="info">{authNotice}</Notice>}
 
         <div className="login__actions">
           {isGoogleEnabled && (

@@ -1,4 +1,4 @@
-import type { Achievement, Level, User } from "../types";
+import type { Achievement, CoachSource, Level, User } from "../types";
 import { exerciseLabel } from "./exercises";
 
 /**
@@ -7,6 +7,18 @@ import { exerciseLabel } from "./exercises";
  */
 
 export const LEVELS: readonly Level[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED"];
+
+/** Límites de entrada que valida el backend (Bean Validation). */
+export const LIMITS = {
+  /** POST /api/auth/guest `name` y PATCH /api/me `name`. */
+  userName: 120,
+  /** PATCH /api/me `goal`. */
+  goal: 60,
+  /** POST /api/coach `question`. */
+  coachQuestion: 500,
+  /** POST /api/coach `context`. */
+  coachContext: 4000,
+} as const;
 
 const LEVEL_LABEL: Record<Level, string> = {
   BEGINNER: "Principiante",
@@ -131,15 +143,19 @@ export function routineReason(reason: string, level: unknown): string {
   return reason;
 }
 
-const COACH_SOURCE: Record<string, string> = {
+const COACH_SOURCE: Record<CoachSource, string> = {
   claude: "Coach IA",
   rules: "Guía de técnica",
-  fallback: "Modo sin conexión",
 };
 
+/** Normaliza `source` del coach: el backend envía "claude" o "rules". */
+export function toCoachSource(value: unknown): CoachSource {
+  return value === "claude" ? "claude" : "rules";
+}
+
 export function coachSourceLabel(source: string | undefined): string | undefined {
-  if (!source) return undefined;
-  return COACH_SOURCE[source] ?? undefined;
+  if (source !== "claude" && source !== "rules") return undefined;
+  return COACH_SOURCE[source];
 }
 
 const SERVER_STATE: Record<string, string> = {

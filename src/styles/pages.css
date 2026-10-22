@@ -610,7 +610,31 @@
 .chat-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "input send"
+    "count count";
   gap: var(--space-2);
+  row-gap: 6px;
+}
+
+.chat-form .input {
+  grid-area: input;
+}
+
+.chat-form button {
+  grid-area: send;
+}
+
+.chat-form__count {
+  grid-area: count;
+  justify-self: end;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chat-form__count--warn {
+  color: var(--warning, #ffb020);
+  font-weight: 600;
 }
 
 .suggestions {
@@ -773,5 +797,59 @@
 
   .stat__value {
     font-size: 28px;
+  }
+}
+
+/* Estado del canal en vivo (entrenar) */
+.channel-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.channel-status svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.channel-status--ai {
+  border-color: rgb(198 255 61 / 0.35);
+  background: var(--lime-soft);
+  color: var(--text);
+}
+
+.channel-status--ai svg {
+  color: var(--lime);
+}
+
+.channel-status--fallback,
+.channel-status--silent,
+.channel-status--retry {
+  border-color: rgb(255 209 102 / 0.35);
+  background: rgb(255 209 102 / 0.08);
+  color: var(--text);
+}
+
+.channel-status--fallback svg,
+.channel-status--silent svg,
+.channel-status--retry svg {
+  color: var(--warning);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
   }
 }

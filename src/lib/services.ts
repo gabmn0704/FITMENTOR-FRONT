@@ -1,4 +1,5 @@
 import { apiRequest, cachedGet } from "./api";
+import { LIMITS } from "./contract";
 import type {
   Achievement,
   AuthResponse,
@@ -24,11 +25,14 @@ export interface ProfilePatch {
 export const authApi = {
   google: (credential: string) =>
     apiRequest<AuthResponse>("/api/auth/google", { method: "POST", body: { credential } }),
-  guest: (name?: string) =>
-    apiRequest<AuthResponse>("/api/auth/guest", {
+  /** Nombre opcional, máx. 120 caracteres en el backend. */
+  guest: (name?: string) => {
+    const trimmed = name?.trim().slice(0, LIMITS.userName);
+    return apiRequest<AuthResponse>("/api/auth/guest", {
       method: "POST",
-      body: name ? { name } : {},
-    }),
+      body: trimmed ? { name: trimmed } : {},
+    });
+  },
 };
 
 export const meApi = {
@@ -67,11 +71,17 @@ export const exercisesApi = {
 };
 
 export const coachApi = {
-  /** El backend acepta `context` como texto (máx. 4000) y la pregunta hasta 1000 caracteres. */
-  ask: (token: string, question: string, context?: string) =>
-    apiRequest<CoachAnswer>("/api/coach", {
+  /**
+   * El backend acepta la pregunta hasta 500 caracteres y `context` hasta 4000.
+   * Se recortan aquí para no provocar un 400 por un texto pegado demasiado largo.
+   */
+  ask: (token: string, question: string, context?: string) => {
+    const q = question.trim().slice(0, LIMITS.coachQuestion);
+    const c = context?.slice(0, LIMITS.coachContext);
+    return apiRequest<CoachAnswer>("/api/coach", {
       method: "POST",
-      body: context ? { question, context } : { question },
+      body: c ? { question: q, context: c } : { question: q },
       token,
-    }),
+    });
+  },
 };

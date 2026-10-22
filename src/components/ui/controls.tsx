@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { initials } from "../../lib/format";
 
-export function Avatar({ name, picture }: { name: string; picture?: string }) {
+export function Avatar({ name, picture }: { name: string; picture?: string | null }) {
   return (
     <span className="avatar" aria-hidden="true">
       {picture ? <img src={picture} alt="" referrerPolicy="no-referrer" /> : initials(name)}

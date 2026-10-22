@@ -12,6 +12,8 @@ interface AuthContextValue {
   loginAsGuest: (name?: string) => Promise<void>;
   updateUser: (patch: ProfilePatch) => Promise<void>;
   logout: () => void;
+  /** Aviso para la pantalla de acceso (p. ej. sesión caducada tras un 401). */
+  authNotice: string | null;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -25,13 +27,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((nextToken: string, rawUser: User) => {
     const nextUser = normalizeUser(rawUser);
+    setAuthNotice(null);
     storage.setString(STORAGE_KEYS.token, nextToken);
     storage.setJSON(STORAGE_KEYS.user, nextUser);
     setToken(nextToken);
     setUser(nextUser);
   }, []);
 
-  const logout = useCallback(() => {
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
+
+  const clearSession = useCallback(() => {
     storage.remove(STORAGE_KEYS.token);
     storage.remove(STORAGE_KEYS.user);
     clearApiCache();
@@ -39,10 +44,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const logout = useCallback(() => {
+    setAuthNotice(null);
+    clearSession();
+  }, [clearSession]);
+
+  // Un 401 con token: la sesión caducó o el usuario ya no existe.
   useEffect(() => {
-    setUnauthorizedHandler(logout);
+    setUnauthorizedHandler(() => {
+      setAuthNotice("Tu sesión caducó o ya no es válida. Vuelve a entrar para continuar.");
+      clearSession();
+    });
     return () => setUnauthorizedHandler(null);
-  }, [logout]);
+  }, [clearSession]);
 
   // Refresca el perfil con el token guardado; un 401 cerrará la sesión.
   useEffect(() => {
@@ -94,8 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ token, user, loginWithGoogle, loginAsGuest, updateUser, logout }),
-    [token, user, loginWithGoogle, loginAsGuest, updateUser, logout],
+    () => ({ token, user, loginWithGoogle, loginAsGuest, updateUser, logout, authNotice }),
+    [token, user, loginWithGoogle, loginAsGuest, updateUser, logout, authNotice],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

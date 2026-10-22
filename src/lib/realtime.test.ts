@@ -5,6 +5,8 @@ import {
   buildConnectHeaders,
   buildPoseMessage,
   feedbackTopic,
+  fitsStompFrame,
+  isValidSessionId,
   parseServerMessage,
   stateTopic,
   toRepPhase,
@@ -71,6 +73,8 @@ describe("buildPoseMessage", () => {
 describe("toRepPhase", () => {
   it("acepta solo fases conocidas", () => {
     expect(toRepPhase("down")).toBe("down");
+    expect(toRepPhase("hold")).toBe("hold");
+    expect(toRepPhase(null)).toBeUndefined();
     expect(toRepPhase("sideways")).toBeUndefined();
     expect(toRepPhase(3)).toBeUndefined();
   });
@@ -113,5 +117,44 @@ describe("parseServerMessage", () => {
     expect(parseServerMessage('{"type":"state"}')).toBeNull();
     expect(parseServerMessage('{"type":"unknown"}')).toBeNull();
     expect(parseServerMessage("null")).toBeNull();
+  });
+});
+
+describe("límites del canal STOMP", () => {
+  it("valida session_id como el backend", () => {
+    expect(isValidSessionId("0fad0176-1724-4888-acbd-71cd2a61e975")).toBe(true);
+    expect(isValidSessionId("a_b-C9")).toBe(true);
+    expect(isValidSessionId("")).toBe(false);
+    expect(isValidSessionId("x".repeat(101))).toBe(false);
+    expect(isValidSessionId("abc.def")).toBe(false);
+    expect(isValidSessionId("*")).toBe(false);
+    expect(isValidSessionId(42)).toBe(false);
+  });
+
+  it("no construye poses con un session_id inválido", () => {
+    const landmarks: Point[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 0.9 }));
+    expect(buildPoseMessage("squat", landmarks, 640, 480, "id.con.puntos")).toBeNull();
+  });
+
+  it("acota coordenadas fuera de [-0.5, 1.5] y descarta puntos no finitos", () => {
+    const landmarks: Point[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 0.9 }));
+    landmarks[11] = { x: -2, y: 3, visibility: 0.9 };
+    landmarks[12] = { x: Number.NaN, y: 0.5, visibility: 0.9 };
+    const message = buildPoseMessage("squat", landmarks, 640, 480, "s-1");
+    expect(message?.points).toHaveLength(11);
+    expect(message?.points[0]).toMatchObject({ name: "left_shoulder", x: -0.5, y: 1.5 });
+  });
+
+  it("respeta el máximo de 8 KB por mensaje", () => {
+    expect(fitsStompFrame("x".repeat(2000))).toBe(true);
+    expect(fitsStompFrame("x".repeat(8 * 1024))).toBe(false);
+  });
+
+  it("feedback con phase null (IA caída) no trae fase y conserva reps", () => {
+    const parsed = parseServerMessage(
+      JSON.stringify({ type: "feedback", score: 70, message: "Mantén la espalda recta.", feedback: [], phase: null, reps: 4, state: "ACTIVE_SET", exercise: "squat" }),
+    );
+    expect(parsed).toMatchObject({ type: "feedback", reps: 4, state: "ACTIVE_SET", exercise: "squat" });
+    expect(parsed && "phase" in parsed ? parsed.phase : undefined).toBeUndefined();
   });
 });
