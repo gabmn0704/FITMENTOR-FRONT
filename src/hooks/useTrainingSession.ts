@@ -98,6 +98,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   const scoreSum = useRef({ total: 0, count: 0 });
   const realtimeRef = useRef(realtime);
   realtimeRef.current = realtime;
+  /** Falso tras desmontar: las operaciones asíncronas en vuelo no deben seguir. */
+  const alive = useRef(true);
 
   const setStatusBoth = useCallback((next: TrainingStatus) => {
     statusRef.current = next;
@@ -281,6 +283,12 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       setStatusBoth("loading");
       resetCounters();
       stream.current = await openCamera();
+      if (!alive.current) {
+        // La vista se cerró mientras se pedía la cámara: no dejamos el stream abierto.
+        stopStream(stream.current);
+        stream.current = null;
+        return;
+      }
       if (!video.current) throw new Error("Sin elemento de video");
       video.current.srcObject = stream.current;
       await video.current.play();
@@ -289,6 +297,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       console.error(err);
       stopStream(stream.current);
       stream.current = null;
+      realtimeRef.current.endSession();
       setError(cameraErrorMessage(err));
       setStatusBoth("idle");
       setCue("No se pudo iniciar el análisis.");
@@ -422,10 +431,13 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
 
   // Limpieza al desmontar: cámara, bucle y temporizadores.
   useEffect(() => {
+    alive.current = true;
     return () => {
+      alive.current = false;
       stopLoop();
       stopTimers();
       if (countdownId.current !== null) window.clearInterval(countdownId.current);
+      countdownId.current = null;
       stopStream(stream.current);
       stream.current = null;
       voice.current?.cancel();
