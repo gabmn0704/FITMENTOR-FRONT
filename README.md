@@ -152,7 +152,7 @@ src/
 
 ## Capturas
 
-Las capturas de `docs/screenshots/` se generaron con datos simulados (sin backend real) y un usuario de prueba genérico. Reproducibles con Playwright interceptando las llamadas a la API.
+Las capturas de `docs/screenshots/` se generaron con Playwright, interceptando las llamadas a la API con datos simulados (sin backend real) y un usuario de prueba genérico.
 
 ## Pendientes conocidos
 
