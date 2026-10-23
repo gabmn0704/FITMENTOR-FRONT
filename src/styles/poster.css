@@ -31,17 +31,21 @@
 .login-split {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: start;
   min-height: 100dvh;
   background: var(--bg);
 }
 
+/* El cartel ocupa siempre una pantalla: no se estira si el formulario es más alto. */
 .login-poster {
-  position: relative;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-5);
+  justify-content: flex-start;
+  gap: clamp(16px, 4vh, 40px);
   padding: clamp(24px, 4vw, 56px);
   background: var(--field-lime);
   color: var(--field-lime-ink);
@@ -58,7 +62,7 @@
 .login-poster__title {
   position: relative;
   z-index: 2;
-  font-size: clamp(84px, 12.5vw, 220px);
+  font-size: clamp(72px, min(12.5vw, 22vh), 220px);
   line-height: 0.84;
   font-weight: 900;
 }
@@ -78,7 +82,7 @@
   right: -4%;
   bottom: -6%;
   width: 46%;
-  height: 58%;
+  height: min(46%, 56vh);
   transform: rotate(4deg);
   clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%, 0 22%);
   background: #0d0f0c;
@@ -93,9 +97,11 @@
 }
 
 .login-poster__lead {
-  position: relative;
+  position: absolute;
+  left: clamp(24px, 4vw, 56px);
+  bottom: clamp(24px, 4vh, 56px);
   z-index: 2;
-  max-width: min(30rem, 42%);
+  max-width: min(30rem, 40%);
   font-size: 19px;
   font-weight: 600;
   line-height: 1.45;
@@ -104,7 +110,8 @@
 .login-panel {
   display: grid;
   place-items: center;
-  padding: clamp(24px, 4vw, 56px);
+  min-height: 100dvh;
+  padding: clamp(24px, 4vw, 56px) clamp(24px, 4vw, 56px);
   background: var(--bg);
 }
 
@@ -115,7 +122,7 @@
 }
 
 .login-panel__inner h2 {
-  font-size: clamp(44px, 5vw, 68px);
+  font-size: clamp(40px, min(5vw, 8vh), 68px);
   line-height: 0.9;
 }
 
@@ -225,10 +232,20 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .login-split {
+    align-items: stretch;
+  }
+
   .login-poster {
+    position: relative;
+    height: auto;
     min-height: 0;
     gap: var(--space-4);
     padding-bottom: 0;
+  }
+
+  .login-panel {
+    min-height: 0;
   }
 
   .login-poster__title {
@@ -251,9 +268,29 @@
   }
 }
 
-/* Pantallas bajas: el texto de apoyo se oculta antes de chocar con la foto. */
-@media (max-height: 760px) and (min-width: 901px) {
+/* Pantallas bajas: el texto de apoyo se oculta y el formulario se compacta para caber sin desplazarse. */
+@media (max-height: 820px) and (min-width: 901px) {
   .login-poster__lead {
+    display: none;
+  }
+
+  .login-panel__inner {
+    gap: var(--space-4);
+  }
+
+  .login-panel__inner .stack {
+    gap: var(--space-3);
+  }
+
+  .login-panel .input {
+    min-height: 42px;
+  }
+
+  .login-panel .btn--lg {
+    min-height: 48px;
+  }
+
+  .login-panel .auth-hint {
     display: none;
   }
 }
