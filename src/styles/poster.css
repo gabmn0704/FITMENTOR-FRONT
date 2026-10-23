@@ -36,19 +36,38 @@
   background: var(--bg);
 }
 
-/* El cartel ocupa siempre una pantalla: no se estira si el formulario es más alto. */
+/* El cartel ocupa siempre una pantalla: foto a sangre, velo plano y el titular encima. */
 .login-poster {
   position: sticky;
   top: 0;
+  isolation: isolate;
   height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: clamp(16px, 4vh, 40px);
+  justify-content: space-between;
+  gap: clamp(20px, 5vh, 56px);
   padding: clamp(24px, 4vw, 56px);
-  background: var(--field-lime);
-  color: var(--field-lime-ink);
+  background: #0d0f0c;
+  color: #ffffff;
+}
+
+.login-poster__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 80% 50%;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+.login-poster__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgb(8 10 7 / 0.52);
 }
 
 .login-poster__brand {
@@ -56,15 +75,29 @@
   width: fit-content;
   color: inherit;
   text-decoration: none;
-  z-index: 2;
+}
+
+.login-poster .logo__word {
+  color: #ffffff;
+}
+
+.login-poster__copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(16px, 3vh, 32px);
 }
 
 .login-poster__title {
-  position: relative;
-  z-index: 2;
-  font-size: clamp(72px, min(11vw, 17vh), 200px);
+  font-size: clamp(84px, min(12vw, 21vh), 220px);
   line-height: 0.84;
   font-weight: 900;
+  color: #ffffff;
+}
+
+.login-poster__accent {
+  color: var(--field-lime);
 }
 
 .mask {
@@ -77,33 +110,32 @@
   display: block;
 }
 
-/* La foto es un marco completo dentro del cartel: se ve entera, sin recortes por los bordes. */
-.login-poster__photo {
-  position: relative;
-  flex: 1 1 0;
-  min-height: 180px;
-  align-self: stretch;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: #0d0f0c;
+.login-poster__points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+  font-weight: 700;
+  color: #f1f4ee;
 }
 
-.login-poster__photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 48%;
-  filter: contrast(1.06) saturate(0.95);
-  animation: drift 18s ease-in-out infinite alternate;
+.login-poster__points li {
+  position: relative;
+  padding-left: 18px;
 }
 
-.login-poster__lead {
-  position: relative;
-  z-index: 2;
-  max-width: 32rem;
-  font-size: 19px;
-  font-weight: 600;
-  line-height: 1.45;
+.login-poster__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--field-lime);
 }
 
 .login-panel {
@@ -214,14 +246,14 @@
     animation-delay: 110ms;
   }
 
-  .login-poster__lead,
+  .login-poster__points,
   .login-panel__inner {
     animation: fade-up 700ms var(--ease-out) 420ms both;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-poster__photo img {
+  .login-poster__bg {
     animation: none;
   }
 }
@@ -229,46 +261,32 @@
 @media (max-width: 900px) {
   .login-split {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .login-split {
     align-items: stretch;
   }
 
   .login-poster {
     position: relative;
     height: auto;
-    min-height: 0;
-    gap: var(--space-4);
-    padding-bottom: 0;
+    min-height: min(68dvh, 520px);
+    padding-bottom: clamp(24px, 5vw, 40px);
+  }
+
+  .login-poster__title {
+    font-size: clamp(84px, 26vw, 160px);
+  }
+
+  .login-poster__points {
+    display: none;
   }
 
   .login-panel {
     min-height: 0;
   }
-
-  .login-poster__title {
-    font-size: clamp(72px, 24vw, 150px);
-  }
-
-  .login-poster {
-    padding-bottom: clamp(24px, 4vw, 56px);
-  }
-
-  .login-poster__photo {
-    flex: none;
-    aspect-ratio: 3 / 2;
-    min-height: 0;
-  }
-
-  .login-poster__lead {
-    display: none;
-  }
 }
 
 /* Pantallas bajas: el texto de apoyo se oculta y el formulario se compacta para caber sin desplazarse. */
 @media (max-height: 820px) and (min-width: 901px) {
-  .login-poster__lead {
+  .login-poster__points {
     display: none;
   }
 
