@@ -8,7 +8,7 @@ import type { RouteId } from "./lib/routes";
 import { AchievementsPage } from "./pages/AchievementsPage";
 import { CoachPage } from "./pages/CoachPage";
 import { HomePage } from "./pages/HomePage";
-import { LoginPage } from "./pages/LoginPage";
+import { Landing } from "./landing/Landing";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { RoutinePage } from "./pages/RoutinePage";
@@ -51,7 +51,7 @@ function Screens() {
     if (token) void syncPendingSessions(token);
   }, [token]);
 
-  if (!token) return <LoginPage />;
+  if (!token) return <Landing />;
 
   const page = (id: RouteId) => {
     switch (id) {

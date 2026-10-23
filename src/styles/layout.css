@@ -173,7 +173,7 @@
     --sidebar-width: 84px;
   }
 
-  .brand__text,
+  .logo__word,
   .sidebar .nav-link__label,
   .sidebar__footer .profile__text {
     display: none;
