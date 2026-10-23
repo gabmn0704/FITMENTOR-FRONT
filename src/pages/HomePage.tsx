@@ -12,6 +12,21 @@ import { achievementText, progressPercent, routineNote, routineReason } from "..
 import type { RouteId } from "../lib/routes";
 import type { Stats } from "../types";
 
+const MOTIVATION = [
+  "Una repetición más y ya eres otro.",
+  "La técnica de hoy es la fuerza de mañana.",
+  "No necesitas ganas, necesitas empezar.",
+  "Constancia le gana al talento.",
+  "Hazlo bien, hazlo lento, hazlo hoy.",
+  "Tu cuerpo sigue lo que tu cabeza repite.",
+  "Cada sesión suma, aunque no lo notes.",
+];
+
+function motivationOfTheDay(date: Date): string {
+  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86_400_000);
+  return MOTIVATION[dayOfYear % MOTIVATION.length];
+}
+
 function greeting(hour: number): string {
   if (hour < 13) return "Buenos días";
   if (hour < 20) return "Buenas tardes";
@@ -41,39 +56,50 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
   return (
     <div className="stack">
-      <section className="hero rise" style={{ "--i": 0 } as CSSProperties} aria-labelledby="home-title">
-        <div className="hero__grid">
-          <div className="stack" style={{ gap: 14 }}>
-            <p className="eyebrow">
-              {greeting(new Date().getHours())}
-              {name ? `, ${name}` : ""}
-            </p>
-            <h1 id="home-title">
-              Hoy es buen día para <span style={{ color: "var(--lime)" }}>moverte</span>.
-            </h1>
-            <p className="muted">
-              {data.streakDays > 0
-                ? `Llevas ${data.streakDays} ${data.streakDays === 1 ? "día" : "días"} seguidos. No la rompas.`
-                : "Tu racha empieza con una sesión. Te acompañamos con la técnica."}
-            </p>
-            <div className="row">
-              <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={18} />}>
-                Entrenar ahora
-              </Button>
-              {data.streakDays > 0 && (
-                <span className="streak" aria-label={`Racha de ${data.streakDays} días`}>
-                  <Flame size={20} aria-hidden="true" /> {data.streakDays} días
-                </span>
-              )}
-            </div>
+      <section className="poster-hero rise" style={{ "--i": 0 } as CSSProperties} aria-labelledby="home-title">
+        <div className="poster-hero__copy">
+          <p className="poster-hero__hello">
+            {greeting(new Date().getHours())}
+            {name ? `, ${name}` : ""}
+          </p>
+          <h1 id="home-title">
+            Hoy se
+            <br />
+            entrena.
+          </h1>
+          <p className="poster-hero__lead">
+            {data.streakDays > 0
+              ? `Llevas ${data.streakDays} ${data.streakDays === 1 ? "día" : "días"} seguidos. No la rompas.`
+              : "Tu racha empieza con una sesión. Te acompañamos con la técnica."}
+          </p>
+          <div className="row">
+            <button type="button" className="poster-btn" onClick={() => onNavigate("entrenar")}>
+              Entrenar ahora
+              <ArrowRight size={20} aria-hidden="true" />
+            </button>
+            {data.streakDays > 0 && (
+              <span className="poster-streak" aria-label={`Racha de ${data.streakDays} días`}>
+                <Flame size={20} aria-hidden="true" /> {data.streakDays} días
+              </span>
+            )}
           </div>
-          <ProgressRing value={goal.percent} size={164} stroke={14} label={`Meta semanal ${goal.percent} por ciento`}>
+        </div>
+        <div className="poster-hero__media" aria-hidden="true">
+          <img src="/img/studio.jpg" alt="" />
+        </div>
+        <div className="poster-hero__goal">
+          <ProgressRing value={goal.percent} size={150} stroke={14} label={`Meta semanal ${goal.percent} por ciento`}>
             <strong className="tabular">{goal.percent}%</strong>
             <span>
               {goal.reps} / {WEEKLY_GOAL_REPS} reps
             </span>
           </ProgressRing>
+          <p>Meta semanal</p>
         </div>
+      </section>
+
+      <section className="motivation-strip rise" style={{ "--i": 1 } as CSSProperties} aria-label="Frase del día">
+        <p>{motivationOfTheDay(new Date())}</p>
       </section>
 
       {stats.error && (
@@ -83,30 +109,22 @@ export function HomePage({ onNavigate }: HomePageProps) {
       )}
 
       <section className="stats-row" aria-label="Resumen">
-        <Card as="div" className="rise" style={{ "--i": 1 } as CSSProperties}>
-          <div className="stat">
-            <span className="stat__value tabular">{data.totalSessions}</span>
-            <span className="stat__label">sesiones</span>
-          </div>
-        </Card>
-        <Card as="div" className="rise" style={{ "--i": 2 } as CSSProperties}>
-          <div className="stat">
-            <span className="stat__value tabular">{data.totalReps}</span>
-            <span className="stat__label">repeticiones</span>
-          </div>
-        </Card>
-        <Card as="div" className="rise" style={{ "--i": 3 } as CSSProperties}>
-          <div className="stat">
-            <span className="stat__value tabular">{data.avgAccuracy}%</span>
-            <span className="stat__label">precisión media</span>
-          </div>
-        </Card>
-        <Card as="div" className="rise" style={{ "--i": 4 } as CSSProperties}>
-          <div className="stat">
-            <span className="stat__value tabular">{data.totalCalories}</span>
-            <span className="stat__label">kcal estimadas</span>
-          </div>
-        </Card>
+        <div className="tile tile--orange rise" style={{ "--i": 2 } as CSSProperties}>
+          <span className="tile__value tabular">{data.totalSessions}</span>
+          <span className="tile__label">sesiones</span>
+        </div>
+        <div className="tile tile--bone rise" style={{ "--i": 3 } as CSSProperties}>
+          <span className="tile__value tabular">{data.totalReps}</span>
+          <span className="tile__label">repeticiones</span>
+        </div>
+        <div className="tile tile--lime rise" style={{ "--i": 4 } as CSSProperties}>
+          <span className="tile__value tabular">{data.avgAccuracy}%</span>
+          <span className="tile__label">precisión media</span>
+        </div>
+        <div className="tile tile--yellow rise" style={{ "--i": 5 } as CSSProperties}>
+          <span className="tile__value tabular">{data.totalCalories}</span>
+          <span className="tile__label">kcal estimadas</span>
+        </div>
       </section>
 
       <div className="home-split">
