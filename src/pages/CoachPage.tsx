@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { Bot, Send, Sparkles } from "lucide-react";
 import { Button, Notice } from "../components/ui";
+import { TypedText } from "../components/motion/TypedText";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { coachApi } from "../lib/services";
+import { localCoachAnswer } from "../lib/coachLocal";
 import { coachSourceLabel, levelLabel, LIMITS, toCoachSource } from "../lib/contract";
 import { LRUCache, normalizeText } from "../structures";
 import type { CoachAnswer } from "../types";
@@ -13,7 +15,11 @@ interface Message {
   role: "user" | "coach";
   text: string;
   source?: string;
+  /** Respuesta nueva del coach: se escribe palabra por palabra una sola vez. */
+  typing?: boolean;
 }
+
+const OFFLINE_LABEL = "Guía local · sin conexión con el coach";
 
 const SUGGESTIONS = [
   "¿Cómo mejoro la profundidad de la sentadilla?",
@@ -40,9 +46,17 @@ export function CoachPage() {
   const nextId = useRef(1);
   const log = useRef<HTMLDivElement>(null);
 
+  const stickToEnd = useCallback((smooth = true) => {
+    log.current?.scrollTo({ top: log.current.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  }, []);
+
   useEffect(() => {
-    log.current?.scrollTo({ top: log.current.scrollHeight, behavior: "smooth" });
-  }, [messages, thinking]);
+    stickToEnd();
+  }, [messages, thinking, stickToEnd]);
+
+  const finishTyping = useCallback((id: number) => {
+    setMessages((list) => list.map((message) => (message.id === id ? { ...message, typing: false } : message)));
+  }, []);
 
   const ask = async (question: string) => {
     const text = question.trim().slice(0, LIMITS.coachQuestion);
@@ -64,8 +78,20 @@ export function CoachPage() {
         answer = { answer: raw.answer, source: toCoachSource(raw.source) };
         answerCache.set(key, answer);
       }
-      setMessages((list) => [...list, { id: nextId.current++, role: "coach", text: answer!.answer, source: answer!.source }]);
+      setMessages((list) => [
+        ...list,
+        { id: nextId.current++, role: "coach", text: answer!.answer, source: answer!.source, typing: true },
+      ]);
     } catch (err) {
+      // Sin red, servidor caído o sin la IA: el chat sigue respondiendo con la guía local.
+      const unreachable = err instanceof ApiError && (err.status === 0 || err.status === 404 || err.status >= 500);
+      if (unreachable) {
+        setMessages((list) => [
+          ...list,
+          { id: nextId.current++, role: "coach", text: localCoachAnswer(text), source: "offline", typing: true },
+        ]);
+        return;
+      }
       const message =
         err instanceof ApiError && err.status === 0
           ? "Sin conexión con el coach. Intenta de nuevo cuando vuelvas a tener red."
@@ -90,6 +116,9 @@ export function CoachPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="gym">
+        <span className="chat-hero-orb" aria-hidden="true">
+          <Bot size={20} />
+        </span>
         <p className="eyebrow">Coach IA</p>
         <h1>Pregunta lo que quieras</h1>
         <p>Respuestas de técnica y progresión. Ante una molestia, consulta a un profesional.</p>
@@ -99,9 +128,15 @@ export function CoachPage() {
         <div className="chat" ref={log} role="log" aria-live="polite">
           {messages.map((message) => (
             <div key={message.id} className={`bubble bubble--${message.role}`}>
-              {message.text}
-              {coachSourceLabel(message.source) && (
-                <div className="bubble__source">{coachSourceLabel(message.source)}</div>
+              {message.typing ? (
+                <TypedText text={message.text} onProgress={() => stickToEnd(false)} onDone={() => finishTyping(message.id)} />
+              ) : (
+                message.text
+              )}
+              {!message.typing && (message.source === "offline" || coachSourceLabel(message.source)) && (
+                <div className="bubble__source">
+                  {message.source === "offline" ? OFFLINE_LABEL : coachSourceLabel(message.source)}
+                </div>
               )}
             </div>
           ))}
@@ -117,8 +152,13 @@ export function CoachPage() {
         {error && <Notice tone="error">{error}</Notice>}
 
         <div className="suggestions" aria-label="Sugerencias">
-          {SUGGESTIONS.map((suggestion) => (
-            <button key={suggestion} type="button" className="chip" onClick={() => void ask(suggestion)} disabled={thinking}>
+          {SUGGESTIONS.map((suggestion, index) => (
+            <button
+              key={suggestion}
+              type="button"
+              className="chip"
+              style={{ "--i": index } as CSSProperties}
+              onClick={() => void ask(suggestion)} disabled={thinking}>
               <Sparkles size={13} aria-hidden="true" /> {suggestion}
             </button>
           ))}
