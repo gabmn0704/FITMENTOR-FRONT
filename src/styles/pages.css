@@ -853,3 +853,63 @@
     animation: none;
   }
 }
+
+/* Cabeceras con fotografía y hero de inicio. Siempre oscuros para que el texto contraste. */
+.page-header[data-banner],
+.hero {
+  --text: #f4f7f2;
+  --text-muted: #c3cdc6;
+  color: #f4f7f2;
+}
+
+.page-header[data-banner] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 190px;
+  align-content: end;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
+  background: #0d1113;
+}
+
+.page-header[data-banner]::before,
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  filter: grayscale(0.4) contrast(1.1);
+}
+
+.page-header[data-banner]::after,
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(7 9 10 / 0.92) 0%, rgb(7 9 10 / 0.55) 60%, rgb(7 9 10 / 0.35) 100%);
+}
+
+.page-header[data-banner="ropes"]::before { background-image: url("/img/ropes.jpg"); }
+.page-header[data-banner="gym"]::before { background-image: url("/img/gym.jpg"); }
+.page-header[data-banner="studio"]::before { background-image: url("/img/studio.jpg"); }
+.page-header[data-banner="deadlift"]::before { background-image: url("/img/deadlift.jpg"); }
+.page-header[data-banner="core"]::before { background-image: url("/img/core.jpg"); }
+
+.hero {
+  isolation: isolate;
+}
+
+.hero::before {
+  background-image: url("/img/deadlift.jpg");
+  opacity: 0.5;
+}
+
+.hero .btn--ghost {
+  color: #f4f7f2;
+}

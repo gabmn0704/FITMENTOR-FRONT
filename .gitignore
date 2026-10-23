@@ -12,3 +12,4 @@ vite.config.d.ts
 .env.*.local
 *.pem
 *.key
+.taste-skill/

@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100dvh;
-  background: var(--gradient-hero), var(--bg);
+  background: var(--bg);
 }
 
 .sidebar {
@@ -16,8 +16,7 @@
   gap: var(--space-5);
   padding: var(--space-5) var(--space-4);
   border-right: 1px solid var(--surface-border);
-  background: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
-  backdrop-filter: blur(var(--glass-blur));
+  background: var(--bg-elevated);
 }
 
 .brand {
@@ -67,23 +66,16 @@
 }
 
 .nav-link[aria-current="page"] {
-  background: var(--lime-soft);
-  color: var(--text);
+  background: var(--field-lime);
+  color: var(--field-lime-ink);
 }
 
 .nav-link[aria-current="page"] svg {
-  color: var(--lime);
+  color: var(--field-lime-ink);
 }
 
 .nav-link[aria-current="page"]::before {
-  content: "";
-  position: absolute;
-  left: -16px;
-  top: 10px;
-  bottom: 10px;
-  width: 3px;
-  border-radius: 3px;
-  background: var(--lime);
+  display: none;
 }
 
 .sidebar__footer {
@@ -165,7 +157,7 @@
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
   padding: var(--space-5);
-  background: var(--gradient-hero), var(--bg);
+  background: var(--bg);
 }
 
 @media (max-width: 1024px) {
@@ -173,7 +165,7 @@
     --sidebar-width: 84px;
   }
 
-  .brand__text,
+  .sidebar .logo__word,
   .sidebar .nav-link__label,
   .sidebar__footer .profile__text {
     display: none;
@@ -255,4 +247,15 @@
   .bottom-nav .nav-link {
     font-size: 9px;
   }
+}
+
+/* Grano sutil sobre toda la app para dar textura al fondo. */
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }

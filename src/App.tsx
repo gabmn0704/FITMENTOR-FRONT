@@ -3,6 +3,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { Button } from "./components/ui";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { useHashRoute } from "./hooks/useHashRoute";
+import { usePointerEffects } from "./hooks/usePointerEffects";
 import { syncPendingSessions } from "./lib/sessions";
 import type { RouteId } from "./lib/routes";
 import { AchievementsPage } from "./pages/AchievementsPage";
@@ -45,6 +46,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
 function Screens() {
   const { token, user } = useAuth();
   const [route, navigate] = useHashRoute();
+  usePointerEffects();
 
   // Al iniciar sesión, sube en segundo plano las sesiones guardadas sin conexión.
   useEffect(() => {
@@ -74,7 +76,9 @@ function Screens() {
 
   return (
     <AppShell route={route} user={user} onNavigate={navigate}>
-      <ErrorBoundary key={route}>{page(route)}</ErrorBoundary>
+      <div className="page-enter" key={route}>
+        <ErrorBoundary>{page(route)}</ErrorBoundary>
+      </div>
     </AppShell>
   );
 }
