@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button, Notice } from "../ui";
 import { useAuth } from "../../hooks/useAuth";
 import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../../lib/config";
@@ -9,7 +10,24 @@ type Mode = "login" | "register";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** 0 a 4: longitud, mayúsculas y minúsculas, números y símbolos. Solo orienta; el backend valida. */
+export function passwordStrength(password: string): number {
+  if (!password) return 0;
+  let score = 0;
+  if (password.length >= 8) score += 1;
+  if (password.length >= 12) score += 1;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+  if (/\d/.test(password) && /[^A-Za-z0-9]/.test(password)) score += 1;
+  return Math.min(4, score);
+}
+
+const STRENGTH_LABELS = ["", "Débil", "Aceptable", "Buena", "Fuerte"];
+const STRENGTH_COLORS = ["", "var(--danger)", "var(--orange)", "var(--yellow)", "var(--lime)"];
+
 function errorMessage(error: unknown): string {
+  if (error instanceof ApiError && error.status === 404) {
+    return "Este servidor aún no admite cuentas por correo. Usa Google o entra como invitado.";
+  }
   if (error instanceof ApiError && error.status === 0) return error.message;
   if (error instanceof Error && error.message) return error.message;
   return "No se pudo iniciar sesión. Inténtalo de nuevo.";
@@ -34,6 +52,8 @@ export function AuthPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [googleReady, setGoogleReady] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const strength = passwordStrength(password);
 
   useEffect(() => {
     if (!isGoogleEnabled) return;
@@ -99,7 +119,7 @@ export function AuthPanel() {
 
   return (
     <div className="auth-panel" id="acceso">
-      <div className="auth-tabs" role="tablist" aria-label="Acceso">
+      <div className="auth-tabs" role="tablist" aria-label="Acceso" data-mode={mode}>
         <button
           type="button"
           role="tab"
@@ -124,7 +144,7 @@ export function AuthPanel() {
 
       <form className="stack" onSubmit={onSubmit} noValidate>
         {mode === "register" && (
-          <div className="field">
+          <div className="field field--enter">
             <label htmlFor="auth-name">Nombre</label>
             <input
               id="auth-name"
@@ -150,19 +170,40 @@ export function AuthPanel() {
             onChange={(event) => setEmail(event.target.value)}
           />
         </div>
-        <div className="field">
+        <div className="field field--password">
           <label htmlFor="auth-password">Contraseña</label>
           <input
             id="auth-password"
             className="input"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             maxLength={72}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
             placeholder={mode === "login" ? "Tu contraseña" : "Mínimo 8 caracteres"}
             onChange={(event) => setPassword(event.target.value)}
           />
+          <button
+            type="button"
+            className="field__reveal"
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((visible) => !visible)}
+          >
+            {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+          </button>
         </div>
+        {mode === "register" && password && (
+          <div className="field--enter" style={{ "--strength-color": STRENGTH_COLORS[strength] } as CSSProperties}>
+            <div className="strength" aria-hidden="true">
+              {[1, 2, 3, 4].map((step) => (
+                <i key={step} className={strength >= step ? "on" : ""} />
+              ))}
+            </div>
+            <span className="strength__text" role="status">
+              {strength === 0 ? "Usa al menos 8 caracteres" : `Seguridad: ${STRENGTH_LABELS[strength]}`}
+            </span>
+          </div>
+        )}
         <Button type="submit" variant="primary" large block loading={busy}>
           {mode === "login" ? "Entrar" : "Crear mi cuenta"}
         </Button>

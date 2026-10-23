@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import App from "../../App";
-import { validateCredentials } from "./AuthPanel";
+import { passwordStrength, validateCredentials } from "./AuthPanel";
 
 describe("validateCredentials", () => {
   it("exige nombre solo al registrarse", () => {
@@ -23,5 +23,14 @@ describe("Pantalla de acceso", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Crear cuenta" }));
     expect(screen.getByLabelText("Nombre")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Crear mi cuenta" })).toBeInTheDocument();
+  });
+});
+
+describe("passwordStrength", () => {
+  it("sube con la longitud y la variedad", () => {
+    expect(passwordStrength("")).toBe(0);
+    expect(passwordStrength("abcdefgh")).toBe(1);
+    expect(passwordStrength("Abcdefgh1234")).toBe(3);
+    expect(passwordStrength("Abcdefgh1234!")).toBe(4);
   });
 });
