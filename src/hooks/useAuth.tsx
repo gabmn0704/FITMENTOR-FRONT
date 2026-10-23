@@ -10,6 +10,8 @@ interface AuthContextValue {
   user: User | null;
   loginWithGoogle: (credential: string) => Promise<void>;
   loginAsGuest: (name?: string) => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  registerWithEmail: (name: string, email: string, password: string) => Promise<void>;
   updateUser: (patch: ProfilePatch) => Promise<void>;
   logout: () => void;
   /** Aviso para la pantalla de acceso (p. ej. sesión caducada tras un 401). */
@@ -95,6 +97,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persist],
   );
 
+  const loginWithEmail = useCallback(
+    async (email: string, password: string) => {
+      const response = await authApi.login(email.trim(), password);
+      persist(response.token, response.user);
+    },
+    [persist],
+  );
+
+  const registerWithEmail = useCallback(
+    async (name: string, email: string, password: string) => {
+      const response = await authApi.register(name.trim(), email.trim(), password);
+      persist(response.token, response.user);
+    },
+    [persist],
+  );
+
   const updateUser = useCallback(
     async (patch: ProfilePatch) => {
       if (!token) return;
@@ -108,8 +126,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ token, user, loginWithGoogle, loginAsGuest, updateUser, logout, authNotice }),
-    [token, user, loginWithGoogle, loginAsGuest, updateUser, logout, authNotice],
+    () => ({
+      token,
+      user,
+      loginWithGoogle,
+      loginAsGuest,
+      loginWithEmail,
+      registerWithEmail,
+      updateUser,
+      logout,
+      authNotice,
+    }),
+    [token, user, loginWithGoogle, loginAsGuest, loginWithEmail, registerWithEmail, updateUser, logout, authNotice],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

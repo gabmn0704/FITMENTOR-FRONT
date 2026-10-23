@@ -25,6 +25,10 @@ export interface ProfilePatch {
 export const authApi = {
   google: (credential: string) =>
     apiRequest<AuthResponse>("/api/auth/google", { method: "POST", body: { credential } }),
+  register: (name: string, email: string, password: string) =>
+    apiRequest<AuthResponse>("/api/auth/register", { method: "POST", body: { name, email, password } }),
+  login: (email: string, password: string) =>
+    apiRequest<AuthResponse>("/api/auth/login", { method: "POST", body: { email, password } }),
   /** Nombre opcional, máx. 120 caracteres en el backend. */
   guest: (name?: string) => {
     const trimmed = name?.trim().slice(0, LIMITS.userName);
