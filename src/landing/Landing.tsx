@@ -54,8 +54,6 @@ export function Landing() {
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.from(".lp-hero__reveal", { y: 36, opacity: 0, duration: 1, ease: "power3.out", stagger: 0.12 });
-
         gsap.fromTo(
           ".lp-word",
           { opacity: 0.12 },
@@ -209,7 +207,7 @@ export function Landing() {
           </div>
           <div className="lp-accordion">
             {SLICES.map(({ id, icon: Icon, title, text }) => (
-              <article key={id} className="lp-slice" tabIndex={0}>
+              <article key={id} className={`lp-slice lp-slice--${id}`} tabIndex={0}>
                 <Icon size={26} aria-hidden="true" />
                 <div className="lp-slice__body">
                   <h3>{title}</h3>

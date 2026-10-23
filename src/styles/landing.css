@@ -608,3 +608,96 @@
     transform: none;
   }
 }
+
+/* Fotografía: fondos con velo oscuro para que el texto siempre contraste. */
+.lp-hero__bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/img/ropes.jpg") center / cover no-repeat;
+  opacity: 0.32;
+  filter: grayscale(0.6) contrast(1.1);
+}
+
+.lp-card--a::before,
+.lp-slice::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  filter: grayscale(0.5) contrast(1.1);
+  transition: transform 700ms var(--ease-out), opacity var(--dur-base) ease;
+}
+
+.lp-card--a::before {
+  background-image: url("/img/deadlift.jpg");
+  opacity: 0.35;
+}
+
+.lp-card--a::after,
+.lp-slice::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(7 9 10 / 0.15) 0%, rgb(7 9 10 / 0.88) 100%);
+}
+
+.lp-card--a > *,
+.lp-slice > * {
+  position: relative;
+  z-index: 1;
+}
+
+.lp-card--a .lp-card__pose {
+  position: absolute;
+}
+
+.lp-card--a:hover::before,
+.lp-slice:hover::before {
+  transform: scale(1.06);
+  opacity: 0.65;
+}
+
+.lp-slice--camara::before { background-image: url("/img/gym.jpg"); }
+.lp-slice--coach::before { background-image: url("/img/core.jpg"); }
+.lp-slice--rutina::before { background-image: url("/img/studio.jpg"); }
+.lp-slice--logros::before { background-image: url("/img/deadlift.jpg"); }
+
+.lp-slice,
+.lp-card--a {
+  color: #f4f7f2;
+}
+
+.lp-slice__body p,
+.lp-card--a p {
+  color: #d3dbd5;
+}
+
+:root[data-theme="light"] .lp-card--a,
+:root[data-theme="light"] .lp-slice {
+  --text: #f4f7f2;
+}
+
+/* Entrada del hero con CSS: el contenido es visible aunque falle el JavaScript. */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-hero__reveal {
+    animation: lp-rise 900ms var(--ease-out) both;
+  }
+
+  .lp-hero__lead.lp-hero__reveal {
+    animation-delay: 140ms;
+  }
+
+  .lp-hero__actions.lp-hero__reveal {
+    animation-delay: 280ms;
+  }
+}
+
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
