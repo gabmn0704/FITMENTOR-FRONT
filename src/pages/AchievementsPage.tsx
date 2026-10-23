@@ -21,7 +21,7 @@ export function AchievementsPage() {
 
   return (
     <div className="stack">
-      <header className="page-header">
+      <header className="page-header" data-banner="ropes">
         <p className="eyebrow">Insignias</p>
         <h1>Logros</h1>
         <p>

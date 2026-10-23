@@ -74,7 +74,7 @@ export function ProgressPage() {
 
   return (
     <div className="stack">
-      <header className="page-header">
+      <header className="page-header" data-banner="deadlift">
         <p className="eyebrow">Tu progreso</p>
         <h1>Constancia y técnica</h1>
         <p>Cada sesión suma control, consistencia y técnica.</p>

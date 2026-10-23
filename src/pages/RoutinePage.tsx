@@ -46,7 +46,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
 
   return (
     <div className="stack">
-      <header className="page-header">
+      <header className="page-header" data-banner="core">
         <p className="eyebrow">Plan adaptativo</p>
         <h1>Tu rutina de hoy</h1>
         <p>{routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}</p>
