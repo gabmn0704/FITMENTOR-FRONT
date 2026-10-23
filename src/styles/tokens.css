@@ -1,8 +1,9 @@
 /* Tokens de diseño. Tema oscuro por defecto; el claro se activa con data-theme="light". */
 :root {
   color-scheme: dark;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Outfit", "Geist", system-ui, sans-serif;
+  --font-body: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   --bg: #07090a;
   --bg-elevated: #0d1113;
