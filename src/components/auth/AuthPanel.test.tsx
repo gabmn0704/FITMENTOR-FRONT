@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import App from "../App";
+import App from "../../App";
 import { validateCredentials } from "./AuthPanel";
 
 describe("validateCredentials", () => {
@@ -16,7 +16,7 @@ describe("validateCredentials", () => {
   });
 });
 
-describe("Landing", () => {
+describe("Pantalla de acceso", () => {
   it("permite cambiar entre entrar y crear cuenta", () => {
     window.localStorage.clear();
     render(<App />);

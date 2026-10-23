@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button, Notice } from "../components/ui";
-import { useAuth } from "../hooks/useAuth";
-import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../lib/config";
-import { loadGoogleIdentity } from "../lib/google";
-import { ApiError } from "../lib/api";
+import { Button, Notice } from "../ui";
+import { useAuth } from "../../hooks/useAuth";
+import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../../lib/config";
+import { loadGoogleIdentity } from "../../lib/google";
+import { ApiError } from "../../lib/api";
 
 type Mode = "login" | "register";
 
