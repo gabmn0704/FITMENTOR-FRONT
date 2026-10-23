@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { Activity, Bot, CalendarDays, Dumbbell, LayoutDashboard, Trophy, User, Zap, type LucideIcon } from "lucide-react";
+import { Activity, Bot, CalendarDays, Dumbbell, LayoutDashboard, Trophy, User, type LucideIcon } from "lucide-react";
 import { Avatar } from "../ui";
+import { Logo } from "../../brand/Logo";
 import { ROUTES, routeHref, type RouteId } from "../../lib/routes";
 import { isGuest, levelLabel } from "../../lib/contract";
 import type { User as UserType } from "../../types";
@@ -56,10 +57,7 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
 
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand__mark" aria-hidden="true">
-            <Zap size={18} fill="currentColor" />
-          </span>
-          <span className="brand__text">FitMentor</span>
+          <Logo size={34} />
         </div>
         <nav className="nav-list" aria-label="Navegación principal">
           {ROUTES.map((r) => (

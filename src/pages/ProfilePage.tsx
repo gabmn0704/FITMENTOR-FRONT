@@ -67,7 +67,7 @@ export function ProfilePage() {
 
   return (
     <div className="stack">
-      <header className="page-header">
+      <header className="page-header" data-banner="studio">
         <p className="eyebrow">Perfil y ajustes</p>
         <h1>Tu espacio</h1>
         <p>Ajusta cómo FitMentor te acompaña en cada sesión.</p>

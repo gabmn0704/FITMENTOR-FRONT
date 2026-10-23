@@ -5,11 +5,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 44px;
+  min-height: 46px;
   padding: 0 var(--space-5);
   border-radius: var(--radius-pill);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
   transition:
     transform var(--dur-fast) var(--ease-out),
@@ -27,9 +27,8 @@
 }
 
 .btn--primary {
-  background: var(--lime);
-  color: var(--lime-ink);
-  box-shadow: 0 8px 30px -12px rgb(198 255 61 / 0.7);
+  background: var(--field-lime);
+  color: var(--field-lime-ink);
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -86,11 +85,7 @@
   position: relative;
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--gradient-card), var(--bg-elevated);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--bg-elevated);
 }
 
 .card--interactive {
@@ -101,7 +96,7 @@
 
 .card--interactive:hover {
   transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--lime) 45%, transparent);
+  background: var(--surface);
 }
 
 .card__header {
@@ -114,8 +109,10 @@
 
 .card__title {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 .chip {
@@ -149,8 +146,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange), var(--lime));
-  color: #0a0f05;
+  background: var(--field-orange);
+  color: var(--field-orange-ink);
   font-weight: 800;
   font-size: 13px;
   flex-shrink: 0;

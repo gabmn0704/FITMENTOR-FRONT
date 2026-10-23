@@ -81,7 +81,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
 
   return (
     <section className="stack" aria-labelledby="train-title">
-      <header className="page-header">
+      <header className="page-header" data-banner="ropes">
         <p className="eyebrow">Centro de entrenamiento</p>
         <h1 id="train-title">
           {meta.label} <span style={{ color: "var(--lime)" }}>en vivo</span>

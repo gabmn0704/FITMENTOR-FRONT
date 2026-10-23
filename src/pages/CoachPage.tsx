@@ -89,7 +89,7 @@ export function CoachPage() {
 
   return (
     <div className="stack">
-      <header className="page-header">
+      <header className="page-header" data-banner="gym">
         <p className="eyebrow">Coach IA</p>
         <h1>Pregunta lo que quieras</h1>
         <p>Respuestas de técnica y progresión. Ante una molestia, consulta a un profesional.</p>

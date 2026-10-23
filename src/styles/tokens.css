@@ -1,38 +1,48 @@
-/* Tokens de diseño. Tema oscuro por defecto; el claro se activa con data-theme="light". */
+/* Tokens de diseño. Dirección "cartel plano": colores saturados sin degradados, tipografía pesada
+   y paneles de un solo color. Tema oscuro por defecto; el claro se activa con data-theme="light". */
 :root {
   color-scheme: dark;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Big Shoulders", "Outfit", system-ui, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --bg: #07090a;
-  --bg-elevated: #0d1113;
-  --surface: rgb(255 255 255 / 0.04);
-  --surface-strong: rgb(255 255 255 / 0.08);
-  --surface-border: rgb(255 255 255 / 0.1);
-  --glass-blur: 18px;
+  --bg: #0d0f0c;
+  --bg-elevated: #171a15;
+  --surface: #1d211a;
+  --surface-strong: #272c22;
+  --surface-border: rgb(255 255 255 / 0.09);
+  --glass-blur: 0px;
 
-  --text: #f4f7f2;
-  --text-muted: #9aa69f;
-  --text-subtle: #6b7770;
+  --text: #f1f4ee;
+  --text-muted: #b2b8a8;
+  --text-subtle: #81887a;
 
+  /* Campos de color del cartel: cada panel usa uno solo, con su tinta. */
+  --field-lime: #c6ff3d;
+  --field-lime-ink: #0d1200;
+  --field-orange: #ff6a2b;
+  --field-orange-ink: #1a0800;
   --lime: #c6ff3d;
   --lime-soft: rgb(198 255 61 / 0.14);
-  --lime-ink: #0a1200;
-  --orange: #ff7a1a;
-  --orange-soft: rgb(255 122 26 / 0.16);
-  --danger: #ff5c6c;
+  --lime-ink: #0d1200;
+  --orange: #ff6a2b;
+  --orange-soft: rgb(255 106 43 / 0.16);
+  --orange-ink: #1a0800;
+  --bone: #efe9d9;
+  --bone-ink: #14150f;
+  --yellow: #ffd23a;
+  --yellow-ink: #1a1400;
+  --danger: #ff6b6b;
   --success: #6ee7a0;
-  --warning: #ffd166;
+  --warning: #ffd23a;
 
-  --gradient-hero: radial-gradient(900px 480px at 85% -10%, rgb(198 255 61 / 0.18), transparent 60%),
-    radial-gradient(700px 420px at -10% 110%, rgb(255 122 26 / 0.16), transparent 60%);
-  --gradient-card: linear-gradient(155deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.015));
-  --shadow-card: 0 18px 50px -24px rgb(0 0 0 / 0.7);
-  --shadow-glow: 0 0 0 1px rgb(198 255 61 / 0.35), 0 10px 40px -10px rgb(198 255 61 / 0.55);
+  --gradient-hero: none;
+  --gradient-card: none;
+  --shadow-card: none;
+  --shadow-glow: 0 0 0 3px rgb(198 255 61 / 0.35);
 
-  --radius-sm: 10px;
+  --radius-sm: 12px;
   --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-lg: 28px;
   --radius-pill: 999px;
 
   --space-1: 4px;
@@ -50,50 +60,44 @@
   --dur-slow: 700ms;
 
   --nav-height: 72px;
-  --sidebar-width: 248px;
-  --content-max: 1200px;
+  --sidebar-width: 256px;
+  --content-max: 1240px;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #f4f5ef;
-  --bg-elevated: #ffffff;
-  --surface: rgb(0 0 0 / 0.03);
-  --surface-strong: rgb(0 0 0 / 0.06);
-  --surface-border: rgb(10 20 10 / 0.12);
-  --text: #0d1110;
-  --text-muted: #56625b;
-  --text-subtle: #7b8680;
-  --lime: #6c9e00;
-  --lime-soft: rgb(108 158 0 / 0.14);
+  --bg: #ebe5d4;
+  --bg-elevated: #f7f3e8;
+  --surface: #e2dcc9;
+  --surface-strong: #d7d0bb;
+  --surface-border: rgb(20 21 15 / 0.14);
+  --text: #14150f;
+  --text-muted: #4c4f42;
+  --text-subtle: #6f7262;
+  --lime: #4f7a00;
+  --lime-soft: rgb(79 122 0 / 0.14);
   --lime-ink: #ffffff;
-  --orange: #e8600a;
-  --orange-soft: rgb(232 96 10 / 0.12);
-  --gradient-hero: radial-gradient(900px 480px at 85% -10%, rgb(198 255 61 / 0.35), transparent 60%),
-    radial-gradient(700px 420px at -10% 110%, rgb(255 122 26 / 0.18), transparent 60%);
-  --gradient-card: linear-gradient(155deg, #ffffff, #f7f8f3);
-  --shadow-card: 0 14px 40px -22px rgb(20 40 20 / 0.25);
-  --shadow-glow: 0 0 0 1px rgb(108 158 0 / 0.4), 0 10px 30px -12px rgb(108 158 0 / 0.5);
+  --orange: #d9480f;
+  --orange-soft: rgb(217 72 15 / 0.12);
+  --shadow-glow: 0 0 0 3px rgb(79 122 0 / 0.3);
 }
 
-/* Preferencia del sistema solo si el usuario no ha elegido tema. */
+/* Preferencia del sistema solo si el usuario eligió "Sistema". */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
+  :root:not([data-theme="dark"]):not([data-theme="light"]) {
     color-scheme: light;
-    --bg: #f4f5ef;
-    --bg-elevated: #ffffff;
-    --surface: rgb(0 0 0 / 0.03);
-    --surface-strong: rgb(0 0 0 / 0.06);
-    --surface-border: rgb(10 20 10 / 0.12);
-    --text: #0d1110;
-    --text-muted: #56625b;
-    --text-subtle: #7b8680;
-    --lime: #6c9e00;
-    --lime-soft: rgb(108 158 0 / 0.14);
+    --bg: #ebe5d4;
+    --bg-elevated: #f7f3e8;
+    --surface: #e2dcc9;
+    --surface-strong: #d7d0bb;
+    --surface-border: rgb(20 21 15 / 0.14);
+    --text: #14150f;
+    --text-muted: #4c4f42;
+    --text-subtle: #6f7262;
+    --lime: #4f7a00;
+    --lime-soft: rgb(79 122 0 / 0.14);
     --lime-ink: #ffffff;
-    --orange: #e8600a;
-    --orange-soft: rgb(232 96 10 / 0.12);
-    --gradient-card: linear-gradient(155deg, #ffffff, #f7f8f3);
-    --shadow-card: 0 14px 40px -22px rgb(20 40 20 / 0.25);
+    --orange: #d9480f;
+    --orange-soft: rgb(217 72 15 / 0.12);
   }
 }
