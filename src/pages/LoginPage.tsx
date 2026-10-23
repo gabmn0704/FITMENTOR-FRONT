@@ -17,13 +17,13 @@ export function LoginPage() {
             <span>bien.</span>
           </span>
         </h1>
-        <div className="login-poster__photo" aria-hidden="true">
-          <img src="/img/deadlift.jpg" alt="" />
-        </div>
         <p className="login-poster__lead">
           Tu cámara mide los ángulos de tu cuerpo, cuenta cada repetición y te dice qué corregir. El video nunca sale de
           tu dispositivo.
         </p>
+        <div className="login-poster__photo" aria-hidden="true">
+          <img src="/img/deadlift.jpg" alt="" />
+        </div>
       </section>
 
       <main className="login-panel" id="main">

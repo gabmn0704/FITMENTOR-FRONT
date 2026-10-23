@@ -62,7 +62,7 @@
 .login-poster__title {
   position: relative;
   z-index: 2;
-  font-size: clamp(72px, min(12.5vw, 22vh), 220px);
+  font-size: clamp(72px, min(11vw, 17vh), 200px);
   line-height: 0.84;
   font-weight: 900;
 }
@@ -77,14 +77,14 @@
   display: block;
 }
 
+/* La foto es un marco completo dentro del cartel: se ve entera, sin recortes por los bordes. */
 .login-poster__photo {
-  position: absolute;
-  right: -4%;
-  bottom: -6%;
-  width: 46%;
-  height: min(46%, 56vh);
-  transform: rotate(4deg);
-  clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%, 0 22%);
+  position: relative;
+  flex: 1 1 0;
+  min-height: 180px;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
   background: #0d0f0c;
 }
 
@@ -92,16 +92,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.08) saturate(0.9);
+  object-position: 50% 48%;
+  filter: contrast(1.06) saturate(0.95);
   animation: drift 18s ease-in-out infinite alternate;
 }
 
 .login-poster__lead {
-  position: absolute;
-  left: clamp(24px, 4vw, 56px);
-  bottom: clamp(24px, 4vh, 56px);
+  position: relative;
   z-index: 2;
-  max-width: min(30rem, 40%);
+  max-width: 32rem;
   font-size: 19px;
   font-weight: 600;
   line-height: 1.45;
@@ -252,15 +251,14 @@
     font-size: clamp(72px, 24vw, 150px);
   }
 
+  .login-poster {
+    padding-bottom: clamp(24px, 4vw, 56px);
+  }
+
   .login-poster__photo {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: calc(100% + 2 * clamp(24px, 4vw, 56px));
-    height: 150px;
-    margin-inline: calc(-1 * clamp(24px, 4vw, 56px));
-    transform: none;
-    clip-path: polygon(0 22%, 100% 0, 100% 100%, 0 100%);
+    flex: none;
+    aspect-ratio: 3 / 2;
+    min-height: 0;
   }
 
   .login-poster__lead {
@@ -301,6 +299,7 @@
   overflow: hidden;
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(20px, 3vw, 40px);
   min-height: 440px;
   padding: clamp(24px, 3.4vw, 48px);
   border-radius: var(--radius-lg);
@@ -361,27 +360,28 @@
 }
 
 .poster-hero__media {
-  position: absolute;
-  right: -3%;
-  top: -8%;
-  bottom: -8%;
-  width: 40%;
-  transform: rotate(4deg);
-  clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%, 0 18%);
+  position: relative;
+  z-index: 1;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
   background: #0d0f0c;
 }
 
 .poster-hero__media img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 30%;
   filter: contrast(1.06) saturate(0.95);
 }
 
 .poster-hero__goal {
   position: absolute;
-  right: clamp(20px, 3vw, 40px);
-  bottom: clamp(20px, 3vw, 40px);
+  right: clamp(36px, 4.6vw, 68px);
+  bottom: clamp(36px, 4.6vw, 68px);
   z-index: 3;
   display: grid;
   justify-items: center;
@@ -519,15 +519,7 @@
   }
 
   .poster-hero__media {
-    position: relative;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: calc(100% + 2 * clamp(24px, 3.4vw, 48px));
-    height: 220px;
-    margin: var(--space-3) calc(-1 * clamp(24px, 3.4vw, 48px)) calc(-1 * clamp(24px, 3.4vw, 48px));
-    transform: none;
-    clip-path: polygon(0 18%, 100% 0, 100% 100%, 0 100%);
+    min-height: 220px;
   }
 
   .stats-row {
