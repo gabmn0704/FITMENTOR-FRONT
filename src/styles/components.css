@@ -1,0 +1,286 @@
+/* Primitivos reutilizables: botones, tarjetas de vidrio, chips, anillos y estados. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur-base) var(--ease-out),
+    color var(--dur-fast) ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn--primary {
+  background: var(--lime);
+  color: var(--lime-ink);
+  box-shadow: 0 8px 30px -12px rgb(198 255 61 / 0.7);
+}
+
+.btn--primary:hover:not(:disabled) {
+  box-shadow: var(--shadow-glow);
+}
+
+.btn--ghost {
+  background: var(--surface-strong);
+  border: 1px solid var(--surface-border);
+  color: var(--text);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--lime);
+}
+
+.btn--danger {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--danger) 60%, transparent);
+  color: var(--danger);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--lg {
+  min-height: 56px;
+  font-size: 16px;
+}
+
+.btn--icon {
+  width: 44px;
+  padding: 0;
+}
+
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tarjeta de vidrio con borde sutil y gradiente. */
+.card {
+  position: relative;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--gradient-card), var(--bg-elevated);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.card--interactive {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) ease;
+}
+
+.card--interactive:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--lime) 45%, transparent);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface-strong);
+  color: var(--text-muted);
+  border: 1px solid var(--surface-border);
+}
+
+.chip--lime {
+  background: var(--lime-soft);
+  color: var(--lime);
+  border-color: transparent;
+}
+
+.chip--orange {
+  background: var(--orange-soft);
+  color: var(--orange);
+  border-color: transparent;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--lime));
+  color: #0a0f05;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.input,
+.select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--lime);
+  box-shadow: 0 0 0 4px var(--lime-soft);
+}
+
+.select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.notice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.notice--error {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+  color: var(--danger);
+}
+
+.notice--info {
+  background: var(--lime-soft);
+  color: var(--text);
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--surface-border);
+  border-radius: var(--radius-lg);
+}
+
+.empty strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+/* Anillo de progreso animado por stroke-dashoffset. */
+.ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.ring svg {
+  transform: rotate(-90deg);
+}
+
+.ring__track {
+  stroke: var(--surface-strong);
+}
+
+.ring__value {
+  transition: stroke-dashoffset var(--dur-slow) var(--ease-out);
+}
+
+.ring__content {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+
+.ring__content strong {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.ring__content span {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-strong) 50%, var(--surface) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
