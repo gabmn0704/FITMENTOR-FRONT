@@ -1,6 +1,8 @@
 import { Logo } from "../brand/Logo";
 import { AuthPanel } from "../components/auth/AuthPanel";
+import { Marquee } from "../components/motion/Marquee";
 
+const TICKER = ["Sentadilla", "Flexión", "Plancha", "Peso muerto", "Zancada", "Coach IA", "Tu cámara, tu privacidad"];
 const HIGHLIGHTS = ["Mide tus ángulos en vivo", "Cuenta cada repetición", "Tu video no sale del dispositivo"];
 
 /** Primera pantalla: foto a sangre con el titular a la izquierda y el acceso a la derecha. */
@@ -29,6 +31,9 @@ export function LoginPage() {
               <li key={text}>{text}</li>
             ))}
           </ul>
+        </div>
+        <div className="login-marquee">
+          <Marquee items={TICKER} label="Ejercicios que corrige FitMentor" />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import { useMemo, type CSSProperties } from "react";
 import { ArrowRight, Flame, Sparkles } from "lucide-react";
 import { Button, Card, EmptyState, ProgressRing } from "../components/ui";
+import { CountUp } from "../components/motion/CountUp";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { achievementsApi, routineApi, statsApi } from "../lib/services";
@@ -89,7 +90,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
         <div className="poster-hero__goal">
           <ProgressRing value={goal.percent} size={150} stroke={14} label={`Meta semanal ${goal.percent} por ciento`}>
-            <strong className="tabular">{goal.percent}%</strong>
+            <strong className="tabular"><CountUp value={goal.percent} suffix="%" /></strong>
             <span>
               {goal.reps} / {WEEKLY_GOAL_REPS} reps
             </span>
@@ -110,19 +111,19 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
       <section className="stats-row" aria-label="Resumen">
         <div className="tile tile--orange rise" style={{ "--i": 2 } as CSSProperties}>
-          <span className="tile__value tabular">{data.totalSessions}</span>
+          <span className="tile__value tabular"><CountUp value={data.totalSessions} /></span>
           <span className="tile__label">sesiones</span>
         </div>
         <div className="tile tile--bone rise" style={{ "--i": 3 } as CSSProperties}>
-          <span className="tile__value tabular">{data.totalReps}</span>
+          <span className="tile__value tabular"><CountUp value={data.totalReps} /></span>
           <span className="tile__label">repeticiones</span>
         </div>
         <div className="tile tile--lime rise" style={{ "--i": 4 } as CSSProperties}>
-          <span className="tile__value tabular">{data.avgAccuracy}%</span>
+          <span className="tile__value tabular"><CountUp value={data.avgAccuracy} suffix="%" /></span>
           <span className="tile__label">precisión media</span>
         </div>
         <div className="tile tile--yellow rise" style={{ "--i": 5 } as CSSProperties}>
-          <span className="tile__value tabular">{data.totalCalories}</span>
+          <span className="tile__value tabular"><CountUp value={data.totalCalories} /></span>
           <span className="tile__label">kcal estimadas</span>
         </div>
       </section>

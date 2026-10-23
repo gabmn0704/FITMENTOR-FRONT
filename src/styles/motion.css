@@ -1,0 +1,618 @@
+/* Sistema de movimiento y atmósfera. Se carga el último para refinar lo anterior.
+   Reglas: solo transform y opacity; ease-out fuerte para entradas; salida más rápida que la entrada;
+   los efectos de hover solo con puntero real; "reducir movimiento" apaga todo lo decorativo. */
+
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --glow-lime: rgb(198 255 61 / 0.16);
+  --glow-orange: rgb(255 106 43 / 0.14);
+  --spot-card: rgb(198 255 61 / 0.09);
+  --spot-tile: rgb(255 255 255 / 0.34);
+}
+
+:root[data-theme="light"] {
+  --glow-lime: rgb(79 122 0 / 0.1);
+  --glow-orange: rgb(217 72 15 / 0.1);
+  --spot-card: rgb(79 122 0 / 0.08);
+  --spot-tile: rgb(255 255 255 / 0.45);
+}
+
+/* ---------- Atmósfera: dos focos de color que derivan despacio detrás de todo ---------- */
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 38% at 82% 6%, var(--glow-lime), transparent 70%),
+    radial-gradient(38% 34% at 8% 94%, var(--glow-orange), transparent 70%);
+  animation: aurora 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes aurora {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-3%, 2%, 0) scale(1.08);
+  }
+}
+
+.main,
+.sidebar {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* ---------- Entrada de página escalonada ---------- */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter > * > * {
+  animation: page-in 520ms var(--ease-out) both;
+}
+
+.page-enter > * > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.page-enter > * > *:nth-child(2) {
+  animation-delay: 60ms;
+}
+.page-enter > * > *:nth-child(3) {
+  animation-delay: 120ms;
+}
+.page-enter > * > *:nth-child(4) {
+  animation-delay: 180ms;
+}
+.page-enter > * > *:nth-child(5) {
+  animation-delay: 240ms;
+}
+.page-enter > * > *:nth-child(n + 6) {
+  animation-delay: 300ms;
+}
+
+/* Fichas de estadísticas: cada una llega con 70 ms de diferencia. */
+.stats-row > .tile {
+  animation: page-in 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ---------- Superficies con luz que sigue al cursor ---------- */
+.card,
+.tile,
+.routine-item {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.card::after,
+.tile::after,
+.routine-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), var(--spot-card), transparent 65%);
+  transition: opacity 300ms ease;
+}
+
+.tile::after {
+  z-index: 0;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), var(--spot-tile), transparent 62%);
+  mix-blend-mode: soft-light;
+}
+
+.card {
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover::after,
+  .tile:hover::after,
+  .routine-item:hover::after {
+    opacity: 1;
+  }
+
+  .tile {
+    transition: transform 320ms var(--ease-out);
+  }
+
+  .tile:hover {
+    transform: translateY(-4px) rotate(-0.4deg);
+  }
+
+  .tile:nth-child(even):hover {
+    transform: translateY(-4px) rotate(0.4deg);
+  }
+
+  .routine-item {
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .routine-item:hover {
+    transform: translateX(4px);
+  }
+}
+
+.tile:active,
+.card--interactive:active {
+  transform: scale(0.985);
+  transition-duration: 120ms;
+}
+
+/* ---------- Botones: brillo que cruza al pasar el cursor y pulsación física ---------- */
+.btn,
+.poster-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn--primary::after,
+.poster-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.4) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.poster-btn::after {
+  background: linear-gradient(105deg, transparent 30%, rgb(198 255 61 / 0.28) 50%, transparent 70%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover:not(:disabled)::after,
+  .poster-btn:hover::after {
+    transform: translateX(120%);
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .poster-btn:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.btn:active:not(:disabled),
+.poster-btn:active,
+.chip:active:not(:disabled),
+.nav-link:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+.poster-btn svg {
+  transition: transform 260ms var(--ease-out);
+}
+
+.poster-btn:hover svg {
+  transform: translateX(5px);
+}
+
+/* ---------- Navegación: la pastilla activa se desliza entre destinos ---------- */
+.nav-list {
+  position: relative;
+}
+
+.nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--field-lime);
+  box-shadow: 0 8px 28px -10px var(--lime);
+  transform: translateY(calc(var(--idx, 0) * 48px));
+  transition: transform 420ms var(--ease-drawer);
+  pointer-events: none;
+}
+
+.sidebar .nav-link {
+  z-index: 1;
+}
+
+.sidebar .nav-link[aria-current="page"] {
+  background: transparent;
+}
+
+@media (max-width: 760px) {
+  .nav-indicator {
+    display: none;
+  }
+}
+
+/* ---------- Cabecera de portada: paralaje y brillo ---------- */
+.poster-hero__media img {
+  transform: scale(1.09) translate3d(calc(var(--px, 0) * -16px), calc(var(--py, 0) * -10px), 0);
+  transition: transform 700ms var(--ease-out);
+}
+
+.poster-hero__goal {
+  transform: translate3d(calc(var(--px, 0) * 10px), calc(var(--py, 0) * 8px), 0);
+  transition: transform 700ms var(--ease-out);
+}
+
+.poster-hero h1 {
+  animation: page-in 700ms var(--ease-out) 80ms both;
+}
+
+.poster-streak svg {
+  animation: flame 1.8s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes flame {
+  0%,
+  100% {
+    transform: scale(1) rotate(-3deg);
+  }
+  50% {
+    transform: scale(1.18) rotate(4deg);
+  }
+}
+
+/* ---------- Cinta en movimiento ---------- */
+.marquee {
+  overflow: hidden;
+  border-block: 1px solid var(--surface-border);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 34s linear infinite;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+.marquee__list {
+  display: flex;
+  flex-shrink: 0;
+  gap: 40px;
+  margin: 0;
+  padding: 14px 20px;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee__list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.marquee__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.login-marquee {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  border: 0;
+  color: #f1f4ee;
+  background: rgb(13 15 12 / 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ---------- Acceso: pestañas con pulgar deslizante, errores que sacuden ---------- */
+.auth-tabs {
+  position: relative;
+  isolation: isolate;
+}
+
+.auth-tabs::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  width: calc(50% - 9px);
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--field-lime);
+  box-shadow: 0 8px 24px -10px var(--lime);
+  transform: translateX(0);
+  transition: transform 380ms var(--ease-drawer);
+}
+
+.auth-tabs[data-mode="register"]::before {
+  transform: translateX(calc(100% + 6px));
+}
+
+.auth-tabs__tab[aria-selected="true"] {
+  background: transparent;
+}
+
+.notice {
+  animation: notice-in 320ms var(--ease-out) both;
+}
+
+.notice--error {
+  animation: notice-in 320ms var(--ease-out) both, shake 420ms var(--ease-out) 60ms;
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shake {
+  20% {
+    translate: -6px 0;
+  }
+  40% {
+    translate: 5px 0;
+  }
+  60% {
+    translate: -3px 0;
+  }
+  80% {
+    translate: 2px 0;
+  }
+}
+
+.field--password {
+  position: relative;
+}
+
+.field--password .input {
+  padding-right: 52px;
+}
+
+.field__reveal {
+  position: absolute;
+  right: 6px;
+  bottom: 3px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: color 160ms ease, background-color 160ms ease, transform 120ms var(--ease-out);
+}
+
+.field__reveal:hover {
+  color: var(--text);
+  background: var(--surface-strong);
+}
+
+.field__reveal:active {
+  transform: scale(0.92);
+}
+
+.strength {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.strength i {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-strong);
+  transform-origin: left;
+  transition: background-color 300ms ease, transform 300ms var(--ease-out);
+}
+
+.strength i.on {
+  background: var(--strength-color, var(--lime));
+}
+
+.strength__text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Los campos de registro entran con una caída corta. */
+.field--enter {
+  animation: notice-in 360ms var(--ease-out) both;
+}
+
+.input {
+  transition: border-color 160ms ease, box-shadow 220ms var(--ease-out), background-color 160ms ease;
+}
+
+.input:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--lime) 38%, var(--surface-border));
+}
+
+/* ---------- Coach: burbujas con origen, puntos que rebotan, texto que se escribe ---------- */
+.bubble {
+  animation: bubble-in 360ms var(--ease-out) both;
+}
+
+.bubble--user {
+  transform-origin: 100% 100%;
+}
+
+.bubble--coach {
+  transform-origin: 0 100%;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bubble--typing span {
+  animation: dot-bounce 1s ease-in-out infinite;
+}
+
+@keyframes dot-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.bubble__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--lime);
+  animation: caret 0.9s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.suggestions .chip {
+  animation: page-in 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 250ms);
+  transition: transform 160ms var(--ease-out), background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .suggestions .chip:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--lime);
+    color: var(--text);
+    background: var(--lime-soft);
+  }
+}
+
+.chat-hero-orb {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: var(--field-lime);
+  color: var(--field-lime-ink);
+  animation: orb 3.2s ease-in-out infinite;
+}
+
+@keyframes orb {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(198 255 61 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgb(198 255 61 / 0);
+  }
+}
+
+/* ---------- Barras y anillos ---------- */
+.bar__fill {
+  transform-origin: left;
+  animation: bar-in 900ms var(--ease-out) 200ms both;
+}
+
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Esqueletos ---------- */
+.skeleton {
+  animation-duration: 1.6s;
+}
+
+/* ---------- Menos movimiento: se conservan fundidos, se quita el desplazamiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .app-shell::before,
+  .marquee__track,
+  .poster-streak svg,
+  .chat-hero-orb {
+    animation: none;
+  }
+
+  .page-enter > * > *,
+  .stats-row > .tile,
+  .bubble,
+  .suggestions .chip {
+    animation: none;
+  }
+}
+
+/* La cinta del acceso ocupa el borde inferior del cartel: se le reserva espacio. */
+.login-poster__copy {
+  padding-bottom: 56px;
+}
+
+/* El contador anidado en el anillo hereda tamaño y color del número, no los de la etiqueta. */
+.ring__content strong span {
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+}
