@@ -19,7 +19,7 @@
   justify-content: space-between;
   gap: clamp(20px, 5vh, 56px);
   padding: clamp(24px, 4vw, 56px);
-  background: var(--cobalt);
+  background: var(--rail);
   color: var(--on-cobalt);
 }
 
@@ -42,7 +42,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(100deg, var(--cobalt) 0 30%, transparent 78%);
+  background: linear-gradient(100deg, var(--rail) 0 30%, transparent 78%);
 }
 
 @keyframes drift {
@@ -79,7 +79,7 @@
 }
 
 .access__accent {
-  color: var(--on-cobalt-muted);
+  color: var(--signal);
 }
 
 .access__points {
@@ -106,7 +106,7 @@
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  background: var(--on-cobalt);
+  background: var(--signal);
 }
 
 .access__ticker {
@@ -114,7 +114,7 @@
   inset: auto 0 0;
   z-index: 2;
   color: var(--on-cobalt);
-  background: color-mix(in srgb, var(--cobalt-deep) 82%, transparent);
+  background: color-mix(in srgb, var(--rail) 82%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
