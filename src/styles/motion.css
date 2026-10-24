@@ -105,7 +105,7 @@ body::before {
 }
 
 .race-hero__bib {
-  animation: bib-drop 760ms var(--ease-spring) 650ms both;
+  animation: bib-drop 760ms var(--ease-settle) 650ms both;
 }
 
 @keyframes bib-drop {
@@ -320,7 +320,7 @@ body::before {
 }
 
 .line-dot {
-  animation: dot-pop 420ms var(--ease-spring) 900ms both;
+  animation: dot-pop 420ms var(--ease-settle) 900ms both;
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -434,10 +434,10 @@ body::before {
 }
 
 .bubble--typing span {
-  animation: dot-bounce 1s ease-in-out infinite;
+  animation: dot-lift 1s ease-in-out infinite;
 }
 
-@keyframes dot-bounce {
+@keyframes dot-lift {
   0%,
   60%,
   100% {

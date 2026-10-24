@@ -379,7 +379,7 @@
   display: flex;
   flex-direction: column;
   transform: translateY(calc(var(--to, 0) * var(--cell) * -1));
-  transition: transform 1250ms var(--ease-out) var(--delay, 0ms);
+  transition: transform 1250ms var(--ease-out) calc(var(--odo-start, 500ms) + var(--delay, 0ms));
   will-change: transform;
 }
 
@@ -391,6 +391,26 @@
 
 .odo__fixed {
   display: inline-block;
+}
+
+/* Cada cifra empieza a rodar cuando su ficha ya es visible; en vivo (repeticiones, precisión) gira al instante. */
+.tile .odo {
+  --odo-start: calc(var(--i, 0) * 90ms + 620ms);
+}
+
+.race-hero__bib-number .odo {
+  --odo-start: 1100ms;
+}
+
+.big-number .odo,
+.ring__content .odo,
+.summary .odo {
+  --odo-start: 0ms;
+}
+
+.big-number .odo__col,
+.ring__content .odo__col {
+  transition-duration: 700ms;
 }
 
 .odo__suffix {
@@ -422,7 +442,7 @@
   height: 18px;
   border-radius: 2px;
   background: var(--text);
-  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-base) ease;
+  transition: transform var(--dur-base) var(--ease-settle), background-color var(--dur-base) ease;
 }
 
 .switch[aria-checked="true"] {
