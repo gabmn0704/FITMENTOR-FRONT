@@ -62,7 +62,7 @@ export function MealPlanCard({ profile, dayIndex, week, trainingDay }: MealPlanC
             <ul className="meal__items">
               {meal.items.map((item) => (
                 <li key={item.name}>
-                  <strong>{item.amount}</strong> {item.name.toLowerCase()}
+                  <strong>{item.amount}</strong> {item.label}
                   {item.swaps.length > 0 && (
                     <details className="swaps">
                       <summary>Cambiar por</summary>
