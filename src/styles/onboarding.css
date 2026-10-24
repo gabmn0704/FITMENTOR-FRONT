@@ -296,21 +296,30 @@
   .onboard__field {
     position: relative;
     height: auto;
-    gap: var(--space-5);
-    padding-bottom: 56px;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-4) 36px;
+  }
+
+  .onboard__lead {
+    padding-bottom: 8px;
   }
 
   .onboard__lead h1 {
-    font-size: clamp(72px, 22vw, 7rem);
+    font-size: clamp(52px, 15vw, 4.5rem);
+  }
+
+  .onboard__lead h1 .mask {
+    display: inline-block;
+    margin-right: 0.2em;
   }
 
   .onboard__lead p {
-    font-size: 16px;
+    display: none;
   }
 
   .onboard__panel {
     min-height: 0;
-    padding-top: var(--space-5);
+    padding: var(--space-4);
   }
 }
 

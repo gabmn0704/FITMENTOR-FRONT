@@ -1170,3 +1170,80 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Celular: organización ---------- */
+.camera__counter {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .camera__counter {
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    padding: 8px 14px 6px;
+    border-radius: var(--radius-md);
+    background: rgb(5 8 20 / 0.72);
+    backdrop-filter: blur(10px);
+    color: #f6f8ff;
+    pointer-events: none;
+  }
+
+  .camera__counter-reps,
+  .camera__counter-score {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 4px;
+    font-family: var(--font-display);
+    font-stretch: 62%;
+    font-weight: 900;
+    font-size: 56px;
+    line-height: 1;
+  }
+
+  .camera__counter-reps small {
+    margin-bottom: 0.14em;
+    font-size: 0.4em;
+    font-weight: 800;
+    color: #b4bccd;
+  }
+
+  .camera__counter-score {
+    font-size: 32px;
+    color: #ff7d66;
+  }
+}
+
+@media (max-width: 560px) {
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .controls > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .controls .btn {
+    width: 100%;
+  }
+
+  .segmented {
+    display: flex;
+    width: 100%;
+  }
+
+  .segmented button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 6px;
+  }
+
+  .page-header[data-banner] {
+    min-height: 190px;
+  }
+}

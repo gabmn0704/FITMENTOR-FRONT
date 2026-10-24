@@ -101,11 +101,14 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
             voiceOn={session.voiceOn}
             onToggleVoice={session.actions.toggleVoice}
             formatTime={formatDuration}
+            reps={session.reps}
+            target={meta.target}
+            score={session.score}
           />
 
           {session.error && <Notice tone="error">{session.error}</Notice>}
 
-          <div className="row" role="group" aria-label="Controles de sesión">
+          <div className="row controls" role="group" aria-label="Controles de sesión">
             {session.status === "running" ? (
               <Button variant="ghost" onClick={session.actions.pause} icon={<Pause size={16} />}>
                 Pausar

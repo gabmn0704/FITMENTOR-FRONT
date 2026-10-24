@@ -77,7 +77,8 @@ export function AuthPanel() {
           size: "large",
           shape: "pill",
           text: "continue_with",
-          width: 340,
+          // El botón de Google tiene ancho fijo: se ajusta al ancho real del formulario (200 a 340 px).
+          width: Math.round(Math.min(340, Math.max(200, googleSlot.current.parentElement?.clientWidth ?? 340))),
           locale: "es",
         });
         setGoogleReady(true);
