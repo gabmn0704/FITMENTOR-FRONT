@@ -1,5 +1,6 @@
 import { apiRequest, cachedGet } from "./api";
 import { LIMITS } from "./contract";
+import type { CoachProfilePayload } from "./coachProfile";
 import type {
   Achievement,
   AuthResponse,
@@ -74,17 +75,27 @@ export const exercisesApi = {
     cachedGet<NextExercise[]>(`/api/exercises/next?from=${encodeURIComponent(from)}`, token),
 };
 
+/** Datos opcionales que acompañan la pregunta para que la respuesta sea personal. */
+export interface CoachChat {
+  profile?: CoachProfilePayload;
+  history?: Array<{ role: "user" | "coach"; text: string }>;
+}
+
 export const coachApi = {
   /**
    * El backend acepta la pregunta hasta 500 caracteres y `context` hasta 4000.
    * Se recortan aquí para no provocar un 400 por un texto pegado demasiado largo.
    */
-  ask: (token: string, question: string, context?: string) => {
+  ask: (token: string, question: string, chat: CoachChat = {}) => {
     const q = question.trim().slice(0, LIMITS.coachQuestion);
-    const c = context?.slice(0, LIMITS.coachContext);
+    const history = chat.history?.slice(-6).map((turn) => ({ role: turn.role, text: turn.text.slice(0, 400) }));
     return apiRequest<CoachAnswer>("/api/coach", {
       method: "POST",
-      body: c ? { question: q, context: c } : { question: q },
+      body: {
+        question: q,
+        ...(chat.profile ? { profile: chat.profile } : {}),
+        ...(history && history.length ? { history } : {}),
+      },
       token,
     });
   },

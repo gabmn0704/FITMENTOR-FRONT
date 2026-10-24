@@ -6,9 +6,9 @@ import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import { coachApi } from "../lib/services";
 import { localCoachAnswer } from "../lib/coachLocal";
-import { coachSourceLabel, levelLabel, LIMITS, toCoachSource } from "../lib/contract";
-import { LRUCache, normalizeText } from "../structures";
-import type { CoachAnswer } from "../types";
+import { coachSourceLabel, LIMITS, toCoachSource } from "../lib/contract";
+import { useProfile } from "../hooks/useProfile";
+import { coachProfilePayload, coachSuggestions, coachWelcome } from "../lib/coachProfile";
 
 interface Message {
   id: number;
@@ -21,25 +21,14 @@ interface Message {
 
 const OFFLINE_LABEL = "Guía local · sin conexión con el coach";
 
-const SUGGESTIONS = [
-  "¿Cómo mejoro la profundidad de la sentadilla?",
-  "¿Qué hago si me duele la rodilla al bajar?",
-  "Dame una rutina corta de 15 minutos",
-  "¿Cuántas repeticiones debería hacer por semana?",
-];
-
-/** Respuestas recientes del coach: evita repetir la misma pregunta al API durante 10 minutos. */
-const answerCache = new LRUCache<string, CoachAnswer>(32, 10 * 60 * 1000);
-
-const WELCOME: Message = {
-  id: 0,
-  role: "coach",
-  text: "Soy tu coach de técnica. Pregúntame sobre postura, progresión o cómo recuperarte.",
-};
 
 export function CoachPage() {
   const { token, user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([WELCOME]);
+  const { profile } = useProfile();
+  const suggestions = coachSuggestions(profile?.goal);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    { id: 0, role: "coach", text: coachWelcome(user?.name, profile?.goal) },
+  ]);
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
   const [error, setError] = useState("");
@@ -66,21 +55,18 @@ export function CoachPage() {
     setMessages((list) => [...list, { id: nextId.current++, role: "user", text }]);
     setThinking(true);
     try {
-      const key = normalizeText(text);
-      let answer = answerCache.get(key);
-      if (!answer) {
-        if (!token) throw new ApiError(401, "Inicia sesión para hablar con el coach.");
-        const context = user ? `Nivel del usuario: ${levelLabel(user.level)}. Responde en español.` : undefined;
-        const raw = await coachApi.ask(token, text, context);
-        if (!raw || typeof raw.answer !== "string" || !raw.answer.trim()) {
-          throw new Error("El coach no devolvió una respuesta válida.");
-        }
-        answer = { answer: raw.answer, source: toCoachSource(raw.source) };
-        answerCache.set(key, answer);
+      if (!token) throw new ApiError(401, "Inicia sesión para hablar con el coach.");
+      // El hilo (sin el saludo ni los avisos locales) viaja con la pregunta para que la respuesta siga la conversación.
+      const history = messages
+        .filter((message) => message.id !== 0 && message.source !== "offline")
+        .map((message) => ({ role: message.role, text: message.text }));
+      const raw = await coachApi.ask(token, text, { profile: profile ? coachProfilePayload(profile) : undefined, history });
+      if (!raw || typeof raw.answer !== "string" || !raw.answer.trim()) {
+        throw new Error("El coach no devolvió una respuesta válida.");
       }
       setMessages((list) => [
         ...list,
-        { id: nextId.current++, role: "coach", text: answer!.answer, source: answer!.source, typing: true },
+        { id: nextId.current++, role: "coach", text: raw.answer, source: toCoachSource(raw.source), typing: true },
       ]);
     } catch (err) {
       // Sin red, servidor caído o sin la IA: el chat sigue respondiendo con la guía local.
@@ -88,7 +74,7 @@ export function CoachPage() {
       if (unreachable) {
         setMessages((list) => [
           ...list,
-          { id: nextId.current++, role: "coach", text: localCoachAnswer(text), source: "offline", typing: true },
+          { id: nextId.current++, role: "coach", text: localCoachAnswer(text, profile ? coachProfilePayload(profile) : undefined), source: "offline", typing: true },
         ]);
         return;
       }
@@ -117,7 +103,7 @@ export function CoachPage() {
     <div className="stack">
       <header className="page-header" data-banner="gym">
         <h1>Pregunta lo que quieras</h1>
-        <p>Respuestas de técnica y progresión. Ante una molestia, consulta a un profesional.</p>
+        <p>Técnica, rutinas y alimentación según tu objetivo. Ante una molestia, consulta a un profesional.</p>
       </header>
 
       <section className="card stack" style={{ gap: 12 }} aria-label="Conversación con el coach">
@@ -148,7 +134,7 @@ export function CoachPage() {
         {error && <Notice tone="error">{error}</Notice>}
 
         <div className="suggestions" aria-label="Sugerencias">
-          {SUGGESTIONS.map((suggestion, index) => (
+          {suggestions.map((suggestion, index) => (
             <button
               key={suggestion}
               type="button"

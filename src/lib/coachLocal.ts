@@ -1,4 +1,5 @@
 import { normalizeText } from "../structures";
+import type { CoachProfilePayload } from "./coachProfile";
 
 /**
  * Respuesta de respaldo del coach cuando el servidor no responde (sin red, caído o sin la IA).
@@ -79,8 +80,15 @@ function mentions(text: string, stems: string[]): boolean {
   return stems.some((stem) => new RegExp(`(?<![a-z])${stem}`).test(text));
 }
 
-export function localCoachAnswer(question: string): string {
+const NUTRITION_STEMS = ["proteina", "comer", "dieta", "nutri", "calori", "cenar", "ceno", "desayun", "almuerzo", "peso", "grasa"];
+
+export function localCoachAnswer(question: string, profile?: CoachProfilePayload): string {
   const text = normalizeText(question);
   if (mentions(text, PAIN_STEMS)) return PAIN_ANSWER;
-  return RULES.find((rule) => mentions(text, rule.stems))?.answer ?? FALLBACK;
+  const answer = RULES.find((rule) => mentions(text, rule.stems))?.answer ?? FALLBACK;
+  // Con perfil, las preguntas de alimentación abren con las metas de la persona.
+  if (profile && mentions(text, NUTRITION_STEMS)) {
+    return `Según tu plan, apunta a unas ${profile.kcal} kcal y unos ${profile.proteinG} g de proteína al día. ${answer}`;
+  }
+  return answer;
 }
