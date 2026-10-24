@@ -5,6 +5,7 @@ export const STORAGE_KEYS = {
   sessions: "fitmentor.sessions",
   theme: "fitmentor.theme",
   voice: "fitmentor.voice",
+  profile: "fitmentor.profile",
 } as const;
 
 /**
