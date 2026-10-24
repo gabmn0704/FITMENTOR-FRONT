@@ -4,7 +4,7 @@ import { Button, Notice } from "../ui";
 import { useAuth } from "../../hooks/useAuth";
 import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../../lib/config";
 import { loadGoogleIdentity } from "../../lib/google";
-import { ApiError, warmUpBackend } from "../../lib/api";
+import { ApiError, pingBackend } from "../../lib/api";
 
 type Mode = "login" | "register";
 
@@ -98,8 +98,19 @@ export function AuthPanel() {
 
   const [waking, setWaking] = useState(false);
 
+  // Si el servidor tarda en responder se avisa por qué; mientras tanto ya se puede escribir.
+  const [serverSlow, setServerSlow] = useState(false);
   useEffect(() => {
-    warmUpBackend();
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => setServerSlow(true), 2500);
+    void pingBackend(controller.signal).finally(() => {
+      window.clearTimeout(timer);
+      if (!controller.signal.aborted) setServerSlow(false);
+    });
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
 
   /** Un fallo de red suele ser el servidor gratuito despertando: se reintenta unas veces antes de rendirse. */
@@ -164,6 +175,11 @@ export function AuthPanel() {
         </button>
       </div>
 
+      {serverSlow && !waking && !error && (
+        <Notice tone="info">
+          Despertando el servidor: la primera vez del día puede tardar hasta un minuto. Ve escribiendo tus datos; entras apenas esté listo.
+        </Notice>
+      )}
       {waking && !error && (
         <Notice tone="info">El servidor estaba dormido y está despertando. Puede tardar hasta un minuto; seguimos intentando…</Notice>
       )}
