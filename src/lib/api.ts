@@ -170,6 +170,32 @@ async function send<T>(path: string, options: RequestOptions = {}): Promise<T> {
   return (await response.json()) as T;
 }
 
+/**
+ * Despierta el backend: en el plan gratuito de Render el servicio se duerme y el primer
+ * intento tarda hasta un minuto. Se lanza al abrir el acceso y se ignora cualquier resultado.
+ */
+export function warmUpBackend(): void {
+  try {
+    void fetch(buildApiUrl("/api/exercises"), { method: "GET", mode: "no-cors", cache: "no-store" }).catch(() => undefined);
+  } catch {
+    /* sin red: no hay nada que hacer */
+  }
+}
+
+/**
+ * Comprueba si el backend ya responde. Resuelve en cuanto llega CUALQUIER respuesta HTTP (aunque sea 401: lo que
+ * importa es que el servidor esté despierto) y devuelve los milisegundos que tardó; null si no hubo red.
+ */
+export async function pingBackend(signal?: AbortSignal): Promise<number | null> {
+  const started = performance.now();
+  try {
+    await fetch(buildApiUrl("/api/exercises"), { method: "GET", cache: "no-store", signal });
+    return Math.round(performance.now() - started);
+  } catch {
+    return null;
+  }
+}
+
 /** Caché de lectura para búsquedas y respuestas repetidas (LRU con TTL de 5 min). */
 const readCache = new LRUCache<string, unknown>(64, 5 * 60 * 1000);
 
