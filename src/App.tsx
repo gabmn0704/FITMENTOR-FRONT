@@ -47,7 +47,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
 
 function Screens() {
   const { token, user } = useAuth();
-  const { profile, skipped } = useProfile();
+  const { wizardOpen } = useProfile();
   const [route, navigate] = useHashRoute();
   usePointerEffects();
 
@@ -57,7 +57,7 @@ function Screens() {
   }, [token]);
 
   if (!token) return <LoginPage />;
-  if (user && !profile && !skipped) return <Onboarding />;
+  if (user && wizardOpen) return <Onboarding />;
 
   const page = (id: RouteId) => {
     switch (id) {

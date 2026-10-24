@@ -59,7 +59,7 @@ const toNumber = (text: string): number => (text.trim() === "" ? NaN : Number(te
 /** Asistente de primer uso: meta, cuerpo, plazo y un resumen con las cifras reales antes de empezar. */
 export function Onboarding() {
   const { user, updateUser } = useAuth();
-  const { save, skip } = useProfile();
+  const { save, closeWizard } = useProfile();
   const [step, setStep] = useState(0);
   const [goal, setGoal] = useState<FitnessGoal>("lose_fat");
   const [weight, setWeight] = useState("");
@@ -279,7 +279,7 @@ export function Onboarding() {
                   Atrás
                 </Button>
               ) : (
-                <button type="button" className="link-button" onClick={skip}>
+                <button type="button" className="link-button" onClick={closeWizard}>
                   Ahora no
                 </button>
               )}

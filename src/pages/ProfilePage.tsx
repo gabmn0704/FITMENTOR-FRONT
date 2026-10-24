@@ -23,7 +23,7 @@ const THEMES: SegmentOption<ThemeChoice>[] = [
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { profile, reset } = useProfile();
+  const { profile, openWizard } = useProfile();
   const [name, setName] = useState(user?.name ?? "");
   const [voice, setVoice] = useState(() => storage.getString(STORAGE_KEYS.voice) !== "off");
   const [saving, setSaving] = useState(false);
@@ -140,7 +140,7 @@ export function ProfilePage() {
               Entrenas <strong>{profile.daysPerWeek} días por semana</strong> y comes unas <strong>{nutritionTargets(profile).kcal} kcal</strong> al día.
             </li>
           </ul>
-          <Button variant="ghost" style={{ marginTop: 16 }} onClick={reset}>
+          <Button variant="ghost" style={{ marginTop: 16 }} onClick={openWizard}>
             Rehacer mi plan
           </Button>
         </Card>
