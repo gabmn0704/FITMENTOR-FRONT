@@ -3,6 +3,8 @@ import { Trophy } from "lucide-react";
 import { Button, ProgressRing } from "../ui";
 import { Odometer } from "../motion/Odometer";
 import { exerciseLabel } from "../../lib/exercises";
+import { useProfile } from "../../hooks/useProfile";
+import { postWorkoutTip } from "../../lib/nutrition";
 import { formatDuration } from "../../lib/format";
 import type { FinishedSession } from "../../hooks/useTrainingSession";
 
@@ -53,6 +55,7 @@ interface SessionSummaryProps {
 
 export function SessionSummary({ session, saving, saved, onSave, onDiscard }: SessionSummaryProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const { profile } = useProfile();
   const reduceMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
@@ -106,6 +109,7 @@ export function SessionSummary({ session, saving, saved, onSave, onDiscard }: Se
             )}
           </div>
         </div>
+        {profile && <p className="summary__tip">{postWorkoutTip(profile.goal)}</p>}
         <div className="row" style={{ justifyContent: "flex-end" }}>
           <Button variant="ghost" onClick={onDiscard} disabled={saving}>
             Descartar

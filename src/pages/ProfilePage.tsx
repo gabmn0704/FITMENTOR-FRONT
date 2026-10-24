@@ -3,6 +3,9 @@ import { LogOut, ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import { Avatar, Button, Card, Notice, Segmented, Switch, type SegmentOption } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme, type ThemeChoice } from "../hooks/useTheme";
+import { useProfile } from "../hooks/useProfile";
+import { bmi, bmiCategory, goalName } from "../lib/profile";
+import { nutritionTargets } from "../lib/nutrition";
 import { STORAGE_KEYS, storage } from "../lib/storage";
 import { ApiError, clearApiCache } from "../lib/api";
 import { GOALS, LEVELS, isGuest, levelLabel, toGoal } from "../lib/contract";
@@ -20,6 +23,7 @@ const THEMES: SegmentOption<ThemeChoice>[] = [
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { profile, reset } = useProfile();
   const [name, setName] = useState(user?.name ?? "");
   const [voice, setVoice] = useState(() => storage.getString(STORAGE_KEYS.voice) !== "off");
   const [saving, setSaving] = useState(false);
@@ -121,6 +125,26 @@ export function ProfilePage() {
       </div>
 
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
+
+      {profile && (
+        <Card as="div" title="Tu plan">
+          <ul className="facts">
+            <li>
+              Objetivo: <strong>{goalName(profile.goal)}</strong>
+              {profile.targetWeightKg !== null && ` (de ${profile.weightKg} kg a ${profile.targetWeightKg} kg en ${profile.weeks} semanas)`}.
+            </li>
+            <li>
+              Medidas: {profile.weightKg} kg, {profile.heightCm} cm · IMC {bmi(profile)} ({bmiCategory(bmi(profile)).toLowerCase()}).
+            </li>
+            <li>
+              Entrenas <strong>{profile.daysPerWeek} días por semana</strong> y comes unas <strong>{nutritionTargets(profile).kcal} kcal</strong> al día.
+            </li>
+          </ul>
+          <Button variant="ghost" style={{ marginTop: 16 }} onClick={reset}>
+            Rehacer mi plan
+          </Button>
+        </Card>
+      )}
 
       <Card as="div" title="Preferencias">
         <div className="settings-list">
