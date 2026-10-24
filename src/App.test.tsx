@@ -15,7 +15,7 @@ describe("App", () => {
     expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
   });
 
-  it("muestra el shell con navegación cuando hay token guardado", () => {
+  it("muestra el shell con navegación cuando hay token guardado", async () => {
     window.localStorage.setItem(STORAGE_KEYS.token, "test-token");
     window.localStorage.setItem(
       STORAGE_KEYS.user,
@@ -29,14 +29,14 @@ describe("App", () => {
     render(<App />);
     expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Navegación móvil" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 1, name: /Sentadilla/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Sentadilla/ })).toBeInTheDocument();
   });
 
-  it("pide el perfil con el asistente cuando la persona aún no lo ha completado", () => {
+  it("pide el perfil con el asistente cuando la persona aún no lo ha completado", async () => {
     window.localStorage.setItem(STORAGE_KEYS.token, "test-token");
     window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify({ id: "7", name: "Luis", guest: false }));
     render(<App />);
-    expect(screen.getByText(/qué quieres lograr/i)).toBeInTheDocument();
+    expect(await screen.findByText(/qué quieres lograr/i)).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
   });
 });
