@@ -1247,3 +1247,15 @@
     min-height: 190px;
   }
 }
+
+.pose__prop {
+  fill: var(--surface-3);
+  stroke: var(--line-strong);
+  stroke-width: 2;
+}
+
+.pose__weight {
+  fill: var(--cobalt);
+  stroke: var(--surface);
+  stroke-width: 2;
+}

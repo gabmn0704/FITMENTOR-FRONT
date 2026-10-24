@@ -1,7 +1,6 @@
 import { Camera, Check, Wind, X } from "lucide-react";
-import { EXERCISES } from "../../lib/exercises";
+import { catalogLabel, type CatalogId } from "../../lib/catalog";
 import { FLOOR_Y, GUIDES, type PoseFrame } from "../../lib/exerciseGuide";
-import type { ExerciseId } from "../../types";
 
 const toPath = (points: ReadonlyArray<readonly [number, number]>) =>
   points.map(([x, y], index) => `${index ? "L" : "M"}${x},${y}`).join(" ");
@@ -11,12 +10,16 @@ function Figure({ frame, label }: { frame: PoseFrame; label: string }) {
     <figure className={`pose${frame.wrong ? " pose--wrong" : ""}`}>
       <svg viewBox="0 0 200 160" role="img" aria-label={label}>
         <line className="pose__floor" x1="8" x2="192" y1={FLOOR_Y} y2={FLOOR_Y} />
+        {frame.props?.map(([x, y, w, h], index) => (
+          <rect key={index} className="pose__prop" x={x} y={y} width={w} height={h} rx="3" />
+        ))}
         {frame.bar && (
           <g className="pose__bar">
             <line x1={frame.bar[0] - 30} x2={frame.bar[0] + 30} y1={frame.bar[1]} y2={frame.bar[1]} />
             <circle cx={frame.bar[0]} cy={frame.bar[1]} r="11" />
           </g>
         )}
+        {frame.weight && <circle className="pose__weight" cx={frame.weight[0]} cy={frame.weight[1]} r="7" />}
         {frame.limbs.map((limb, index) => (
           <path key={index} className="pose__limb" d={toPath(limb)} />
         ))}
@@ -39,9 +42,9 @@ function Figure({ frame, label }: { frame: PoseFrame; label: string }) {
 }
 
 /** Dibujo de las dos posiciones del ejercicio, con pasos, errores comunes y cómo colocarte ante la cámara. */
-export function ExerciseGuide({ exercise, compact = false }: { exercise: ExerciseId; compact?: boolean }) {
+export function ExerciseGuide({ exercise, compact = false }: { exercise: CatalogId; compact?: boolean }) {
   const guide = GUIDES[exercise];
-  const name = EXERCISES[exercise].label;
+  const name = catalogLabel(exercise);
   return (
     <div className={`guide${compact ? "" : " guide--wide"}`}>
       <div className="guide__frames">
