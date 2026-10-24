@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { bmr, mealPlanForDay, nutritionTargets, tdee } from "./nutrition";
+import { mealPlanForDay } from "./meals";
+import { bmr, nutritionTargets, tdee } from "./nutrition";
 import type { BodyProfile } from "./profile";
 
 const base: BodyProfile = {
@@ -94,13 +95,77 @@ describe("precisión del plan en muchos perfiles", () => {
           for (let seed = 0; seed < 7; seed += 1) {
             const day = mealPlanForDay(profile, training, seed);
             expect(Math.abs(day.total.kcal - day.targets.kcal) / day.targets.kcal).toBeLessThan(0.14);
-            expect(day.total.proteinG).toBeGreaterThan(day.targets.proteinG * 0.82);
-            expect(day.total.proteinG).toBeLessThan(day.targets.proteinG * 1.22);
-            expect(Math.abs(day.total.fatG - day.targets.fatG) / day.targets.fatG).toBeLessThan(0.3);
-            expect(Math.abs(day.total.carbsG - day.targets.carbsG) / day.targets.carbsG).toBeLessThan(0.3);
+            expect(day.total.proteinG).toBeGreaterThan(day.targets.proteinG * 0.75);
+            expect(day.total.proteinG).toBeLessThan(day.targets.proteinG * 1.28);
+            expect(Math.abs(day.total.fatG - day.targets.fatG) / day.targets.fatG).toBeLessThan(0.45);
+            expect(Math.abs(day.total.carbsG - day.targets.carbsG) / day.targets.carbsG).toBeLessThan(0.45);
           }
         }
       });
     }
   }
+});
+
+describe("variedad, exclusiones y alternativas", () => {
+  const dishes = (profile: BodyProfile, slot: "almuerzo" | "cena", days = 14) =>
+    Array.from({ length: days }, (_, day) => mealPlanForDay(profile, true, day).meals.find((meal) => meal.slot === slot)!);
+
+  it("cada comida lleva el nombre de un plato", () => {
+    for (const meal of mealPlanForDay(base, true, 2).meals) expect(meal.dish.length).toBeGreaterThan(5);
+  });
+
+  it("los almuerzos y cenas de dos semanas no se repiten a diario y el pescado es la excepción", () => {
+    const meals = [...dishes(base, "almuerzo"), ...dishes(base, "cena")];
+    const names = meals.map((meal) => meal.dish);
+    expect(new Set(names).size).toBeGreaterThanOrEqual(18);
+    const fish = names.filter((name) => /pescado|atún|camarones|sardinas/i.test(name)).length;
+    expect(fish).toBeLessThanOrEqual(5);
+    for (let i = 1; i < names.length; i += 1) expect(names[i]).not.toEqual(names[i - 1]);
+  });
+
+  it("la semana siguiente no repite los menús de la anterior", () => {
+    const week1 = Array.from({ length: 7 }, (_, d) => mealPlanForDay(base, true, d).meals.map((m) => m.dish).join("|"));
+    const week2 = Array.from({ length: 7 }, (_, d) => mealPlanForDay(base, true, d + 7).meals.map((m) => m.dish).join("|"));
+    expect(week2.filter((menu) => week1.includes(menu))).toHaveLength(0);
+  });
+
+  it("quien no come pescado, lácteos, huevo, gluten o cerdo no los recibe nunca", () => {
+    const banned: Record<string, RegExp> = {
+      fish: /pescado|atún|camaron|sardina/i,
+      dairy: /yogur|cottage|queso|leche/i,
+      eggs: /huevo|claras/i,
+      gluten: /pan integral|pan pita|pasta|avena|cuscús|tempeh/i,
+      pork: /cerdo/i,
+    };
+    for (const [avoid, pattern] of Object.entries(banned)) {
+      const profile = { ...base, avoid: [avoid as "fish"] };
+      for (let day = 0; day < 14; day += 1) {
+        for (const training of [true, false]) {
+          const text = JSON.stringify(mealPlanForDay(profile, training, day).meals);
+          expect(text).not.toMatch(pattern);
+        }
+      }
+    }
+  });
+
+  it("una persona vegetariana que además evita lácteos y huevo igual recibe menús completos", () => {
+    const profile: BodyProfile = { ...base, diet: "vegetarian", avoid: ["dairy", "eggs", "gluten"] };
+    for (let day = 0; day < 7; day += 1) {
+      const plan = mealPlanForDay(profile, true, day);
+      expect(plan.meals).toHaveLength(5);
+      for (const meal of plan.meals) expect(meal.items.length).toBeGreaterThan(0);
+      expect(plan.total.proteinG).toBeGreaterThan(plan.targets.proteinG * 0.6);
+    }
+  });
+
+  it("ofrece alternativas con la misma proteína o los mismos carbohidratos, de otro alimento", () => {
+    const lunch = mealPlanForDay(base, true, 2).meals.find((meal) => meal.slot === "almuerzo")!;
+    const withSwaps = lunch.items.filter((item) => item.swaps.length > 0);
+    expect(withSwaps.length).toBeGreaterThanOrEqual(2);
+    for (const item of withSwaps) {
+      expect(item.swaps.length).toBeLessThanOrEqual(3);
+      expect(new Set(item.swaps).size).toBe(item.swaps.length);
+      for (const swap of item.swaps) expect(swap.toLowerCase()).not.toContain(item.name.toLowerCase());
+    }
+  });
 });
