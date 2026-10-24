@@ -5,6 +5,10 @@ import { BarChart } from "../components/charts/BarChart";
 import { Odometer } from "../components/motion/Odometer";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
+import { useProfile } from "../hooks/useProfile";
+import { currentWeek } from "../lib/profile";
+import { nutritionTargets } from "../lib/nutrition";
+import { buildWeekPlan, todayIndex } from "../lib/weeklyPlan";
 import { achievementsApi, routineApi, statsApi } from "../lib/services";
 import { readLocalSessions } from "../lib/sessions";
 import { computeLocalStats, weeklyProgress, WEEKLY_GOAL_REPS } from "../lib/stats";
@@ -40,8 +44,53 @@ interface HomePageProps {
   onNavigate: (route: RouteId) => void;
 }
 
+function TodayCard({
+  profile,
+  level,
+  onNavigate,
+}: {
+  profile: NonNullable<ReturnType<typeof useProfile>["profile"]>;
+  level: NonNullable<ReturnType<typeof useAuth>["user"]>["level"];
+  onNavigate: (route: RouteId) => void;
+}) {
+  const week = currentWeek(profile);
+  const day = buildWeekPlan(profile, level, week).days[todayIndex()];
+  const targets = nutritionTargets(profile, day.kind === "train");
+  const training = day.kind === "train";
+  return (
+    <section className="today" aria-label="Lo que te toca hoy">
+      <div className="today__main">
+        <h2>{training ? `Hoy: ${day.title}` : "Hoy descansas"}</h2>
+        <p className="muted">
+          {training
+            ? `${day.items.length} ejercicios, unos ${day.minutes} minutos.`
+            : "Camina, estira y duerme bien: así progresas."}
+        </p>
+      </div>
+      <ul className="today__facts">
+        <li>
+          <strong className="tabular">
+            <Odometer value={targets.kcal} stagger={50} />
+          </strong>
+          <span>kcal de hoy</span>
+        </li>
+        <li>
+          <strong className="tabular">
+            <Odometer value={targets.proteinG} suffix=" g" stagger={50} />
+          </strong>
+          <span>de proteína</span>
+        </li>
+      </ul>
+      <Button variant="primary" onClick={() => onNavigate("rutina")} icon={<ArrowRight size={18} />}>
+        Ver mi día
+      </Button>
+    </section>
+  );
+}
+
 export function HomePage({ onNavigate }: HomePageProps) {
   const { token, user } = useAuth();
+  const { profile } = useProfile();
   const local = useMemo(() => computeLocalStats(readLocalSessions()), []);
 
   const stats = useAsync(() => statsApi.get(token!), [token], Boolean(token));
@@ -106,6 +155,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </section>
 
+      {profile && (
+        <TodayCard profile={profile} level={user?.level ?? "BEGINNER"} onNavigate={onNavigate} />
+      )}
+
       <section className="motivation-strip" aria-label="Frase del día">
         <p>{motivationOfTheDay(new Date())}</p>
       </section>
@@ -155,7 +208,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           {!token && <EmptyState title="Inicia sesión para ver tu rutina">Tu plan se adapta a tu nivel y progreso.</EmptyState>}
           {token && routine.loading && <div className="skeleton" style={{ height: 160 }} aria-label="Cargando rutina" />}
           {token && routine.error && <EmptyState title="Rutina no disponible">Vuelve a intentarlo más tarde.</EmptyState>}
-          {routine.data && (
+          {routine.data && Array.isArray(routine.data.items) && (
             <div className="stack" style={{ gap: 10 }}>
               {routine.data.items.slice(0, 4).map((item, index) => (
                 <div className="routine-item" key={`${item.exercise}-${index}`}>

@@ -55,7 +55,14 @@ export interface PoseMetrics {
   score: number;
   knee: number | null;
   movementAngle: number | null;
+  /** Desvío vertical de la cadera respecto a la línea hombro-tobillo, en fracción del alto (valor absoluto). */
   alignment: number | null;
+  /** Igual que `alignment` pero con signo: positivo = cadera caída, negativo = cadera alta. */
+  hipOffset?: number | null;
+  /** Inclinación del torso respecto a la vertical, en grados (0 = erguido). */
+  torsoLean?: number | null;
+  /** Correcciones detectadas, de la más importante a la menos. Vacío si la técnica es buena. */
+  issues?: string[];
 }
 
 const clamp = (value: number, min: number, max: number) =>
@@ -71,68 +78,139 @@ export function angle(a: Point, b: Point, c: Point): number | null {
   return (Math.acos(cos) * 180) / Math.PI;
 }
 
-const average = (values: number[]): number | null =>
-  values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+const VISIBLE = 0.55;
 
-/** Calcula métricas de postura a partir de los 33 landmarks de MediaPipe. */
+const seen = (...points: Array<Point | undefined>): boolean =>
+  points.every((point) => point !== undefined && (point.visibility ?? 1) > VISIBLE);
+
+interface BodySide {
+  shoulder: Point;
+  elbow: Point;
+  wrist: Point;
+  hip: Point;
+  knee: Point;
+  ankle: Point;
+  toe: Point | undefined;
+  /** Visibilidad media de hombro, cadera, rodilla y tobillo: decide qué lado mide mejor. */
+  visibility: number;
+}
+
+function bodySides(p: Point[]): BodySide[] {
+  const make = (s: number, e: number, w: number, h: number, k: number, a: number, toe: number): BodySide => ({
+    shoulder: p[s],
+    elbow: p[e],
+    wrist: p[w],
+    hip: p[h],
+    knee: p[k],
+    ankle: p[a],
+    toe: p[toe],
+    visibility: [s, h, k, a].reduce((sum, index) => sum + (p[index]?.visibility ?? 0), 0) / 4,
+  });
+  return [make(11, 13, 15, 23, 25, 27, 31), make(12, 14, 16, 24, 26, 28, 32)];
+}
+
+/** Inclinación del segmento cadera-hombro respecto a la vertical (0 = erguido, 90 = horizontal). */
+function lean(hip: Point, shoulder: Point): number {
+  const dx = shoulder.x - hip.x;
+  const dy = hip.y - shoulder.y;
+  return (Math.atan2(Math.abs(dx), Math.max(dy, 1e-6)) * 180) / Math.PI;
+}
+
+/**
+ * Desvío vertical de la cadera respecto a la línea hombro-tobillo, con signo (positivo = cadera caída en la
+ * imagen). Solo es fiable de perfil: si el cuerpo no está horizontal en la imagen devuelve null.
+ */
+function hipOffsetFrom(side: BodySide): number | null {
+  const span = side.ankle.x - side.shoulder.x;
+  if (Math.abs(span) < 0.25) return null;
+  const onLine = side.shoulder.y + ((side.ankle.y - side.shoulder.y) * (side.hip.x - side.shoulder.x)) / span;
+  return side.hip.y - onLine;
+}
+
+/** Calcula métricas y correcciones de postura a partir de los 33 landmarks de MediaPipe, midiendo el lado mejor visto. */
 export function analyzePose(points: Point[], exercise: ExerciseId): PoseMetrics | null {
-  const visible = (...indices: number[]) =>
-    indices.every((index) => points[index] && (points[index].visibility ?? 1) > 0.55);
-  const p = points;
+  const sides = bodySides(points);
+  const full = sides.filter((side) => seen(side.shoulder, side.hip, side.knee, side.ankle));
+  const best = [...sides].sort((a, b) => b.visibility - a.visibility)[0];
+  const side = full.length ? full.sort((a, b) => b.visibility - a.visibility)[0] : best;
 
-  const knee = average(
-    [
-      visible(23, 25, 27) ? angle(p[23], p[25], p[27]) : null,
-      visible(24, 26, 28) ? angle(p[24], p[26], p[28]) : null,
-    ].filter((n): n is number => n !== null),
-  );
-  const elbow = average(
-    [
-      visible(11, 13, 15) ? angle(p[11], p[13], p[15]) : null,
-      visible(12, 14, 16) ? angle(p[12], p[14], p[16]) : null,
-    ].filter((n): n is number => n !== null),
-  );
-  const hip = average(
-    [
-      visible(11, 23, 25) ? angle(p[11], p[23], p[25]) : null,
-      visible(12, 24, 26) ? angle(p[12], p[24], p[26]) : null,
-    ].filter((n): n is number => n !== null),
-  );
+  const kneeOf = (s: BodySide) => (seen(s.hip, s.knee, s.ankle) ? angle(s.hip, s.knee, s.ankle) : null);
+  const kneeAngles = sides.map(kneeOf).filter((value): value is number => value !== null);
+  const knee = kneeAngles.length ? (exercise === "lunge" ? Math.min(...kneeAngles) : kneeOf(side) ?? kneeAngles[0]) : null;
+  const elbow = seen(side.shoulder, side.elbow, side.wrist) ? angle(side.shoulder, side.elbow, side.wrist) : null;
+  const hip = seen(side.shoulder, side.hip, side.knee) ? angle(side.shoulder, side.hip, side.knee) : null;
+  const torsoLean = seen(side.shoulder, side.hip) ? lean(side.hip, side.shoulder) : null;
+  const hipOffset = seen(side.shoulder, side.hip, side.ankle) ? hipOffsetFrom(side) : null;
+  const alignment = hipOffset === null ? null : Math.abs(hipOffset);
 
-  const shoulderY = visible(11, 12) ? (p[11].y + p[12].y) / 2 : null;
-  const hipY = visible(23, 24) ? (p[23].y + p[24].y) / 2 : null;
-  const ankleY = visible(27, 28) ? (p[27].y + p[28].y) / 2 : null;
-  const alignment =
-    shoulderY !== null && hipY !== null && ankleY !== null
-      ? Math.abs(hipY - (shoulderY + ankleY) / 2)
-      : null;
-
-  const movementAngle =
-    exercise === "push_up" ? elbow : exercise === "deadlift" ? hip : knee;
-
-  let score = movementAngle === null ? 0 : 82;
-  if ((exercise === "squat" || exercise === "lunge") && knee !== null)
-    score = clamp(100 - Math.abs(knee - 95) * 0.45, 45, 98);
-  if (exercise === "push_up" && elbow !== null && alignment !== null)
-    score = clamp(100 - Math.abs(elbow - 90) * 0.18 - alignment * 180, 35, 98);
-  if (exercise === "plank" && alignment !== null)
-    score = clamp(100 - alignment * 260, 35, 98);
-  if (exercise === "deadlift" && hip !== null)
-    score = clamp(100 - Math.abs(hip - 125) * 0.3, 45, 98);
-
+  const movementAngle = exercise === "push_up" ? elbow : exercise === "deadlift" ? hip : knee;
   const hasPose = movementAngle !== null || (exercise === "plank" && alignment !== null);
   if (!hasPose) return null;
+
+  const issues: string[] = [];
+  let score = movementAngle === null ? 0 : 82;
+
+  if ((exercise === "squat" || exercise === "lunge") && knee !== null) {
+    score = clamp(100 - Math.abs(knee - 95) * 0.45, 45, 98);
+    const limit = exercise === "squat" ? 55 : 28;
+    if (torsoLean !== null && torsoLean > limit) {
+      score -= Math.min(15, (torsoLean - limit) * 0.4);
+      issues.push(exercise === "squat" ? "Pecho arriba: te estás inclinando demasiado hacia adelante." : "Mantén el torso erguido al bajar.");
+    }
+    // Rodilla por delante de la punta del pie: solo se evalúa cuando se ve el pie.
+    const toe = side.toe;
+    if (toe && seen(side.knee, toe, side.ankle)) {
+      const facing = Math.sign(toe.x - side.ankle.x) || 1;
+      if ((side.knee.x - toe.x) * facing > 0.02 && knee < 130) {
+        score -= 6;
+        issues.push("Lleva la cadera más atrás: las rodillas se pasan de las puntas de los pies.");
+      }
+    }
+    if (knee > 125) issues.push("Desciende con control; flexiona las rodillas.");
+    else if (knee < 55) issues.push("Reduce un poco la profundidad y mantén el control.");
+  }
+
+  if (exercise === "push_up" && elbow !== null) {
+    score = clamp(100 - Math.abs(elbow - 90) * 0.18 - (alignment ?? 0) * 180, 35, 98);
+    if (hipOffset !== null && hipOffset > 0.06) issues.push("La cadera está cayendo: aprieta abdomen y glúteos.");
+    if (hipOffset !== null && hipOffset < -0.06) issues.push("Baja la cadera: debe quedar en línea con hombros y talones.");
+    if (elbow < 75) issues.push("Baja hasta donde mantengas el cuerpo alineado.");
+  }
+
+  if (exercise === "plank" && alignment !== null && hipOffset !== null) {
+    score = clamp(100 - alignment * 260, 35, 98);
+    if (hipOffset > 0.05) issues.push("Sube la cadera: se está hundiendo y carga la zona lumbar.");
+    if (hipOffset < -0.05) issues.push("Baja la cadera: debe quedar en línea con hombros y tobillos.");
+  }
+
+  if (exercise === "deadlift" && hip !== null) {
+    score = clamp(100 - Math.abs(hip - 125) * 0.3, 45, 98);
+    if (knee !== null && knee < 105) {
+      score -= 8;
+      issues.push("Estás sentándote: dobla menos las rodillas y lleva la cadera hacia atrás.");
+    }
+    if (hip < 90) issues.push("Lleva la cadera atrás y conserva la espalda larga.");
+  }
+
+  const front = seen(points[11], points[12]) && Math.abs(points[11].x - points[12].x) > 0.18;
+  // De frente los ángulos se aplanan y la medición pierde fiabilidad: es lo primero que se corrige.
+  if (front) issues.unshift("Colócate de perfil a la cámara: así mido mejor tu técnica.");
+
   return {
-    score: Math.round(score),
+    score: Math.round(clamp(score, 30, 98)),
     knee: knee === null ? null : Math.round(knee),
     movementAngle: movementAngle === null ? null : Math.round(movementAngle),
     alignment,
+    hipOffset,
+    torsoLean: torsoLean === null ? null : Math.round(torsoLean),
+    issues,
   };
 }
 
-/** Frase de corrección local (modo offline). */
+/** Frase de corrección local (modo offline): la corrección más importante, o un refuerzo si la técnica es buena. */
 export function coachingCue(exercise: ExerciseId, data: PoseMetrics | null): string {
   if (!data) return "Aléjate un poco y coloca hombros, cadera y pies dentro del encuadre.";
+  if (data.issues && data.issues.length) return data.issues[0];
   if (exercise === "squat" || exercise === "lunge")
     return (data.knee ?? 180) > 125
       ? "Desciende con control; flexiona las rodillas."
@@ -153,6 +231,9 @@ export function coachingCue(exercise: ExerciseId, data: PoseMetrics | null): str
     ? "Lleva la cadera atrás y conserva la espalda larga."
     : "Buen patrón. Sube extendiendo la cadera con control.";
 }
+
+/** Duración mínima de una repetición real: más rápido suele ser ruido de la detección, no un movimiento. */
+export const MIN_REP_MS = 600;
 
 /** Umbrales de ángulo por ejercicio para la máquina de estados de repeticiones. */
 const THRESHOLDS: Record<ExerciseId, { up: number; down: number; bottom: number; done: number }> = {

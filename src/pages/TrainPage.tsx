@@ -3,6 +3,7 @@ import { Pause, Play, RefreshCw, Square, Undo2, Wifi, WifiOff } from "lucide-rea
 import { Button, Card, Notice, ProgressRing } from "../components/ui";
 import { CameraStage } from "../components/training/CameraStage";
 import { ExercisePicker } from "../components/training/ExercisePicker";
+import { ExerciseGuide } from "../components/training/ExerciseGuide";
 import { RestTimer } from "../components/training/RestTimer";
 import { SessionSummary } from "../components/training/SessionSummary";
 import { Sparkline } from "../components/charts/Sparkline";
@@ -197,6 +198,10 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
           </Card>
         </div>
       </div>
+
+      <Card as="section" title={`Cómo se hace: ${meta.label}`}>
+        <ExerciseGuide exercise={session.exercise} />
+      </Card>
 
       {session.finished && (
         <SessionSummary

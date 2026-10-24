@@ -21,10 +21,22 @@ describe("App", () => {
       STORAGE_KEYS.user,
       JSON.stringify({ id: "1", name: "Ana Pérez", guest: true }),
     );
+    window.localStorage.setItem(
+      `${STORAGE_KEYS.profile}.1`,
+      JSON.stringify({ goal: "health", weightKg: 70, heightCm: 170, age: null, sex: null, targetWeightKg: null, weeks: 12, daysPerWeek: 3, diet: "omnivore", startedAt: "2026-10-01T00:00:00.000Z" }),
+    );
     window.location.hash = "#/entrenar";
     render(<App />);
     expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Navegación móvil" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: /Sentadilla/ })).toBeInTheDocument();
+  });
+
+  it("pide el perfil con el asistente cuando la persona aún no lo ha completado", () => {
+    window.localStorage.setItem(STORAGE_KEYS.token, "test-token");
+    window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify({ id: "7", name: "Luis", guest: false }));
+    render(<App />);
+    expect(screen.getByText(/qué quieres lograr/i)).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
   });
 });

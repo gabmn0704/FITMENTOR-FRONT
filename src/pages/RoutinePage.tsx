@@ -3,6 +3,8 @@ import { ArrowRight, Dumbbell, Timer } from "lucide-react";
 import { Button, Card, EmptyState, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
+import { useProfile } from "../hooks/useProfile";
+import { WeekPlanView } from "../components/plan/WeekPlanView";
 import { Odometer } from "../components/motion/Odometer";
 import { SinglyLinkedList, type SinglyNode } from "../structures";
 import { routineApi } from "../lib/services";
@@ -24,7 +26,8 @@ function buildList(routine: Routine | null): SinglyLinkedList<RoutineItem> {
 }
 
 export function RoutinePage({ onNavigate }: RoutinePageProps) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const { profile, reset } = useProfile();
   const routine = useAsync(() => routineApi.get(token!), [token], Boolean(token));
   const list = useMemo(() => buildList(routine.data), [routine.data]);
   const [node, setNode] = useState<SinglyNode<RoutineItem> | null>(null);
@@ -51,6 +54,21 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
         <h1>Tu rutina de hoy</h1>
         <p>{routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}</p>
       </header>
+
+      {profile ? (
+        <WeekPlanView profile={profile} level={user?.level ?? "BEGINNER"} onNavigate={onNavigate} />
+      ) : (
+        <Card as="section" title="Haz tu plan personal">
+          <p className="muted" style={{ marginBottom: 16 }}>
+            Cuéntanos tu objetivo, peso, altura y plazo, y armamos tu rutina semanal con la alimentación de cada día.
+          </p>
+          <Button variant="primary" large onClick={reset}>
+            Crear mi plan
+          </Button>
+        </Card>
+      )}
+
+      {profile && routine.data && current && <h2 className="section-title">Ajuste de la IA según tu última sesión</h2>}
 
       {!token && <Notice tone="info">Inicia sesión para generar tu rutina personalizada.</Notice>}
       {token && routine.loading && <div className="skeleton" style={{ height: 320 }} aria-label="Cargando rutina" />}

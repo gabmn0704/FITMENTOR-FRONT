@@ -1,4 +1,4 @@
-/* Estructura de la app: riel cobalto en escritorio, barra inferior en móvil. */
+/* Estructura de la app: riel de tinta en escritorio, barra inferior en móvil. */
 
 .app-shell {
   display: grid;
@@ -17,7 +17,7 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-5) var(--space-4) var(--space-5) var(--space-4);
-  background: var(--cobalt);
+  background: var(--rail);
   color: var(--on-cobalt);
 }
 
@@ -53,8 +53,8 @@
   right: 0;
   height: 44px;
   border-radius: var(--radius-sm);
-  background: var(--on-cobalt);
-  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.55);
+  background: var(--cobalt);
+  box-shadow: 0 10px 24px -12px rgb(27 59 255 / 0.9);
   transform: translateY(calc(var(--idx, 0) * 48px));
   transition: transform 460ms var(--ease-drawer);
   pointer-events: none;
@@ -80,7 +80,7 @@
 }
 
 .nav-link[aria-current="page"] {
-  color: var(--cobalt);
+  color: #ffffff;
 }
 
 .sidebar .nav-link:focus-visible {
@@ -97,7 +97,7 @@
   margin-top: auto;
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--cobalt-deep);
+  background: rgb(255 255 255 / 0.07);
 }
 
 .sidebar__footer strong {
@@ -247,8 +247,8 @@
     gap: 2px;
     height: calc(var(--nav-height) + env(safe-area-inset-bottom));
     padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-    background: var(--cobalt);
-    box-shadow: 0 -12px 32px -16px rgb(13 33 194 / 0.7);
+    background: var(--rail);
+    box-shadow: 0 -12px 32px -16px rgb(10 12 18 / 0.7);
   }
 
   .bottom-nav .nav-link {
@@ -265,8 +265,8 @@
   }
 
   .bottom-nav .nav-link[aria-current="page"] {
-    background: var(--on-cobalt);
-    color: var(--cobalt);
+    background: var(--cobalt);
+    color: #ffffff;
   }
 
   .topbar__title {
@@ -278,4 +278,13 @@
   .bottom-nav .nav-link {
     font-size: 9px;
   }
+}
+
+/* Campos de tinta: dentro de ellos el texto "sobre cobalto" pasa a ser texto sobre tinta. */
+.sidebar,
+.bottom-nav,
+.race-hero,
+.access__field {
+  --on-cobalt: var(--on-ink);
+  --on-cobalt-muted: var(--on-ink-muted);
 }

@@ -7,6 +7,7 @@ import {
   advanceRepPhase,
   analyzePose,
   AngleSmoother,
+  MIN_REP_MS,
   coachingCue,
   SKELETON_EDGES,
   type RepPhase,
@@ -110,6 +111,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   /** Reps contadas en local, para deshacerlas en orden LIFO. */
   const undoStack = useRef(new Stack<number>());
   const smoother = useRef(new AngleSmoother());
+  const repStartedAt = useRef<number | null>(null);
   const scoreWindow = useRef(new CircularBuffer<number>(TREND_SIZE));
   const kneeSum = useRef({ total: 0, count: 0 });
   const sessionId = useRef<string>("");
@@ -187,8 +189,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       c.width = v.videoWidth || 640;
       c.height = v.videoHeight || 480;
       ctx.clearRect(0, 0, c.width, c.height);
-      ctx.strokeStyle = "#c6ff3d";
-      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#f4f6fb";
+      ctx.fillStyle = "#ff3d1f";
       ctx.lineWidth = 4;
       ctx.lineCap = "round";
       for (const [a, b] of SKELETON_EDGES) {
@@ -263,10 +265,16 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
         if (countLocally) {
           const next = advanceRepPhase(phaseRef.current, smoothed, currentExercise);
           if (next.phase !== phaseRef.current) {
+            if (next.phase === "down") repStartedAt.current = now;
             phaseRef.current = next.phase;
             setRepPhase(next.phase);
           }
-          if (next.completed) registerRep();
+          if (next.completed) {
+            // Una repetición real dura más de una fracción de segundo; menos es ruido de la detección.
+            const took = repStartedAt.current === null ? Infinity : now - repStartedAt.current;
+            repStartedAt.current = null;
+            if (took >= MIN_REP_MS) registerRep();
+          }
         }
       }
       if (data.knee !== null) {

@@ -18,7 +18,12 @@
   --text-muted: #434a59;
   --text-subtle: #5b6272;
 
-  /* Cobalto: color de marca, ocupa el riel y las cabeceras */
+  /* Tinta: campo oscuro del riel, la portada y el acceso */
+  --rail: #0a0c12;
+  --on-ink: #f4f6fb;
+  --on-ink-muted: #b4bccd;
+
+  /* Cobalto: color de marca, reservado a datos, selección y acentos */
   --cobalt: #1b3bff;
   --cobalt-deep: #0d21c2;
   --cobalt-soft: rgb(27 59 255 / 0.1);
@@ -76,6 +81,7 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --rail: #0c111c;
   --bg: #05070c;
   --surface: #0e131d;
   --surface-2: #151b28;
@@ -102,6 +108,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
     color-scheme: dark;
+    --rail: #0c111c;
     --bg: #05070c;
     --surface: #0e131d;
     --surface-2: #151b28;
