@@ -289,10 +289,10 @@ Tactile and decisive.
 Ink rail with on-ink-muted links (700), perforated along its right edge. The active item sits on a sliding cobalt tab (44px, 460ms drawer ease, cobalt-tinted drop) and its label turns white; hover lifts inactive links to on-ink. The footer profile sits on a 7% white panel. Mobile: ink bottom bar, the active item is a cobalt block with white text. Segmented controls and auth tabs follow the same pattern: cobalt pill sliding under on-cobalt text.
 
 ### Page Header
-Bib paper (16px radius, resting shadow and hairline) with an ink condensed headline and a muted lead. A grayscale photo fills the right half (up to 640px), multiplied at 50% opacity in light and screened at 22% in dark, masked in from transparent on its left. A cobalt timing ruler runs along the bottom edge.
+Bib paper (16px radius, resting shadow and hairline) with an ink condensed headline and a muted lead. A full-colour photo fills the right side (up to 480px), at 95% opacity in light and 70% in dark, masked in from transparent on its left. A cobalt timing ruler runs along the bottom edge.
 
 ### Home Hero
-An ink field: on-ink display headline and lead, a vermilion streak icon, a diagonally clipped grayscale photo panel (luminosity blend, 92%), an on-ink timing ruler, and the white hero bib (cobalt punched holes, vermilion goal fill) placed bottom right.
+An ink field: on-ink display headline and lead, a vermilion streak icon, a diagonally clipped full-colour photo panel, an on-ink timing ruler, and the white hero bib (cobalt punched holes, vermilion goal fill) placed bottom right.
 
 ### Bib Tile (signature)
 A white card with a colour band on top, cobalt and ink alternating across a row, a punched hole at the band's left, a 2px dashed tear line, and a giant condensed numeral below. Tiles drop in staggered (90ms) with a slight rotation, then their digits roll. Hover lifts 5px and tilts 0.5deg. The hero bib and the auth form (cobalt band, paper holes) are the same object at other sizes.
@@ -306,7 +306,7 @@ One lane per day: day label, track on Tyvek shade with a cobalt bar (vermilion f
 ## Do's and Don'ts
 
 ### Do:
-- **Do** build structural regions as ink fields (`rail-ink`) with on-ink text, and photo page headers as bib paper with a faint grayscale photo and a cobalt ruler.
+- **Do** build structural regions as ink fields (`rail-ink`) with on-ink text, and photo page headers as bib paper with a full-colour photo faded in from the right and a cobalt ruler.
 - **Do** reserve race cobalt for data and selection: active tab, bib bands (alternating with ink), bars and lines, selected states, the form band, focus.
 - **Do** set every quantity in Archivo at wdth 62 / 900 and roll it in through the odometer.
 - **Do** build new data containers as bib tiles: band, punched hole, dashed tear line, numeral.

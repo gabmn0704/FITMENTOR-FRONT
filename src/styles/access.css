@@ -31,9 +31,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 80% 50%;
-  filter: grayscale(1) contrast(1.15);
-  mix-blend-mode: luminosity;
-  opacity: 0.8;
+  filter: contrast(1.05) saturate(1.05);
   animation: drift 24s ease-in-out infinite alternate;
 }
 
