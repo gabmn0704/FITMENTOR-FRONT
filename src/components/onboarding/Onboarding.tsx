@@ -19,6 +19,7 @@ import {
   type Sex,
 } from "../../lib/profile";
 import { LEVELS, levelLabel } from "../../lib/contract";
+import { AVOID_OPTIONS, type Avoid } from "../../lib/foods";
 import type { Level } from "../../types";
 
 const STEPS = ["Tu meta", "Tu cuerpo", "Plazo y ritmo", "Tu plan"] as const;
@@ -71,6 +72,7 @@ export function Onboarding() {
   const [days, setDays] = useState<"3" | "4" | "5" | "6">("4");
   const [diet, setDiet] = useState<Diet>("omnivore");
   const [level, setLevel] = useState<Level>(user?.level ?? "BEGINNER");
+  const [avoid, setAvoid] = useState<Avoid[]>([]);
   const [errors, setErrors] = useState<ProfileErrors>({});
   const [saving, setSaving] = useState(false);
 
@@ -85,8 +87,9 @@ export function Onboarding() {
       weeks: toNumber(weeks),
       daysPerWeek: Number(days) as 3 | 4 | 5 | 6,
       diet,
+      avoid,
     }),
-    [goal, weight, height, age, sex, target, weeks, days, diet],
+    [goal, weight, height, age, sex, target, weeks, days, diet, avoid],
   );
 
   const stepErrors = (index: number): ProfileErrors => {
@@ -227,6 +230,22 @@ export function Onboarding() {
                 <div className="field">
                   <span className="field__label">Alimentación</span>
                   <Segmented label="Tipo de alimentación" options={DIET_OPTIONS} value={diet} onChange={setDiet} />
+                </div>
+                <div className="field">
+                  <span className="field__label">¿Algo que no comas? (opcional)</span>
+                  <div className="chips-row" role="group" aria-label="Alimentos que evitas">
+                    {AVOID_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`chip-button${avoid.includes(option.value) ? " is-on" : ""}`}
+                        aria-pressed={avoid.includes(option.value)}
+                        onClick={() => setAvoid((current) => (current.includes(option.value) ? current.filter((value) => value !== option.value) : [...current, option.value]))}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

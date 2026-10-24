@@ -1,4 +1,5 @@
 import { STORAGE_KEYS, storage } from "./storage";
+import type { Avoid } from "./foods";
 
 /**
  * Perfil físico y de objetivo de la persona. Se pregunta tras el primer inicio de sesión y se guarda en
@@ -22,6 +23,8 @@ export interface BodyProfile {
   weeks: number;
   daysPerWeek: 3 | 4 | 5 | 6;
   diet: Diet;
+  /** Alimentos que la persona no come (alergia, creencia o gusto); el plan los excluye. */
+  avoid?: Avoid[];
   /** ISO 8601 del día en que empezó el plan; marca la semana actual. */
   startedAt: string;
 }

@@ -1,4 +1,6 @@
 import type { ExerciseId } from "../types";
+import type { CatalogId } from "./catalog";
+import { MORE_GUIDES } from "./exerciseGuideMore";
 
 /**
  * Guía visual de cada ejercicio: dos posiciones dibujadas de perfil (viewBox 200 x 160), pasos, errores
@@ -14,8 +16,12 @@ export interface PoseFrame {
   head: Pt;
   /** Cada línea es un tramo del cuerpo (pierna, torso, brazo). */
   limbs: ReadonlyArray<ReadonlyArray<Pt>>;
-  /** Barra con discos (peso muerto). */
+  /** Barra o pesa (peso muerto, press, curl…). */
   bar?: Pt;
+  /** Pesa pequeña en la mano (mancuerna, botella o mochila). */
+  weight?: Pt;
+  /** Objetos del entorno (silla, escalón, pared) como rectángulos [x, y, ancho, alto]. */
+  props?: ReadonlyArray<readonly [number, number, number, number]>;
   /** Articulación que se mide, con su etiqueta de ángulo. */
   mark?: { at: Pt; label: string; dx?: number };
 }
@@ -30,7 +36,7 @@ export interface ExerciseGuide {
 
 export const FLOOR_Y = 142;
 
-export const GUIDES: Record<ExerciseId, ExerciseGuide> = {
+const BASE_GUIDES: Record<ExerciseId, ExerciseGuide> = {
   squat: {
     frames: [
       {
@@ -199,3 +205,6 @@ export const GUIDES: Record<ExerciseId, ExerciseGuide> = {
     camera: "De perfil, a unos 2 metros, con las dos piernas visibles.",
   },
 };
+
+/** Guía de todos los ejercicios del catálogo. */
+export const GUIDES: Record<CatalogId, ExerciseGuide> = { ...BASE_GUIDES, ...MORE_GUIDES };
