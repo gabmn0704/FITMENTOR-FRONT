@@ -134,7 +134,7 @@ describe("variedad, exclusiones y alternativas", () => {
       fish: /pescado|atún|camaron|sardina/i,
       dairy: /yogur|cottage|queso|leche/i,
       eggs: /huevo|claras/i,
-      gluten: /pan integral|pan pita|pasta|avena|cuscús|tempeh/i,
+      gluten: /pan integral|pasta|avena/i,
       pork: /cerdo/i,
     };
     for (const [avoid, pattern] of Object.entries(banned)) {
@@ -166,6 +166,38 @@ describe("variedad, exclusiones y alternativas", () => {
       expect(item.swaps.length).toBeLessThanOrEqual(3);
       expect(new Set(item.swaps).size).toBe(item.swaps.length);
       for (const swap of item.swaps) expect(swap.toLowerCase()).not.toContain(item.name.toLowerCase());
+    }
+  });
+
+  it("solo usa alimentos de la mesa colombiana: nada de tofu, pita, tempeh, soya, cuscús, quinua ni cottage", () => {
+    for (const diet of ["omnivore", "vegetarian"] as const) {
+      for (const goal of ["lose_fat", "build_muscle", "tone", "endurance", "health"] as const) {
+        const profile: BodyProfile = { ...base, diet, goal, targetWeightKg: goal === "lose_fat" ? 74 : goal === "build_muscle" ? 84 : null };
+        for (let day = 0; day < 14; day += 1) {
+          const text = JSON.stringify(mealPlanForDay(profile, true, day).meals);
+          expect(text).not.toMatch(/tofu|tempeh|soya|pita|cuscús|quinoa|quinua|cottage|camarones|pavo|nueces|chía|kiwi/i);
+        }
+      }
+    }
+  });
+
+  it("la mesa colombiana aparece de verdad: arepa, frijoles, papa criolla, plátano, aguacate, guayaba", () => {
+    const text = Array.from({ length: 28 }, (_, day) => JSON.stringify(mealPlanForDay(base, true, day).meals)).join(" ").toLowerCase();
+    for (const word of ["arepa", "frijoles", "papa criolla", "plátano maduro", "aguacate", "guayaba", "queso campesino"]) {
+      expect(text).toContain(word);
+    }
+  });
+
+  it("las cantidades se leen natural: sin repetir el alimento después de «2 huevos»", () => {
+    for (let day = 0; day < 14; day += 1) {
+      for (const meal of mealPlanForDay(base, true, day).meals) {
+        for (const item of meal.items) {
+          const phrase = `${item.amount} ${item.label}`.toLowerCase();
+          expect(phrase).not.toMatch(/huevos?.*de huevo/);
+          expect(phrase).not.toMatch(/arepas? .*de arepa/);
+          for (const swap of item.swaps) expect(swap.toLowerCase()).not.toMatch(/huevos?.*de huevo|arepas? .*de arepa|banano.*de banano/);
+        }
+      }
     }
   });
 });

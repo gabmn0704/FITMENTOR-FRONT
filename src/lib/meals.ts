@@ -9,8 +9,10 @@ import type { BodyProfile } from "./profile";
 
 export interface MealItem {
   name: string;
-  /** Texto listo para mostrar, por ejemplo "2 huevos (100 g)". */
+  /** Cantidad lista para mostrar, por ejemplo "2 huevos (100 g)" o "150 g". */
   amount: string;
+  /** Lo que sigue a la cantidad ("de pechuga de pollo cocida"); vacío si la cantidad ya nombra el alimento. */
+  label: string;
   grams: number;
   /** Otras opciones que aportan lo mismo (misma proteína o mismos carbohidratos), ya con su porción. */
   swaps: string[];
@@ -49,7 +51,8 @@ const macrosOf = (item: Food, grams: number): Macros => ({
 });
 
 function roundGrams(item: Food, grams: number): number {
-  if (item.role === "fruit" && item.unit) {
+  if (item.unit && (item.role === "fruit" || item.unit.grams >= 60)) {
+    // Frutas y piezas grandes (arepa) se sirven en mitades.
     const half = item.unit.grams / 2;
     return Math.max(1, Math.round(grams / half)) * half;
   }
@@ -61,7 +64,7 @@ function roundGrams(item: Food, grams: number): number {
 }
 
 function describe(item: Food, grams: number): string {
-  if (item.role === "fruit" && item.unit) {
+  if (item.unit && (item.role === "fruit" || item.unit.grams >= 60)) {
     const count = grams / item.unit.grams;
     const whole = Math.floor(count);
     const text = whole === 0 ? "½" : count % 1 ? `${whole}½` : String(whole);
@@ -95,35 +98,34 @@ interface SlotRule {
   topUp?: string[];
 }
 
-const VEGETABLES = ["ensalada", "brocoli", "espinaca", "zanahoria", "calabacin", "coliflor"];
-const FRUITS = ["banano", "manzana", "fresas", "papaya", "naranja", "mango", "pina", "kiwi", "pera", "uvas"];
-const NUTS = ["almendras", "nueces", "mani", "chia", "aguacate"];
+const VEGETABLES = ["ensalada", "zanahoria", "habichuela", "brocoli", "espinaca", "ahuyama", "repollo"];
+const FRUITS = ["banano", "manzana", "guayaba", "papaya", "naranja", "mango", "mora", "pina", "pera", "fresas", "mandarina", "melon", "tomate_arbol"];
+const NUTS = ["aguacate", "mani", "almendras"];
 
 /**
- * Proteínas de almuerzo y cena. El orden y las repeticiones importan: la rotación avanza por la lista, así los
- * platos más comunes salen más seguido y el pescado y los mariscos no pasan de uno de cada cinco platos.
+ * Proteínas de almuerzo y cena de la mesa colombiana. El orden y las repeticiones importan: la rotación avanza por
+ * la lista, así los platos más comunes (pollo, carne, frijoles, lentejas) salen más seguido y el pescado no pasa
+ * de uno de cada cinco platos.
  */
-const LUNCH_PROTEINS = ["pollo", "lentejas", "res", "pollo", "pescado", "frijoles", "pavo", "cerdo", "pollo", "garbanzos", "res", "muslo", "atun", "tofu", "lentejas", "camaron", "pavo", "huevo", "soya", "tempeh"];
-const DINNER_PROTEINS = ["huevo", "pollo", "pavo", "lentejas", "tofu", "res", "pescado", "frijoles", "muslo", "garbanzos", "atun", "cerdo", "pollo", "queso", "camaron", "huevo", "soya", "tempeh"];
-/** Con alimentación vegetariana se usan las mismas listas sin lo que lleva carne o pescado. Los productos de soya solo entran ahí. */
-const VEGETARIAN_ONLY = new Set(["soya", "tempeh"]);
+const LUNCH_PROTEINS = ["pollo", "frijoles", "res", "lentejas", "pollo", "pescado", "desmechada", "cerdo", "pollo", "arveja", "res", "muslo", "atun", "frijoles", "huevo", "lentejas", "garbanzos", "muslo", "res", "pollo"];
+const DINNER_PROTEINS = ["huevo", "pollo", "queso", "lentejas", "res", "huevo", "pescado", "frijoles", "muslo", "arveja", "cerdo", "pollo", "desmechada", "garbanzos", "huevo", "atun", "queso"];
 
 /** Equivalentes que se sugieren al cambiar una proteína, por tipo de comida. */
-const SWAP_PROTEINS_MAIN = ["pollo", "pavo", "res", "cerdo", "pescado", "atun", "huevo", "tofu", "lentejas", "garbanzos", "frijoles"];
-const SWAP_PROTEINS_LIGHT = ["huevo", "yogur", "cottage", "claras", "tofu", "queso"];
+const SWAP_PROTEINS_MAIN = ["pollo", "res", "cerdo", "pescado", "atun", "huevo", "queso", "lentejas", "frijoles", "garbanzos", "arveja"];
+const SWAP_PROTEINS_LIGHT = ["huevo", "yogur", "queso", "claras", "mani"];
 
 const SLOT_RULES: Record<Slot, SlotRule> = {
   desayuno: {
     title: "Desayuno",
     share: 0.24,
     proteinShare: 0.24,
-    proteins: ["huevo", "yogur", "cottage", "tofu", "claras", "queso", "tempeh"],
+    proteins: ["huevo", "queso", "yogur", "huevo", "claras", "frijoles", "queso", "mani"],
     swapProteins: SWAP_PROTEINS_LIGHT,
-    carbs: ["avena", "tortilla", "pan", "platano", "pita"],
+    carbs: ["arepa", "pan", "avena", "arepa", "platano", "pan", "arepa"],
     fruit: FRUITS,
     fat: NUTS,
     veg: false,
-    topUp: ["claras", "yogur", "tofu"],
+    topUp: ["claras", "queso", "yogur", "frijoles"],
   },
   almuerzo: {
     title: "Almuerzo",
@@ -131,34 +133,34 @@ const SLOT_RULES: Record<Slot, SlotRule> = {
     proteinShare: 0.32,
     proteins: LUNCH_PROTEINS,
     swapProteins: SWAP_PROTEINS_MAIN,
-    carbs: ["arroz", "papa", "camote", "pasta", "quinoa", "yuca", "arroz_int", "platano", "choclo", "cuscus"],
-    fat: ["aceite", "aguacate", "nueces", "almendras"],
+    carbs: ["arroz", "papa", "arroz", "yuca", "platano", "arroz", "criolla", "batata", "arroz_int", "mazorca", "pasta", "platano_verde", "arepa"],
+    fat: ["aguacate", "aceite", "mani"],
     veg: true,
-    topUp: ["huevo", "queso", "tofu"],
+    topUp: ["huevo", "queso", "claras"],
   },
   merienda: {
     title: "Merienda",
     share: 0.12,
     proteinShare: 0.1,
-    proteins: ["yogur", "cottage", "tofu", "queso"],
+    proteins: ["yogur", "queso", "huevo", "mani", "yogur", "queso"],
     swapProteins: SWAP_PROTEINS_LIGHT,
-    carbs: ["avena", "tortilla", "pan", "platano"],
+    carbs: ["avena", "arepa", "pan", "platano"],
     fruit: FRUITS,
     fat: NUTS,
     veg: false,
-    topUp: ["yogur", "tofu"],
+    topUp: ["yogur", "queso", "claras"],
   },
   post: {
     title: "Después de entrenar",
     share: 0.14,
     proteinShare: 0.16,
-    proteins: ["yogur", "huevo", "pavo", "cottage", "tofu", "atun"],
-    swapProteins: SWAP_PROTEINS_LIGHT,
-    carbs: ["arroz", "camote", "pan", "tortilla", "avena"],
-    fruit: ["banano", "mango", "pina", "uvas", "naranja", "manzana"],
-    fat: ["mani", "almendras", "nueces"],
+    proteins: ["yogur", "huevo", "atun", "queso", "pollo", "claras"],
+    swapProteins: SWAP_PROTEINS_MAIN,
+    carbs: ["arroz", "batata", "pan", "arepa", "avena", "platano"],
+    fruit: ["banano", "mango", "pina", "naranja", "manzana", "guayaba"],
+    fat: ["mani", "almendras", "aguacate"],
     veg: false,
-    topUp: ["yogur", "tofu"],
+    topUp: ["yogur", "queso", "claras"],
   },
   cena: {
     title: "Cena",
@@ -166,10 +168,10 @@ const SLOT_RULES: Record<Slot, SlotRule> = {
     proteinShare: 0.18,
     proteins: DINNER_PROTEINS,
     swapProteins: SWAP_PROTEINS_MAIN,
-    carbs: ["papa", "camote", "arroz", "tortilla", "quinoa", "yuca", "choclo", "pasta", "pan"],
-    fat: ["aceite", "aguacate", "nueces", "almendras"],
+    carbs: ["arepa", "papa", "platano", "arroz", "yuca", "batata", "pan", "criolla", "mazorca"],
+    fat: ["aguacate", "aceite", "mani"],
     veg: true,
-    topUp: ["huevo", "queso", "tofu"],
+    topUp: ["huevo", "queso", "claras"],
   },
 };
 
@@ -178,15 +180,30 @@ interface Pantry {
   avoid: readonly Avoid[];
 }
 
+/** Alimentos de la lista que la persona puede comer, sin repetir ninguno. */
 function allowedList(ids: string[], pantry: Pantry): Food[] {
-  return ids.map((id) => FOODS[id]).filter((item) => item && isAllowed(item, pantry.diet, pantry.avoid));
+  const seen = new Set<string>();
+  return ids
+    .filter((id) => !seen.has(id) && seen.add(id))
+    .map((id) => FOODS[id])
+    .filter((item) => item && isAllowed(item, pantry.diet, pantry.avoid));
+}
+
+/** "de queso campesino…" salvo que la medida casera ya diga el alimento (2 huevos, ½ arepa, 1 banano). */
+function labelFor(item: Food): string {
+  const name = item.name.toLowerCase();
+  const named = item.unit ? [item.unit.one, item.unit.many].some((word) => name.includes(word.toLowerCase())) : false;
+  return named ? "" : `de ${name}`;
 }
 
 /** Elige por rotación entre lo que la persona puede comer; si no queda nada, un alimento seguro de respaldo. */
-function pick(ids: string[], pantry: Pantry, seed: number, fallback: string): Food {
-  const usable = allowedList(ids, pantry);
+function pick(ids: string[], pantry: Pantry, seed: number, fallback: string, used: ReadonlySet<string> = new Set()): Food {
+  const allowed = allowedList(ids, pantry);
+  // Dentro del mismo día se evita repetir alimento mientras quede otra opción.
+  const fresh = allowed.filter((item) => !used.has(item.id));
+  const usable = fresh.length ? fresh : allowed;
   if (usable.length) return usable[Math.abs(seed) % usable.length];
-  const safe = allowedList([fallback, "tofu", "lentejas", "arroz", "papa", "aceite"], pantry);
+  const safe = allowedList([fallback, "lentejas", "frijoles", "arroz", "papa", "aceite"], pantry);
   return safe[0] ?? FOODS[fallback];
 }
 
@@ -210,13 +227,13 @@ function equivalents(entry: Entry, nutrient: "p" | "c", pool: string[], pantry: 
     const needed = (entry.grams * entry.food[nutrient]) / alt[nutrient];
     if (needed > (MAX_GRAMS[alt.id] ?? 450)) continue;
     const grams = roundGrams(alt, needed);
-    out.push(`${describe(alt, grams)} de ${alt.name.toLowerCase()}`);
+    out.push([describe(alt, grams), labelFor(alt)].filter(Boolean).join(" "));
   }
   return out;
 }
 
 /** Arma una comida que se acerca a la meta de calorías y macros del hueco. */
-function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Meal {
+function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number, used: Set<string>): Meal {
   const rule = SLOT_RULES[slot];
   const entries: Entry[] = [];
   const add = (item: Food, grams: number): Entry => {
@@ -225,12 +242,10 @@ function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Me
     return entry;
   };
 
-  const veg = rule.veg ? pick(VEGETABLES, pantry, seed, "ensalada") : null;
+  const veg = rule.veg ? pick(VEGETABLES, pantry, seed, "ensalada", used) : null;
   if (veg) add(veg, 150);
 
-  // Los productos de soya solo se sirven como plato principal en la alimentación vegetariana.
-  const proteinPool = pantry.diet === "omnivore" ? rule.proteins.filter((id) => !VEGETARIAN_ONLY.has(id)) : rule.proteins;
-  const protein = pick(proteinPool, pantry, seed, "tofu");
+  const protein = pick(rule.proteins, pantry, seed, "lentejas", used);
   const proteinNeeded = Math.max(0, target.proteinG - totalOf(entries).proteinG);
   // Las legumbres traen muchos carbohidratos: la ración se limita para que no se coma casi todo el hueco de calorías.
   const kcalCap = protein.c >= 15 ? ((target.kcal * 0.6) / protein.kcal) * 100 : Infinity;
@@ -243,8 +258,8 @@ function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Me
     if (support) add(support, Math.min((shortfall / support.p) * 100, MAX_GRAMS[support.id] ?? 250));
   }
 
-  const carbFood = pick(rule.carbs, pantry, seed + 1, "arroz");
-  const fruit = rule.fruit ? pick(rule.fruit, pantry, seed + 2, "manzana") : null;
+  const carbFood = pick(rule.carbs, pantry, seed + 1, "arroz", used);
+  const fruit = rule.fruit ? pick(rule.fruit, pantry, seed + 2, "manzana", used) : null;
   const carbNeeded = Math.max(0, target.carbsG - totalOf(entries).carbsG);
   let mainCarb: Entry | null = null;
   if (fruit) {
@@ -257,7 +272,7 @@ function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Me
   // La grasa se cuadra con su propia meta, para que los macros salgan parejos.
   const fatLeft = target.fatG - totalOf(entries).fatG;
   if (rule.fat && fatLeft >= 3) {
-    const fatFood = pick(rule.fat, pantry, seed + 3, "aceite");
+    const fatFood = pick(rule.fat, pantry, seed + 3, "aceite", used);
     add(fatFood, Math.min((fatLeft / fatFood.f) * 100, fatFood.id === "aceite" ? 25 : fatFood.id === "aguacate" ? 120 : 45));
   }
 
@@ -294,7 +309,7 @@ function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Me
     let swaps: string[] = [];
     if (entry === mainProteinRounded) swaps = equivalents(entry, "p", rule.swapProteins, pantry, seed + 1);
     else if (entry === mainCarbRounded) swaps = equivalents(entry, "c", rule.carbs, pantry, seed + 2);
-    return { name: entry.food.name, grams: entry.grams, amount: describe(entry.food, entry.grams), swaps };
+    return { name: entry.food.name, grams: entry.grams, amount: describe(entry.food, entry.grams), label: labelFor(entry.food), swaps };
   });
 
   const side = veg ? veg.short : fruit ? fruit.short : null;
@@ -309,6 +324,7 @@ function buildMeal(slot: Slot, target: Macros, pantry: Pantry, seed: number): Me
     .join(" ")
     .replace(/ y ([^ ]+) con (.+) y (.+)$/, " y $1 con $2 y $3");
   const total = totalOf(rounded);
+  for (const entry of entries) used.add(entry.food.id);
 
   return {
     slot,
@@ -333,13 +349,14 @@ export function mealPlanForDay(profile: BodyProfile, trainingDay: boolean, seed 
   const shareTotal = slots.reduce((acc, slot) => acc + SLOT_RULES[slot].share, 0);
   const proteinTotal = slots.reduce((acc, slot) => acc + SLOT_RULES[slot].proteinShare, 0);
 
+  const used = new Set<string>();
   const meals = slots.map((slot, index) => {
     const rule = SLOT_RULES[slot];
     const kcal = (targets.kcal * rule.share) / shareTotal;
     const proteinG = (targets.proteinG * rule.proteinShare) / proteinTotal;
     const fatG = (targets.fatG * rule.share) / shareTotal;
     const carbsG = Math.max(0, (kcal - proteinG * 4 - fatG * 9) / 4);
-    return buildMeal(slot, { kcal, proteinG, carbsG, fatG }, pantry, seed * 3 + index * 5 + (slot === "cena" ? 2 : 0));
+    return buildMeal(slot, { kcal, proteinG, carbsG, fatG }, pantry, seed * 3 + index * 5 + (slot === "cena" ? 2 : 0), used);
   });
 
   const total = meals.reduce<Macros>((acc, meal) => sum(acc, meal), { kcal: 0, proteinG: 0, carbsG: 0, fatG: 0 });
