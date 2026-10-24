@@ -1,6 +1,6 @@
 /* Estilos específicos de cada pantalla. */
 
-/* ---------- Cabeceras de página: papel con la foto en gris y regla de tiempo ---------- */
+/* ---------- Cabeceras de página: papel con la foto a color y regla de tiempo ---------- */
 .page-header[data-banner] {
   position: relative;
   isolation: isolate;
@@ -15,7 +15,7 @@
 }
 
 .page-header[data-banner] h1 {
-  font-size: clamp(56px, 8vw, 6rem);
+  font-size: clamp(52px, 7vw, 5.2rem);
   line-height: 0.86;
   font-weight: 900;
   font-stretch: 62%;
@@ -32,19 +32,17 @@
   position: absolute;
   inset: 0 0 0 auto;
   z-index: -1;
-  width: min(54%, 640px);
+  width: min(38%, 480px);
   background-size: cover;
   background-position: center;
-  filter: grayscale(1) contrast(1.05);
-  mix-blend-mode: multiply;
-  opacity: 0.5;
+  filter: saturate(1.05);
+  opacity: 0.95;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
 }
 
 :root[data-theme="dark"] .page-header[data-banner]::before {
-  mix-blend-mode: screen;
-  opacity: 0.22;
+  opacity: 0.7;
 }
 
 .page-header[data-banner="ropes"]::before { background-image: url("/img/ropes.jpg"); }
@@ -142,9 +140,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 30%;
-  filter: grayscale(1) contrast(1.2);
-  mix-blend-mode: luminosity;
-  opacity: 0.92;
+  filter: contrast(1.04) saturate(1.05);
 }
 
 /* Dorsal de la meta semanal: un papel Tyvek con la cifra grande. */

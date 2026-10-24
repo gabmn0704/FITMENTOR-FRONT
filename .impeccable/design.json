@@ -467,7 +467,7 @@
       }
     ],
     "dos": [
-      "Do build structural regions as ink fields (`rail-ink`) with on-ink text, and photo page headers as bib paper with a faint grayscale photo and a cobalt ruler.",
+      "Do build structural regions as ink fields (`rail-ink`) with on-ink text, and photo page headers as bib paper with a full-colour photo faded in from the right and a cobalt ruler.",
       "Do reserve race cobalt for data and selection: active tab, bib bands (alternating with ink), bars and lines, selected states, the form band, focus.",
       "Do set every quantity in Archivo at wdth 62 / 900 and roll it in through the odometer.",
       "Do build new data containers as bib tiles: band, punched hole, dashed tear line, numeral.",
