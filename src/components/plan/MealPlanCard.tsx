@@ -1,7 +1,8 @@
 import { Droplets, Flame, Utensils } from "lucide-react";
 import { Card } from "../ui";
 import { Odometer } from "../motion/Odometer";
-import { mealPlanForDay, postWorkoutTip } from "../../lib/nutrition";
+import { mealPlanForDay } from "../../lib/meals";
+import { postWorkoutTip } from "../../lib/nutrition";
 import type { BodyProfile } from "../../lib/profile";
 
 interface MealPlanCardProps {
@@ -14,7 +15,7 @@ interface MealPlanCardProps {
 
 /** Plan de alimentación del día, justo después de la rutina: metas, comidas con gramos y consejo post-entreno. */
 export function MealPlanCard({ profile, dayIndex, week, trainingDay }: MealPlanCardProps) {
-  const day = mealPlanForDay(profile, trainingDay, dayIndex + (week - 1) * 3);
+  const day = mealPlanForDay(profile, trainingDay, dayIndex + (week - 1) * 7);
   const { targets, total } = day;
   const macros = [
     { label: "Calorías", value: targets.kcal, got: total.kcal, unit: "" },
@@ -57,10 +58,21 @@ export function MealPlanCard({ profile, dayIndex, week, trainingDay }: MealPlanC
                 {meal.kcal} kcal · {meal.proteinG} g prot.
               </span>
             </div>
+            <p className="meal__dish">{meal.dish}</p>
             <ul className="meal__items">
               {meal.items.map((item) => (
                 <li key={item.name}>
                   <strong>{item.amount}</strong> {item.name.toLowerCase()}
+                  {item.swaps.length > 0 && (
+                    <details className="swaps">
+                      <summary>Cambiar por</summary>
+                      <ul>
+                        {item.swaps.map((swap) => (
+                          <li key={swap}>{swap}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
                 </li>
               ))}
             </ul>

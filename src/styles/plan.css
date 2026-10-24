@@ -444,3 +444,44 @@
   background: var(--cobalt);
   color: var(--on-cobalt);
 }
+
+.meal__dish {
+  font-family: var(--font-display);
+  font-stretch: 68%;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.swaps {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.swaps summary {
+  width: fit-content;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--accent-text);
+}
+
+.swaps ul {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 4px;
+  padding: 10px 12px;
+  list-style: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.swaps ul li {
+  padding-left: 0;
+  color: var(--text-muted);
+}
+
+.swaps ul li::before {
+  display: none;
+}
