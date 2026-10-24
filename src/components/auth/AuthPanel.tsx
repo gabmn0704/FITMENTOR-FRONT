@@ -4,9 +4,12 @@ import { Button, Notice } from "../ui";
 import { useAuth } from "../../hooks/useAuth";
 import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../../lib/config";
 import { loadGoogleIdentity } from "../../lib/google";
-import { ApiError } from "../../lib/api";
+import { ApiError, warmUpBackend } from "../../lib/api";
 
 type Mode = "login" | "register";
+
+const RETRY_ATTEMPTS = 4;
+const RETRY_DELAY_MS = 8000;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,7 +31,9 @@ function errorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 404) {
     return "Este servidor aún no admite cuentas por correo. Usa Google o entra como invitado.";
   }
-  if (error instanceof ApiError && error.status === 0) return error.message;
+  if (error instanceof ApiError && error.status === 0) {
+    return "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo; si persiste, entra como invitado en un minuto.";
+  }
   if (error instanceof Error && error.message) return error.message;
   return "No se pudo iniciar sesión. Inténtalo de nuevo.";
 }
@@ -90,14 +95,32 @@ export function AuthPanel() {
     };
   }, [loginWithGoogle]);
 
+  const [waking, setWaking] = useState(false);
+
+  useEffect(() => {
+    warmUpBackend();
+  }, []);
+
+  /** Un fallo de red suele ser el servidor gratuito despertando: se reintenta unas veces antes de rendirse. */
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
     setError("");
     try {
-      await action();
+      for (let attempt = 0; ; attempt += 1) {
+        try {
+          await action();
+          return;
+        } catch (err) {
+          const offline = err instanceof ApiError && err.status === 0;
+          if (!offline || attempt >= RETRY_ATTEMPTS) throw err;
+          setWaking(true);
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+        }
+      }
     } catch (err) {
       setError(errorMessage(err));
     } finally {
+      setWaking(false);
       setBusy(false);
     }
   };
@@ -140,7 +163,10 @@ export function AuthPanel() {
         </button>
       </div>
 
-      {error ? <Notice tone="error">{error}</Notice> : authNotice && <Notice tone="info">{authNotice}</Notice>}
+      {waking && !error && (
+        <Notice tone="info">El servidor estaba dormido y está despertando. Puede tardar hasta un minuto; seguimos intentando…</Notice>
+      )}
+      {error ? <Notice tone="error">{error}</Notice> : !waking && authNotice && <Notice tone="info">{authNotice}</Notice>}
 
       <form className="stack" onSubmit={onSubmit} noValidate>
         {mode === "register" && (
