@@ -275,6 +275,7 @@ const SLOT_RULES: Record<Slot, SlotRule> = {
     proteins: ["huevo", "yogur", "cottage", "claras"],
     carbs: ["avena", "pan", "tortilla"],
     fruit: ["banano", "manzana", "fresas"],
+    fat: ["almendras", "mani"],
     veg: false,
     proteinShare: 0.24,
     topUp: "claras",
@@ -387,10 +388,11 @@ function buildMeal(slot: Slot, target: Macros, diet: BodyProfile["diet"], seed: 
     mainCarb = add(carbFood, (carbNeeded / carbFood.c) * 100);
   }
 
-  const fatLeft = (target.kcal - totalOf(entries).kcal) / 9;
-  if (rule.fat && fatLeft >= 4) {
+  // La grasa se cuadra con su propia meta (no con las calorías que sobren), para que los macros salgan parejos.
+  const fatLeft = target.fatG - totalOf(entries).fatG;
+  if (rule.fat && fatLeft >= 3) {
     const fatFood = pick(rule.fat, diet, seed + 3);
-    add(fatFood, Math.min((fatLeft / fatFood.f) * 100, fatFood.id === "aceite" ? 15 : 80));
+    add(fatFood, Math.min((fatLeft / fatFood.f) * 100, fatFood.id === "aceite" ? 20 : 90));
   }
 
   // Los demás alimentos (cereal, legumbre, verdura) también aportan proteína: se descuenta de la ración principal.

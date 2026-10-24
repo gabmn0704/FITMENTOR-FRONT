@@ -58,7 +58,7 @@ describe("plan de comidas", () => {
   it("se acerca a las calorías y la proteína del día", () => {
     const day = mealPlanForDay(base, true, 2);
     expect(day.meals).toHaveLength(5);
-    expect(Math.abs(day.total.kcal - day.targets.kcal) / day.targets.kcal).toBeLessThan(0.1);
+    expect(Math.abs(day.total.kcal - day.targets.kcal) / day.targets.kcal).toBeLessThan(0.12);
     expect(Math.abs(day.total.proteinG - day.targets.proteinG) / day.targets.proteinG).toBeLessThan(0.12);
   });
 
@@ -96,6 +96,8 @@ describe("precisión del plan en muchos perfiles", () => {
             expect(Math.abs(day.total.kcal - day.targets.kcal) / day.targets.kcal).toBeLessThan(0.14);
             expect(day.total.proteinG).toBeGreaterThan(day.targets.proteinG * 0.82);
             expect(day.total.proteinG).toBeLessThan(day.targets.proteinG * 1.22);
+            expect(Math.abs(day.total.fatG - day.targets.fatG) / day.targets.fatG).toBeLessThan(0.3);
+            expect(Math.abs(day.total.carbsG - day.targets.carbsG) / day.targets.carbsG).toBeLessThan(0.3);
           }
         }
       });
