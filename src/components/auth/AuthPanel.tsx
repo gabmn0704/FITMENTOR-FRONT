@@ -22,7 +22,7 @@ export function passwordStrength(password: string): number {
 }
 
 const STRENGTH_LABELS = ["", "Débil", "Aceptable", "Buena", "Fuerte"];
-const STRENGTH_COLORS = ["", "var(--danger)", "var(--orange)", "var(--yellow)", "var(--lime)"];
+const STRENGTH_COLORS = ["", "var(--signal)", "var(--signal)", "var(--cobalt)", "var(--good)"];
 
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 404) {

@@ -3,6 +3,7 @@ import { ArrowRight, Dumbbell, Timer } from "lucide-react";
 import { Button, Card, EmptyState, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
+import { Odometer } from "../components/motion/Odometer";
 import { SinglyLinkedList, type SinglyNode } from "../structures";
 import { routineApi } from "../lib/services";
 import { exerciseLabel } from "../lib/exercises";
@@ -47,7 +48,6 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
   return (
     <div className="stack">
       <header className="page-header" data-banner="core">
-        <p className="eyebrow">Plan adaptativo</p>
         <h1>Tu rutina de hoy</h1>
         <p>{routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}</p>
       </header>
@@ -58,14 +58,14 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
 
       {routine.data && current && (
         <div className="home-split">
-          <Card eyebrow={`Ejercicio ${position} de ${list.size}`} title={exerciseLabel(current.exercise)} className="stack" as="div">
+          <Card title={exerciseLabel(current.exercise)} className="stack" as="div">
             <div className="row" style={{ gap: 28 }}>
               <div className="stat">
-                <span className="stat__value tabular">{current.sets}</span>
+                <span className="stat__value tabular"><Odometer key={`s-${position}`} value={current.sets} /></span>
                 <span className="stat__label">series</span>
               </div>
               <div className="stat">
-                <span className="stat__value tabular">{current.reps}</span>
+                <span className="stat__value tabular"><Odometer key={`r-${position}`} value={current.reps} /></span>
                 <span className="stat__label">repeticiones</span>
               </div>
               <div className="stat">
@@ -84,7 +84,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
             </div>
           </Card>
 
-          <Card eyebrow="Plan completo" title={`Nivel ${levelLabel(routine.data.level).toLowerCase()}`} as="div">
+          <Card title={`Nivel ${levelLabel(routine.data.level).toLowerCase()}`} as="div">
             <ol className="stack" style={{ gap: 10, padding: 0, margin: 0, listStyle: "none" }}>
               {list.toArray().map((item, index) => (
                 <li key={`${item.exercise}-${index}`}>

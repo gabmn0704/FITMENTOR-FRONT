@@ -1,4 +1,4 @@
-/* Estructura de la app: barra lateral en escritorio, barra inferior en móvil. */
+/* Estructura de la app: riel cobalto en escritorio, barra inferior en móvil. */
 
 .app-shell {
   display: grid;
@@ -7,16 +7,30 @@
   background: var(--bg);
 }
 
+/* Riel de navegación: el cobalto de la carrera, con borde perforado como el de un dorsal. */
 .sidebar {
   position: sticky;
   top: 0;
+  z-index: var(--z-rail);
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  padding: var(--space-5) var(--space-4);
-  border-right: 1px solid var(--surface-border);
-  background: var(--bg-elevated);
+  gap: var(--space-6);
+  padding: var(--space-5) var(--space-4) var(--space-5) var(--space-4);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+}
+
+.sidebar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 5px;
+  bottom: 0;
+  width: 6px;
+  pointer-events: none;
+  background: radial-gradient(circle at 3px 50%, var(--bg) 2.4px, transparent 3px) 0 0 / 6px 18px repeat-y;
+  opacity: 0.9;
 }
 
 .brand {
@@ -24,67 +38,83 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: -0.02em;
-}
-
-.brand__mark {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  background: var(--lime);
-  color: var(--lime-ink);
-  box-shadow: 0 0 24px -4px var(--lime);
 }
 
 .nav-list {
+  position: relative;
   display: grid;
   gap: 4px;
 }
 
+.nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--on-cobalt);
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.55);
+  transform: translateY(calc(var(--idx, 0) * 48px));
+  transition: transform 460ms var(--ease-drawer);
+  pointer-events: none;
+}
+
 .nav-link {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: 44px;
   padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  color: var(--on-cobalt-muted);
+  font-weight: 700;
   text-decoration: none;
-  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  transition: color var(--dur-base) ease, transform 100ms var(--ease-out);
 }
 
-.nav-link:hover {
-  background: var(--surface-strong);
-  color: var(--text);
+.nav-link:active {
+  transform: scale(0.97);
 }
 
 .nav-link[aria-current="page"] {
-  background: var(--field-lime);
-  color: var(--field-lime-ink);
+  color: var(--cobalt);
 }
 
-.nav-link[aria-current="page"] svg {
-  color: var(--field-lime-ink);
+.sidebar .nav-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--on-cobalt);
 }
 
-.nav-link[aria-current="page"]::before {
-  display: none;
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:not([aria-current="page"]):hover {
+    color: var(--on-cobalt);
+  }
 }
 
 .sidebar__footer {
   margin-top: auto;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--cobalt-deep);
+}
+
+.sidebar__footer strong {
+  display: block;
+  font-size: 14px;
+  color: var(--on-cobalt);
+}
+
+.sidebar__footer span {
+  font-size: 12px;
+  color: var(--on-cobalt-muted);
 }
 
 .main {
+  position: relative;
   min-width: 0;
-  padding: var(--space-5) var(--space-6) var(--space-7);
+  padding: var(--space-5) var(--space-6) var(--space-8);
 }
 
 .main__inner {
@@ -103,23 +133,18 @@
 
 .topbar__title {
   font-size: 13px;
+  font-weight: 600;
   color: var(--text-muted);
-}
-
-.topbar__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
 }
 
 .page-header {
   display: grid;
   gap: var(--space-2);
-  padding-top: var(--space-4);
+  padding-top: var(--space-2);
 }
 
 .page-header h1 {
-  font-size: clamp(32px, 4.4vw, 52px);
+  font-size: clamp(44px, 5.2vw, 76px);
 }
 
 .page-header p {
@@ -130,7 +155,7 @@
 .grid-cards {
   display: grid;
   gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .stack {
@@ -150,7 +175,6 @@
   display: none;
 }
 
-/* Pantalla de acceso: sin barra lateral. */
 .auth-shell {
   min-height: 100dvh;
   display: grid;
@@ -162,7 +186,7 @@
 
 @media (max-width: 1024px) {
   :root {
-    --sidebar-width: 84px;
+    --sidebar-width: 88px;
   }
 
   .sidebar .logo__word,
@@ -176,14 +200,20 @@
     padding-inline: var(--space-2);
   }
 
+  .nav-list,
+  .nav-indicator {
+    width: 56px;
+  }
+
   .nav-link {
     justify-content: center;
-    width: 52px;
+    width: 56px;
     padding: 0;
   }
 
-  .nav-link[aria-current="page"]::before {
-    left: -8px;
+  .sidebar__footer {
+    padding: var(--space-2);
+    background: transparent;
   }
 
   .main {
@@ -200,6 +230,10 @@
     display: none;
   }
 
+  .nav-indicator {
+    display: none;
+  }
+
   .main {
     padding: var(--space-4) var(--space-4) calc(var(--nav-height) + 32px + env(safe-area-inset-bottom));
   }
@@ -207,16 +241,14 @@
   .bottom-nav {
     position: fixed;
     inset: auto 0 0;
-    z-index: 30;
+    z-index: var(--z-bar);
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 2px;
     height: calc(var(--nav-height) + env(safe-area-inset-bottom));
     padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
-    border-top: 1px solid var(--surface-border);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background: var(--cobalt);
+    box-shadow: 0 -12px 32px -16px rgb(13 33 194 / 0.7);
   }
 
   .bottom-nav .nav-link {
@@ -227,15 +259,14 @@
     min-height: 48px;
     padding: 0;
     font-size: 10px;
-    border-radius: var(--radius-md);
-  }
-
-  .bottom-nav .nav-link[aria-current="page"]::before {
-    display: none;
+    border-radius: var(--radius-sm);
+    color: var(--on-cobalt-muted);
+    transition: background-color var(--dur-base) ease, color var(--dur-base) ease, transform 100ms var(--ease-out);
   }
 
   .bottom-nav .nav-link[aria-current="page"] {
-    background: var(--lime-soft);
+    background: var(--on-cobalt);
+    color: var(--cobalt);
   }
 
   .topbar__title {
@@ -247,15 +278,4 @@
   .bottom-nav .nav-link {
     font-size: 9px;
   }
-}
-
-/* Grano sutil sobre toda la app para dar textura al fondo. */
-.app-shell::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }

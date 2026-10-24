@@ -1,49 +1,49 @@
-/* Tokens de diseño. Dirección "cartel plano": colores saturados sin degradados, tipografía pesada
-   y paneles de un solo color. Tema oscuro por defecto; el claro se activa con data-theme="light". */
+/* Tokens del mundo "día de carrera": dorsal Tyvek, cobalto de pista y un solo bermellón de señal.
+   Claro por defecto; el oscuro es la misma carrera de noche. */
 :root {
-  color-scheme: dark;
-  --font-display: "Big Shoulders", "Outfit", system-ui, sans-serif;
-  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --bg: #0d0f0c;
-  --bg-elevated: #171a15;
-  --surface: #1d211a;
-  --surface-strong: #272c22;
-  --surface-border: rgb(255 255 255 / 0.09);
-  --glass-blur: 0px;
+  /* Terreno y papel */
+  --bg: #e7eaee;
+  --surface: #ffffff;
+  --surface-2: #f2f4f7;
+  --surface-3: #e1e5eb;
+  --line: rgb(10 12 18 / 0.14);
+  --line-strong: rgb(10 12 18 / 0.28);
 
-  --text: #f1f4ee;
-  --text-muted: #b2b8a8;
-  --text-subtle: #81887a;
+  /* Tinta */
+  --text: #0a0c12;
+  --text-muted: #434a59;
+  --text-subtle: #5b6272;
 
-  /* Campos de color del cartel: cada panel usa uno solo, con su tinta. */
-  --field-lime: #c6ff3d;
-  --field-lime-ink: #0d1200;
-  --field-orange: #ff6a2b;
-  --field-orange-ink: #1a0800;
-  --lime: #c6ff3d;
-  --lime-soft: rgb(198 255 61 / 0.14);
-  --lime-ink: #0d1200;
-  --orange: #ff6a2b;
-  --orange-soft: rgb(255 106 43 / 0.16);
-  --orange-ink: #1a0800;
-  --bone: #efe9d9;
-  --bone-ink: #14150f;
-  --yellow: #ffd23a;
-  --yellow-ink: #1a1400;
-  --danger: #ff6b6b;
-  --success: #6ee7a0;
-  --warning: #ffd23a;
+  /* Cobalto: color de marca, ocupa el riel y las cabeceras */
+  --cobalt: #1b3bff;
+  --cobalt-deep: #0d21c2;
+  --cobalt-soft: rgb(27 59 255 / 0.1);
+  --on-cobalt: #f6f8ff;
+  --on-cobalt-muted: #d9dfff;
+  --accent-text: #1b3bff;
 
-  --gradient-hero: none;
-  --gradient-card: none;
-  --shadow-card: none;
-  --shadow-glow: 0 0 0 3px rgb(198 255 61 / 0.35);
+  /* Bermellón: acción, en vivo, récord y error */
+  --signal: #ff3d1f;
+  --signal-ink: #0a0c12;
+  --signal-soft: rgb(255 61 31 / 0.12);
+  --signal-text: #c42a0f;
 
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 28px;
-  --radius-pill: 999px;
+  /* Estados */
+  --good: #0a7a45;
+  --good-soft: rgb(10 122 69 / 0.12);
+
+  --shadow-1: 0 1px 0 rgb(10 12 18 / 0.05), 0 10px 28px -16px rgb(10 12 18 / 0.35);
+  --shadow-2: 0 2px 0 rgb(10 12 18 / 0.06), 0 22px 48px -22px rgb(13 33 194 / 0.55);
+  --focus: 0 0 0 3px var(--bg), 0 0 0 5px var(--cobalt);
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -52,52 +52,75 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
+  --space-8: 72px;
 
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-fast: 160ms;
-  --dur-base: 320ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
   --dur-slow: 700ms;
 
-  --nav-height: 72px;
-  --sidebar-width: 256px;
-  --content-max: 1240px;
+  --nav-height: 68px;
+  --sidebar-width: 248px;
+  --content-max: 1280px;
+
+  /* Capas */
+  --z-rail: 20;
+  --z-bar: 30;
+  --z-pop: 40;
+  --z-modal: 60;
+  --z-sweep: 80;
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #ebe5d4;
-  --bg-elevated: #f7f3e8;
-  --surface: #e2dcc9;
-  --surface-strong: #d7d0bb;
-  --surface-border: rgb(20 21 15 / 0.14);
-  --text: #14150f;
-  --text-muted: #4c4f42;
-  --text-subtle: #6f7262;
-  --lime: #4f7a00;
-  --lime-soft: rgb(79 122 0 / 0.14);
-  --lime-ink: #ffffff;
-  --orange: #d9480f;
-  --orange-soft: rgb(217 72 15 / 0.12);
-  --shadow-glow: 0 0 0 3px rgb(79 122 0 / 0.3);
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #05070c;
+  --surface: #0e131d;
+  --surface-2: #151b28;
+  --surface-3: #1e2636;
+  --line: rgb(237 240 246 / 0.12);
+  --line-strong: rgb(237 240 246 / 0.26);
+  --text: #edf0f6;
+  --text-muted: #adb5c6;
+  --text-subtle: #8c95a9;
+  --cobalt: #2a47ff;
+  --cobalt-deep: #1328cf;
+  --cobalt-soft: rgb(110 135 255 / 0.16);
+  --accent-text: #8a9dff;
+  --signal-text: #ff7d66;
+  --signal-soft: rgb(255 61 31 / 0.18);
+  --good: #56d596;
+  --good-soft: rgb(86 213 150 / 0.14);
+  --shadow-1: 0 1px 0 rgb(255 255 255 / 0.04), 0 14px 32px -18px rgb(0 0 0 / 0.8);
+  --shadow-2: 0 2px 0 rgb(255 255 255 / 0.05), 0 26px 56px -24px rgb(42 71 255 / 0.65);
+  --focus: 0 0 0 3px var(--bg), 0 0 0 5px #8a9dff;
 }
 
-/* Preferencia del sistema solo si el usuario eligió "Sistema". */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]):not([data-theme="light"]) {
-    color-scheme: light;
-    --bg: #ebe5d4;
-    --bg-elevated: #f7f3e8;
-    --surface: #e2dcc9;
-    --surface-strong: #d7d0bb;
-    --surface-border: rgb(20 21 15 / 0.14);
-    --text: #14150f;
-    --text-muted: #4c4f42;
-    --text-subtle: #6f7262;
-    --lime: #4f7a00;
-    --lime-soft: rgb(79 122 0 / 0.14);
-    --lime-ink: #ffffff;
-    --orange: #d9480f;
-    --orange-soft: rgb(217 72 15 / 0.12);
+/* "Sistema": sigue la preferencia del dispositivo solo si no se eligió claro u oscuro. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: dark;
+    --bg: #05070c;
+    --surface: #0e131d;
+    --surface-2: #151b28;
+    --surface-3: #1e2636;
+    --line: rgb(237 240 246 / 0.12);
+    --line-strong: rgb(237 240 246 / 0.26);
+    --text: #edf0f6;
+    --text-muted: #adb5c6;
+    --text-subtle: #8c95a9;
+    --cobalt: #2a47ff;
+    --cobalt-deep: #1328cf;
+    --cobalt-soft: rgb(110 135 255 / 0.16);
+    --accent-text: #8a9dff;
+    --signal-text: #ff7d66;
+    --signal-soft: rgb(255 61 31 / 0.18);
+    --good: #56d596;
+    --good-soft: rgb(86 213 150 / 0.14);
+    --shadow-1: 0 1px 0 rgb(255 255 255 / 0.04), 0 14px 32px -18px rgb(0 0 0 / 0.8);
+    --shadow-2: 0 2px 0 rgb(255 255 255 / 0.05), 0 26px 56px -24px rgb(42 71 255 / 0.65);
+    --focus: 0 0 0 3px var(--bg), 0 0 0 5px #8a9dff;
   }
 }

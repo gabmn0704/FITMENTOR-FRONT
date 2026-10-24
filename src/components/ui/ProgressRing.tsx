@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 interface ProgressRingProps {
   /** Valor entre 0 y 100. */
@@ -9,9 +9,8 @@ interface ProgressRingProps {
   children?: ReactNode;
 }
 
-/** Anillo SVG con degradado lima-naranja; la animación es CSS (respeta reduced motion). */
+/** Anillo SVG de un solo color de tinta; el trazo se dibuja por CSS (respeta reduced motion). */
 export function ProgressRing({ value, size = 132, stroke = 12, label, children }: ProgressRingProps) {
-  const gradientId = `ring-${useId().replace(/:/g, "")}`;
   const clamped = Math.min(100, Math.max(0, Number.isFinite(value) ? value : 0));
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -24,12 +23,6 @@ export function ProgressRing({ value, size = 132, stroke = 12, label, children }
       aria-label={label ?? `Progreso ${Math.round(clamped)} por ciento`}
     >
       <svg width={size} height={size} aria-hidden="true">
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="var(--orange)" />
-            <stop offset="100%" stopColor="var(--lime)" />
-          </linearGradient>
-        </defs>
         <circle className="ring__track" cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} />
         <circle
           className="ring__value"
@@ -37,11 +30,11 @@ export function ProgressRing({ value, size = 132, stroke = 12, label, children }
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={`url(#${gradientId})`}
           strokeWidth={stroke}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
+          style={{ "--circ": circumference } as CSSProperties}
         />
       </svg>
       {children && <div className="ring__content">{children}</div>}

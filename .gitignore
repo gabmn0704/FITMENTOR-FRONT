@@ -13,3 +13,7 @@ vite.config.d.ts
 *.pem
 *.key
 .taste-skill/
+
+# Capturas de revisión de diseño (locales)
+.impeccable/review/
+.impeccable/questions/

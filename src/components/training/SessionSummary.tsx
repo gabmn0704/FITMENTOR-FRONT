@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { Trophy } from "lucide-react";
 import { Button, ProgressRing } from "../ui";
+import { Odometer } from "../motion/Odometer";
 import { exerciseLabel } from "../../lib/exercises";
 import { formatDuration } from "../../lib/format";
 import type { FinishedSession } from "../../hooks/useTrainingSession";
 
-const CONFETTI_COLORS = ["#c6ff3d", "#ff7a1a", "#ffffff", "#6ee7a0"];
+const CONFETTI_COLORS = ["#1b3bff", "#ff3d1f", "#ffc400", "#f6f8ff"];
 const CONFETTI_COUNT = 36;
 
 /** Confeti ligero en CSS: piezas posicionadas al azar una sola vez por resumen. */
@@ -70,7 +71,7 @@ export function SessionSummary({ session, saving, saved, onSave, onDiscard }: Se
         tabIndex={-1}
       >
         <div className="row" style={{ justifyContent: "space-between" }}>
-          <span className="chip chip--lime">
+          <span className="chip chip--cobalt">
             <Trophy size={14} aria-hidden="true" /> Sesión completada
           </span>
           <span className="muted tabular">{formatDuration(session.durationSeconds)}</span>
@@ -83,17 +84,23 @@ export function SessionSummary({ session, saving, saved, onSave, onDiscard }: Se
         </div>
         <div className="row" style={{ justifyContent: "space-around", gap: 24 }}>
           <ProgressRing value={session.score} size={150} label={`Precisión media ${session.score} por ciento`}>
-            <strong>{session.score}</strong>
+            <strong>
+              <Odometer value={session.score} />
+            </strong>
             <span>precisión</span>
           </ProgressRing>
           <div className="stack" style={{ gap: 14 }}>
             <div className="stat">
-              <span className="stat__value tabular">{session.reps}</span>
+              <span className="stat__value tabular">
+                <Odometer value={session.reps} stagger={120} />
+              </span>
               <span className="stat__label">repeticiones</span>
             </div>
             {session.avgAngles?.knee !== undefined && (
               <div className="stat">
-                <span className="stat__value tabular">{session.avgAngles.knee}°</span>
+                <span className="stat__value tabular">
+                  <Odometer value={session.avgAngles.knee} suffix="°" stagger={120} />
+                </span>
                 <span className="stat__label">ángulo medio de rodilla</span>
               </div>
             )}

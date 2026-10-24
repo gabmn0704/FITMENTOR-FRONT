@@ -26,10 +26,10 @@ export function Sparkline({ values, label, height = 64 }: SparklineProps) {
       <polyline
         points={points.join(" ")}
         fill="none"
-        stroke="var(--lime)"
+        stroke="var(--cobalt)"
         strokeWidth={2.5}
-        strokeLinejoin="round"
-        strokeLinecap="round"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
       />
     </svg>
   );

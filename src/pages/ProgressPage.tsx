@@ -1,24 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { CloudUpload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Card, EmptyState } from "../components/ui";
 import { BarChart } from "../components/charts/BarChart";
 import { LineChart } from "../components/charts/LineChart";
+import { Odometer } from "../components/motion/Odometer";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { DoublyLinkedList, type ListCursor } from "../structures";
 import { exerciseLabel } from "../lib/exercises";
-import { formatDuration, formatShortDate } from "../lib/format";
+import { formatDuration, formatShortDate, weekdayLabel } from "../lib/format";
 import { computeLocalStats } from "../lib/stats";
 import { mergeHistory, readLocalSessions, syncPendingSessions, type HistoryEntry } from "../lib/sessions";
 import { sessionsApi, statsApi } from "../lib/services";
 import type { SessionRecord, Stats } from "../types";
-
-const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-
-function weekdayLabel(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  return WEEKDAYS[new Date(y, m - 1, d).getDay()];
-}
 
 export function ProgressPage() {
   const { token } = useAuth();
@@ -75,16 +69,27 @@ export function ProgressPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="deadlift">
-        <p className="eyebrow">Tu progreso</p>
         <h1>Constancia y técnica</h1>
         <p>Cada sesión suma control, consistencia y técnica.</p>
       </header>
 
       <section className="stats-row" aria-label="Totales">
-        <Card as="div"><div className="stat"><span className="stat__value tabular">{data.totalSessions}</span><span className="stat__label">sesiones</span></div></Card>
-        <Card as="div"><div className="stat"><span className="stat__value tabular">{data.totalReps}</span><span className="stat__label">repeticiones</span></div></Card>
-        <Card as="div"><div className="stat"><span className="stat__value tabular">{data.avgAccuracy}%</span><span className="stat__label">precisión media</span></div></Card>
-        <Card as="div"><div className="stat"><span className="stat__value tabular">{data.streakDays}</span><span className="stat__label">días de racha</span></div></Card>
+        <div className="tile tile--cobalt" style={{ "--i": 0 } as CSSProperties}>
+          <span className="tile__band">Sesiones</span>
+          <span className="tile__value"><Odometer value={data.totalSessions} /></span>
+        </div>
+        <div className="tile tile--ink" style={{ "--i": 1 } as CSSProperties}>
+          <span className="tile__band">Repeticiones</span>
+          <span className="tile__value"><Odometer value={data.totalReps} /></span>
+        </div>
+        <div className="tile tile--cobalt" style={{ "--i": 2 } as CSSProperties}>
+          <span className="tile__band">Precisión media</span>
+          <span className="tile__value"><Odometer value={data.avgAccuracy} suffix="%" /></span>
+        </div>
+        <div className="tile tile--ink" style={{ "--i": 3 } as CSSProperties}>
+          <span className="tile__band">Días de racha</span>
+          <span className="tile__value"><Odometer value={data.streakDays} /></span>
+        </div>
       </section>
 
       {pending > 0 && (
@@ -99,16 +104,16 @@ export function ProgressPage() {
       )}
 
       <div className="home-split">
-        <Card eyebrow="Última semana" title="Repeticiones por día">
+        <Card title="Repeticiones por día">
           <BarChart label="Repeticiones de los últimos siete días" data={data.weekly.map((d, i) => ({ label: weekLabels[i], value: d.reps }))} />
         </Card>
-        <Card eyebrow="Técnica" title="Precisión media">
+        <Card title="Precisión media">
           <LineChart label="Precisión media por día" values={accuracyValues} labels={weekLabels} />
         </Card>
       </div>
 
       <div className="home-split">
-        <Card eyebrow="Reparto" title="Por ejercicio">
+        <Card title="Por ejercicio">
           {data.byExercise.length === 0 ? (
             <EmptyState title="Sin datos todavía">Completa una sesión y verás tu reparto aquí.</EmptyState>
           ) : (
@@ -130,7 +135,7 @@ export function ProgressPage() {
           )}
         </Card>
 
-        <Card eyebrow="Historial" title="Sesiones guardadas">
+        <Card title="Sesiones guardadas">
           {!current ? (
             <EmptyState title="Aún no hay sesiones">Completa una sesión y aparecerá aquí.</EmptyState>
           ) : (
@@ -147,7 +152,7 @@ export function ProgressPage() {
                     {current.synced ? "Sincronizada" : "Pendiente"}
                   </div>
                 </div>
-                <span className="chip chip--lime tabular">{current.accuracy}%</span>
+                <span className="chip chip--cobalt tabular">{current.accuracy}%</span>
               </div>
               <div className="history-nav">
                 <Button variant="ghost" onClick={() => move("prev")} disabled={!cursor?.hasPrev()} icon={<ChevronLeft size={16} />} aria-label="Sesión anterior">

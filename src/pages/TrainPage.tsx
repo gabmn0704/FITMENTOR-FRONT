@@ -6,6 +6,7 @@ import { ExercisePicker } from "../components/training/ExercisePicker";
 import { RestTimer } from "../components/training/RestTimer";
 import { SessionSummary } from "../components/training/SessionSummary";
 import { Sparkline } from "../components/charts/Sparkline";
+import { Odometer } from "../components/motion/Odometer";
 import { useAuth } from "../hooks/useAuth";
 import { useRealtime } from "../hooks/useRealtime";
 import { useTrainingSession, type AnalysisMode, type FinishedSession } from "../hooks/useTrainingSession";
@@ -82,15 +83,14 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
   return (
     <section className="stack" aria-labelledby="train-title">
       <header className="page-header" data-banner="ropes">
-        <p className="eyebrow">Centro de entrenamiento</p>
         <h1 id="train-title">
-          {meta.label} <span style={{ color: "var(--lime)" }}>en vivo</span>
+          {meta.label} <span className="accent-live">en vivo</span>
         </h1>
         <p>La IA analiza tu técnica y te corrige. Solo se envían puntos de postura, nunca el video.</p>
       </header>
 
       <div className="train">
-        <Card as="div" className="stack" title={meta.label} eyebrow="Análisis de postura">
+        <Card as="div" className="stack" title={meta.label}>
           <CameraStage
             videoRef={video}
             canvasRef={canvas}
@@ -144,20 +144,22 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
         </Card>
 
         <div className="stack">
-          <Card as="div" className="hud-panel" eyebrow="Tu técnica" title={exerciseLabel(session.exercise)}>
+          <Card as="div" className="hud-panel" title={exerciseLabel(session.exercise)}>
             <div className="metric-pair">
               <div>
                 <p className="muted" style={{ fontSize: 13 }}>
                   Repeticiones
                 </p>
                 <div className="big-number tabular" aria-live="polite">
-                  {session.reps}
+                  <Odometer value={session.reps} stagger={0} />
                   <small>/ {meta.target}</small>
                 </div>
               </div>
               <div className="row" style={{ justifyContent: "center" }}>
                 <ProgressRing value={session.score} size={112} stroke={10} label={`Precisión ${session.score} por ciento`}>
-                  <strong>{session.score}</strong>
+                  <strong>
+                    <Odometer value={session.score} stagger={0} />
+                  </strong>
                   <span>precisión</span>
                 </ProgressRing>
               </div>
@@ -185,7 +187,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
             <RestTimer seconds={60} />
           </Card>
 
-          <Card as="div" title="Ejercicio" eyebrow="Elige tu movimiento">
+          <Card as="div" title="Ejercicio">
             <ExercisePicker value={session.exercise} disabled={busy} onChange={session.actions.selectExercise} />
             {busy && (
               <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>

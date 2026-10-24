@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 /**
  * Efectos de puntero delegados en un solo listener: foco de luz que sigue al cursor
- * en tarjetas y fichas (`--mx`, `--my`) y paralaje suave en la portada (`--px`, `--py`).
+ * en tarjetas y fichas (`--mx`, `--my`).
  * Solo con ratón real y sin "reducir movimiento".
  */
 export function usePointerEffects(): void {
@@ -18,19 +18,13 @@ export function usePointerEffects(): void {
       const { clientX, clientY } = event;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        const lit = target.closest<HTMLElement>(".card, .tile, .poster-hero, .routine-item");
+        const lit = target.closest<HTMLElement>(".card, .tile, .routine-item");
         if (lit) {
           const box = lit.getBoundingClientRect();
           lit.style.setProperty("--mx", `${clientX - box.left}px`);
           lit.style.setProperty("--my", `${clientY - box.top}px`);
         }
-        const hero = target.closest<HTMLElement>(".poster-hero");
-        if (hero) {
-          const box = hero.getBoundingClientRect();
-          hero.style.setProperty("--px", ((clientX - box.left) / box.width - 0.5).toFixed(3));
-          hero.style.setProperty("--py", ((clientY - box.top) / box.height - 0.5).toFixed(3));
-        }
-      });
+              });
     };
     document.addEventListener("pointermove", onMove, { passive: true });
     return () => {
