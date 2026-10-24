@@ -358,7 +358,7 @@
   line-height: 1;
 }
 
-.today__facts span {
+.today__facts li > span {
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;

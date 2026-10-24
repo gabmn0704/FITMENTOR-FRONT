@@ -132,6 +132,7 @@
 /* El formulario es un dorsal: franja con dos perforaciones y una línea de rasgado. */
 .bib-form {
   width: min(100%, 460px);
+  min-width: 0;
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -174,6 +175,8 @@
 
 .bib-form__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: var(--space-5);
   padding: var(--space-6) var(--space-6) var(--space-6);
   border-top: 2px dashed var(--line-strong);
@@ -186,6 +189,8 @@
 
 .auth-panel {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: var(--space-4);
   scroll-margin-top: 24px;
 }
@@ -239,6 +244,8 @@
 .auth-google {
   display: grid;
   justify-items: center;
+  max-width: 100%;
+  overflow: hidden;
   color-scheme: light;
 }
 
@@ -326,11 +333,18 @@
   .access__field {
     position: relative;
     height: auto;
-    min-height: min(64dvh, 500px);
+    min-height: min(46dvh, 360px);
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-4) 0;
+  }
+
+  .access__copy {
+    gap: var(--space-3);
+    padding-bottom: 60px;
   }
 
   .access__title {
-    font-size: clamp(88px, 24vw, 9.5rem);
+    font-size: clamp(64px, 19vw, 6rem);
   }
 
   .access__points {
@@ -367,5 +381,39 @@
 
   .bib-form .auth-hint {
     display: none;
+  }
+}
+
+.auth-panel .stack,
+.auth-panel .field,
+.auth-panel .input {
+  min-width: 0;
+}
+
+/* Celular: menos márgenes para que el formulario use todo el ancho. */
+@media (max-width: 480px) {
+  .access__panel {
+    padding: var(--space-4);
+  }
+
+  .bib-form__band {
+    padding-inline: 40px;
+  }
+
+  .bib-form__band::before {
+    left: 14px;
+  }
+
+  .bib-form__band::after {
+    right: 14px;
+  }
+
+  .bib-form__body {
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-4) var(--space-5);
+  }
+
+  .bib-form h2 {
+    font-size: 44px;
   }
 }

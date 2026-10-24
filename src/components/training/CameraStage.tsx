@@ -1,6 +1,7 @@
 import type { RefObject } from "react";
 import { Camera, Volume2, VolumeX } from "lucide-react";
 import type { TrainingStatus } from "../../hooks/useTrainingSession";
+import { Odometer } from "../motion/Odometer";
 
 interface CameraStageProps {
   videoRef: RefObject<HTMLVideoElement>;
@@ -11,6 +12,10 @@ interface CameraStageProps {
   voiceOn: boolean;
   onToggleVoice: () => void;
   formatTime: (seconds: number) => string;
+  /** Repeticiones y precisión en vivo, mostradas sobre la imagen en pantallas estrechas. */
+  reps?: number;
+  target?: number;
+  score?: number;
 }
 
 const STATUS_LABEL: Record<TrainingStatus, string> = {
@@ -31,6 +36,9 @@ export function CameraStage({
   voiceOn,
   onToggleVoice,
   formatTime,
+  reps,
+  target,
+  score,
 }: CameraStageProps) {
   const active = status === "running" || status === "countdown" || status === "paused";
   return (
@@ -45,6 +53,20 @@ export function CameraStage({
           <span className="muted" style={{ fontSize: 13 }}>
             Buena luz, cámara estable y espacio libre. El video no sale de tu dispositivo.
           </span>
+        </div>
+      )}
+
+      {active && reps !== undefined && (
+        <div className="camera__counter" aria-hidden="true">
+          <span className="camera__counter-reps">
+            <Odometer value={reps} stagger={0} />
+            {target !== undefined && <small>/{target}</small>}
+          </span>
+          {score !== undefined && (
+            <span className="camera__counter-score">
+              <Odometer value={score} stagger={0} suffix="%" />
+            </span>
+          )}
         </div>
       )}
 
