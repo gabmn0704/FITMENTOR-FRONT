@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { STORAGE_KEYS } from "./lib/storage";
 
@@ -7,6 +7,10 @@ describe("App", () => {
   beforeEach(() => {
     window.localStorage.clear();
     window.location.hash = "";
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("muestra el acceso como invitado cuando no hay sesión", () => {
@@ -32,11 +36,24 @@ describe("App", () => {
     expect(screen.getByRole("heading", { level: 1, name: /Sentadilla/ })).toBeInTheDocument();
   });
 
-  it("pide el perfil con el asistente cuando la persona aún no lo ha completado", () => {
+  it("abre el asistente del plan justo al iniciar sesión, no antes", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ token: "t", user: { id: "7", name: "Luis", guest: true, level: "BEGINNER" } }), { status: 200 })),
+    );
+    render(<App />);
+    expect(screen.queryByText(/qué quieres lograr/i)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Entrar como invitado/i }));
+    await waitFor(() => expect(screen.getByText(/qué quieres lograr/i)).toBeInTheDocument());
+    expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
+  });
+
+  it("con una sesión ya guardada entra directo y ofrece crear el plan", () => {
     window.localStorage.setItem(STORAGE_KEYS.token, "test-token");
     window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify({ id: "7", name: "Luis", guest: false }));
     render(<App />);
-    expect(screen.getByText(/qué quieres lograr/i)).toBeInTheDocument();
-    expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/qué quieres lograr/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Crear mi plan/i })).toBeInTheDocument();
   });
 });

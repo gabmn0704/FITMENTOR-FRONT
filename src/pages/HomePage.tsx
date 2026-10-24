@@ -90,7 +90,7 @@ function TodayCard({
 
 export function HomePage({ onNavigate }: HomePageProps) {
   const { token, user } = useAuth();
-  const { profile } = useProfile();
+  const { profile, openWizard } = useProfile();
   const local = useMemo(() => computeLocalStats(readLocalSessions()), []);
 
   const stats = useAsync(() => statsApi.get(token!), [token], Boolean(token));
@@ -155,8 +155,18 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </section>
 
-      {profile && (
+      {profile ? (
         <TodayCard profile={profile} level={user?.level ?? "BEGINNER"} onNavigate={onNavigate} />
+      ) : (
+        <section className="today today--invite" aria-label="Crea tu plan">
+          <div className="today__main">
+            <h2>Hagamos tu plan</h2>
+            <p className="muted">Cuatro preguntas y armamos tu rutina semanal y tu alimentación.</p>
+          </div>
+          <Button variant="primary" onClick={openWizard} icon={<ArrowRight size={18} />}>
+            Crear mi plan
+          </Button>
+        </section>
       )}
 
       <section className="motivation-strip" aria-label="Frase del día">
