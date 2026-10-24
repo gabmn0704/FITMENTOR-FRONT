@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T00:00:00Z",
+  "title": "Design System: FitMentor",
+  "extensions": {
+    "colorMeta": {
+      "tyvek-ground": { "role": "neutral", "displayName": "Tyvek Ground", "canonical": "#e7eaee", "dark": "#05070c", "tonalRamp": ["#1c1f24", "#33373e", "#50555e", "#737982", "#9aa0a8", "#c2c6cc", "#e7eaee", "#f5f6f8"] },
+      "bib-white": { "role": "neutral", "displayName": "Bib White", "canonical": "#ffffff", "dark": "#0e131d", "tonalRamp": ["#0e131d", "#151b28", "#1e2636", "#5b6272", "#a7adb8", "#e1e5eb", "#f2f4f7", "#ffffff"] },
+      "tyvek-shade": { "role": "neutral", "displayName": "Tyvek Shade", "canonical": "#f2f4f7", "dark": "#151b28", "tonalRamp": ["#151b28", "#2a3140", "#454d5d", "#677081", "#8e96a5", "#b9bfc9", "#e1e5eb", "#f2f4f7"] },
+      "tyvek-crease": { "role": "neutral", "displayName": "Tyvek Crease", "canonical": "#e1e5eb", "dark": "#1e2636", "tonalRamp": ["#1e2636", "#343c4c", "#4f5868", "#707989", "#959dab", "#bcc2cc", "#e1e5eb", "#f2f4f7"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "rgb(10 12 18 / 0.14)", "dark": "rgb(237 240 246 / 0.12)" },
+      "hairline-strong": { "role": "neutral", "displayName": "Hairline Strong", "canonical": "rgb(10 12 18 / 0.28)", "dark": "rgb(237 240 246 / 0.26)" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0a0c12", "dark": "#edf0f6", "tonalRamp": ["#0a0c12", "#1d2029", "#2f3440", "#434a59", "#5b6272", "#8c95a9", "#adb5c6", "#edf0f6"] },
+      "ink-muted": { "role": "neutral", "displayName": "Ink Muted", "canonical": "#434a59", "dark": "#adb5c6" },
+      "ink-subtle": { "role": "neutral", "displayName": "Ink Subtle", "canonical": "#5b6272", "dark": "#8c95a9" },
+      "race-cobalt": { "role": "primary", "displayName": "Race Cobalt", "canonical": "#1b3bff", "dark": "#2a47ff", "textForm": { "light": "#1b3bff", "dark": "#8a9dff" }, "tonalRamp": ["#05107a", "#0d21c2", "#1b3bff", "#4a64ff", "#7a8eff", "#a9b6ff", "#d9dfff", "#f6f8ff"] },
+      "cobalt-deep": { "role": "primary", "displayName": "Cobalt Deep", "canonical": "#0d21c2", "dark": "#1328cf" },
+      "cobalt-wash": { "role": "primary", "displayName": "Cobalt Wash", "canonical": "rgb(27 59 255 / 0.1)", "dark": "rgb(110 135 255 / 0.16)" },
+      "on-cobalt": { "role": "primary", "displayName": "On Cobalt", "canonical": "#f6f8ff" },
+      "on-cobalt-muted": { "role": "primary", "displayName": "On Cobalt Muted", "canonical": "#d9dfff" },
+      "signal-vermilion": { "role": "secondary", "displayName": "Signal Vermilion", "canonical": "#ff3d1f", "tonalRamp": ["#5a1106", "#8f1d0b", "#c42a0f", "#ff3d1f", "#ff6a52", "#ff9886", "#ffc6bc", "#fff0ed"] },
+      "signal-text": { "role": "secondary", "displayName": "Signal Text", "canonical": "#c42a0f", "dark": "#ff7d66" },
+      "signal-wash": { "role": "secondary", "displayName": "Signal Wash", "canonical": "rgb(255 61 31 / 0.12)", "dark": "rgb(255 61 31 / 0.18)" },
+      "good-green": { "role": "tertiary", "displayName": "Good Green", "canonical": "#0a7a45", "dark": "#56d596", "tonalRamp": ["#032e1a", "#065230", "#0a7a45", "#2a9a62", "#56d596", "#8ae4b6", "#c0f1d6", "#ebfbf2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home hero and access title; uppercase, Archivo wdth 62, weight 900." },
+      "headline": { "displayName": "Headline", "purpose": "Cobalt page banner titles; uppercase." },
+      "numeral": { "displayName": "Numeral", "purpose": "Every quantity: bib tiles, live rep counter, hero bib, stats, lanes, rings. Always via the odometer." },
+      "title": { "displayName": "Title", "purpose": "h2/h3 and card titles; uppercase, wdth 68, weight 850, word-spacing 0.14em." },
+      "body": { "displayName": "Body", "purpose": "Sentences at normal width; 60ch max in headers." },
+      "label": { "displayName": "Label", "purpose": "Printed bib bands and lane day names; uppercase, tracked." }
+    },
+    "shadows": [
+      { "name": "shadow-1", "value": "0 1px 0 rgb(10 12 18 / 0.05), 0 10px 28px -16px rgb(10 12 18 / 0.35)", "dark": "0 1px 0 rgb(255 255 255 / 0.04), 0 14px 32px -18px rgb(0 0 0 / 0.8)", "purpose": "Resting bib: cards, tiles, strips; always paired with inset 0 0 0 1px var(--line)." },
+      { "name": "shadow-2", "value": "0 2px 0 rgb(10 12 18 / 0.06), 0 22px 48px -22px rgb(13 33 194 / 0.55)", "dark": "0 2px 0 rgb(255 255 255 / 0.05), 0 26px 56px -24px rgb(42 71 255 / 0.65)", "purpose": "Lifted field: cobalt hero and banners, auth bib form, popovers, tile hover." },
+      { "name": "punched-hole", "value": "inset 0 2px 3px rgb(0 0 0 / 0.35)", "purpose": "Circular holes on bib bands and the hero bib." },
+      { "name": "focus", "value": "0 0 0 3px var(--bg), 0 0 0 5px var(--cobalt)", "dark": "0 0 0 3px var(--bg), 0 0 0 5px #8a9dff", "purpose": "Keyboard focus everywhere." },
+      { "name": "input-focus", "value": "0 0 0 4px var(--cobalt-soft)", "purpose": "Halo on focused inputs with a cobalt border." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Default entrance and state easing; odometer roll." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Finish-line sweep on route change." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Sliding nav tab and auth tabs." },
+      { "name": "ease-settle", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Hero bib drop, switch knob, chart dot pop, headline mask rise." },
+      { "name": "dur-fast", "value": "140ms", "purpose": "Colour and press feedback." },
+      { "name": "dur-base", "value": "240ms", "purpose": "Standard state transitions." },
+      { "name": "dur-slow", "value": "700ms", "purpose": "Sheen sweep, live odometer roll." },
+      { "name": "odometer-roll", "value": "1250ms ease-out, per-digit stagger, start after tile entrance", "purpose": "Every number when data arrives." },
+      { "name": "finish-sweep", "value": "720ms 4px vermilion line across the viewport", "purpose": "Route change; removed under reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "phone-narrow", "value": "380px" },
+      { "name": "phone", "value": "480px" },
+      { "name": "mobile-nav", "value": "760px" },
+      { "name": "access-stack", "value": "900px" },
+      { "name": "rail-collapse", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Vermilion action with ink text; one per view.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Entrenar ahora</button>",
+      "css": ".ds-btn { position: relative; overflow: hidden; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 8px; font-family: var(--font-body, Archivo, system-ui, sans-serif); font-weight: 700; font-size: 15px; letter-spacing: 0.01em; cursor: pointer; transition: transform 140ms cubic-bezier(0.23,1,0.32,1), box-shadow 240ms cubic-bezier(0.23,1,0.32,1), background-color 140ms ease, border-color 140ms ease, color 140ms ease; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px #e7eaee, 0 0 0 5px #1b3bff; } .ds-btn-primary { background: #ff3d1f; color: #0a0c12; box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 10px 22px -14px rgb(255 61 31 / 0.9); } .ds-btn-primary::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, transparent 32%, rgb(255 255 255 / 0.5) 50%, transparent 68%); transform: translateX(-120%); } .ds-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 16px 28px -14px rgb(255 61 31 / 1); } .ds-btn-primary:hover::after { transform: translateX(120%); transition: transform 700ms cubic-bezier(0.23,1,0.32,1); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action on white with a strong hairline; turns cobalt on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Ver rutina</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 8px; background: #ffffff; border: 1.5px solid rgb(10 12 18 / 0.28); color: #0a0c12; font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: border-color 140ms ease, color 140ms ease, transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-ghost:hover { border-color: #1b3bff; color: #1b3bff; } .ds-btn-ghost:active { transform: scale(0.97); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px #e7eaee, 0 0 0 5px #1b3bff; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive action: vermilion outline with signal text.",
+      "html": "<button class=\"ds-btn-danger\">Cerrar sesión</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 8px; background: transparent; border: 1.5px solid #ff3d1f; color: #c42a0f; font-family: Archivo, system-ui, sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 140ms ease; } .ds-btn-danger:hover { background: rgb(255 61 31 / 0.12); } .ds-btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 3px #e7eaee, 0 0 0 5px #1b3bff; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "48px field with strong hairline; cobalt border and wash halo on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Correo</span><input class=\"ds-input\" placeholder=\"tu@correo.com\"></label>",
+      "css": ".ds-field { display: grid; gap: 8px; font-family: Archivo, system-ui, sans-serif; } .ds-field__label { font-size: 13px; font-weight: 700; color: #434a59; } .ds-input { width: 100%; min-height: 48px; padding: 0 16px; border-radius: 8px; border: 1.5px solid rgb(10 12 18 / 0.28); background: #ffffff; color: #0a0c12; font: inherit; font-size: 16px; transition: border-color 140ms ease, box-shadow 240ms cubic-bezier(0.23,1,0.32,1); } .ds-input::placeholder { color: #5b6272; } .ds-input:hover:not(:focus) { border-color: #5b6272; } .ds-input:focus { outline: none; border-color: #1b3bff; box-shadow: 0 0 0 4px rgb(27 59 255 / 0.1); }"
+    },
+    {
+      "name": "Nav Rail",
+      "kind": "nav",
+      "refersTo": "nav-rail",
+      "description": "Cobalt rail with perforated edge and a sliding on-cobalt tab under the active link.",
+      "html": "<nav class=\"ds-rail\"><div class=\"ds-rail__list\"><span class=\"ds-rail__tab\"></span><a class=\"ds-rail__link\" aria-current=\"page\" href=\"#\">Inicio</a><a class=\"ds-rail__link\" href=\"#\">Entrenar</a><a class=\"ds-rail__link\" href=\"#\">Progreso</a></div></nav>",
+      "css": ".ds-rail { position: relative; width: 248px; padding: 24px 16px; background: #1b3bff; color: #f6f8ff; font-family: Archivo, system-ui, sans-serif; } .ds-rail::after { content: ''; position: absolute; top: 0; right: 5px; bottom: 0; width: 6px; background: radial-gradient(circle at 3px 50%, #e7eaee 2.4px, transparent 3px) 0 0 / 6px 18px repeat-y; opacity: 0.9; } .ds-rail__list { position: relative; display: grid; gap: 4px; } .ds-rail__tab { position: absolute; top: 0; left: 0; right: 0; height: 44px; border-radius: 8px; background: #f6f8ff; box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.55); transition: transform 460ms cubic-bezier(0.32,0.72,0,1); } .ds-rail__link { position: relative; z-index: 1; display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #d9dfff; font-weight: 700; text-decoration: none; transition: color 240ms ease; } .ds-rail__link:hover:not([aria-current]) { color: #f6f8ff; } .ds-rail__link[aria-current='page'] { color: #1b3bff; } .ds-rail__link:focus-visible { outline: none; box-shadow: 0 0 0 2px #f6f8ff; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Small squared tag; cobalt variant on cobalt wash.",
+      "html": "<span class=\"ds-chip\">Nivel medio</span> <span class=\"ds-chip ds-chip--cobalt\">IA</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 4px; font-family: Archivo, system-ui, sans-serif; font-size: 12px; font-weight: 700; background: #f2f4f7; color: #434a59; border: 1px solid rgb(10 12 18 / 0.14); } .ds-chip--cobalt { background: rgb(27 59 255 / 0.1); color: #1b3bff; border-color: transparent; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White bib surface with resting shadow and inset hairline; uppercase condensed title.",
+      "html": "<section class=\"ds-card\"><h3 class=\"ds-card__title\">Tu semana</h3><p>Repeticiones de los últimos siete días.</p></section>",
+      "css": ".ds-card { padding: 24px; border-radius: 16px; background: #ffffff; color: #0a0c12; font-family: Archivo, system-ui, sans-serif; box-shadow: 0 1px 0 rgb(10 12 18 / 0.05), 0 10px 28px -16px rgb(10 12 18 / 0.35), inset 0 0 0 1px rgb(10 12 18 / 0.14); } .ds-card__title { margin: 0 0 16px; font-stretch: 68%; font-weight: 850; font-size: 30px; line-height: 0.92; letter-spacing: -0.015em; word-spacing: 0.14em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Bib Tile",
+      "kind": "custom",
+      "refersTo": "bib-tile-band",
+      "description": "Signature stat tile: colour band with punched hole, dashed tear line, giant condensed numeral.",
+      "html": "<div class=\"ds-tile\"><span class=\"ds-tile__band\">Repeticiones</span><span class=\"ds-tile__value\">248</span></div>",
+      "css": ".ds-tile { position: relative; overflow: hidden; display: grid; grid-template-rows: auto 1fr; width: 240px; min-height: 200px; border-radius: 16px; background: #ffffff; font-family: Archivo, 'Arial Narrow', system-ui, sans-serif; box-shadow: 0 1px 0 rgb(10 12 18 / 0.05), 0 10px 28px -16px rgb(10 12 18 / 0.35), inset 0 0 0 1px rgb(10 12 18 / 0.14); transition: transform 360ms cubic-bezier(0.23,1,0.32,1), box-shadow 360ms cubic-bezier(0.23,1,0.32,1); } .ds-tile:hover { transform: translateY(-5px) rotate(-0.5deg); box-shadow: 0 2px 0 rgb(10 12 18 / 0.06), 0 22px 48px -22px rgb(13 33 194 / 0.55), inset 0 0 0 1px rgb(10 12 18 / 0.14); } .ds-tile__band { position: relative; padding: 13px 18px 13px 44px; background: #1b3bff; color: #f6f8ff; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; } .ds-tile__band::before { content: ''; position: absolute; left: 16px; top: 50%; width: 11px; height: 11px; margin-top: -5.5px; border-radius: 50%; background: #ffffff; box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.35); } .ds-tile__value { display: flex; align-items: flex-end; padding: 18px 18px 14px; border-top: 2px dashed rgb(10 12 18 / 0.28); font-stretch: 62%; font-weight: 900; font-size: 96px; line-height: 1; color: #0a0c12; }"
+    },
+    {
+      "name": "Photo-Finish Lane",
+      "kind": "custom",
+      "refersTo": "bib-tile-value",
+      "description": "One day of the week strip: label, cobalt bar on a Tyvek track (vermilion for best), condensed value.",
+      "html": "<div class=\"ds-lane\"><span class=\"ds-lane__day\">Lun</span><span class=\"ds-lane__track\"><span class=\"ds-lane__bar\" style=\"width:62%\"></span></span><span class=\"ds-lane__value\">42</span></div><div class=\"ds-lane ds-lane--best\"><span class=\"ds-lane__day\">Mar</span><span class=\"ds-lane__track\"><span class=\"ds-lane__bar\" style=\"width:100%\"></span></span><span class=\"ds-lane__value\">68</span></div>",
+      "css": ".ds-lane { display: grid; grid-template-columns: 44px minmax(0, 1fr) 76px; align-items: center; gap: 12px; min-height: 34px; margin-bottom: 8px; width: 420px; font-family: Archivo, 'Arial Narrow', system-ui, sans-serif; } .ds-lane__day { font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #434a59; } .ds-lane__track { position: relative; display: block; height: 28px; border-radius: 3px; background: #f2f4f7; } .ds-lane__bar { position: absolute; inset: 0 auto 0 0; min-width: 3px; border-radius: 3px; background: #1b3bff; } .ds-lane--best .ds-lane__bar { background: #ff3d1f; } .ds-lane__value { font-stretch: 62%; font-weight: 900; font-size: 30px; line-height: 1; text-align: right; color: #0a0c12; } .ds-lane--best .ds-lane__value { color: #c42a0f; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Race Day",
+    "overview": "FitMentor is dressed as a timed race, not a fitness dashboard. The ground is cool, matte Tyvek (the paper race bibs are printed on), the brand owns one committed race cobalt that floods the navigation rail and every hero field, and a single vermilion signal marks the moment to act, the live state, the personal best and the error. Numbers are the protagonists: set in Archivo pushed to its narrowest width and heaviest weight, they roll into place digit by digit like a split-flap board, and the week is read off a photo-finish strip of lanes with a timing ruler and a dashed finish line.\n\nThe surface is dense but legible at 1 to 2 metres: big condensed numerals, uppercase condensed headlines with tight leading, and a calm sans body at normal width. Materials are literal to the world: bib tiles with a colour band, two punched holes and a dashed tear line; hairline timing rulers along the bottom edge of cobalt fields; a perforated edge on the rail; duotone grayscale photography multiplied into cobalt. Dark theme is the same race at night: ink ground, same cobalt and vermilion, lifted text tones.\n\nThe world refuses the dark-neon fitness dashboard with a lime accent and glow. Light is the base theme; dark (chosen, or following the system) is the same world, never a different one.",
+    "keyCharacteristics": [
+      "Tyvek ground, white bib surfaces, ink numerals.",
+      "One cobalt field per region: rail, hero, page banners, active controls.",
+      "Vermilion is a signal, never decoration.",
+      "Archivo variable: width 62 to 68% for display and numerals, 100% for body.",
+      "Odometer digits on every number when data arrives.",
+      "Bib tiles, timing rulers and photo-finish lanes as the recurring geometry."
+    ],
+    "rules": [
+      { "name": "The One Field Rule", "body": "Cobalt is a field, not a highlight: it floods a whole region (rail, hero, banner, band, active control) or it is absent. Never thin cobalt accents sprinkled over white.", "section": "colors" },
+      { "name": "The Signal Rule", "body": "Vermilion means act, live, best or error. If an element is none of those, it is not vermilion.", "section": "colors" },
+      { "name": "The Bib Number Rule", "body": "Every quantity is set in the condensed numeral voice (wdth 62, 900) and rolls in through the odometer. A number set in body type is unfinished.", "section": "typography" },
+      { "name": "The Two Widths Rule", "body": "Width carries hierarchy: 62 to 75% for display, numerals and titles, 100% for everything read as sentences. Don't invent intermediate body widths.", "section": "typography" },
+      { "name": "The Paper Not Glass Rule", "body": "Depth is paper on a table: soft drop plus hairline. Blur is reserved for overlays on camera and modals.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do flood whole regions with race cobalt and put on-cobalt text on them.",
+      "Do set every quantity in Archivo at wdth 62 / 900 and roll it in through the odometer.",
+      "Do build new data containers as bib tiles: band, punched hole, dashed tear line, numeral.",
+      "Do keep vermilion for the primary action, live, personal best, finish and error.",
+      "Do use 2px-radius squares for bullets, dots and markers.",
+      "Do run entrances and hovers on transform and opacity (chart strokes may draw via dash offset), gate hovers behind `(hover: hover) and (pointer: fine)`, and honour `prefers-reduced-motion`."
+    ],
+    "donts": [
+      "Don't drift toward the dark-neon fitness dashboard: no lime, no neon glow, no separate night palette (dark keeps the same cobalt and vermilion).",
+      "Don't use vermilion as a decorative accent or second brand colour.",
+      "Don't set numbers in body width or regular weight.",
+      "Don't add a second accent hue; green is success only."
+    ]
+  }
+}
