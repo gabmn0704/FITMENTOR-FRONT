@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, Dumbbell, Timer } from "lucide-react";
+import { Camera, Check, ChevronDown, Dumbbell, Timer } from "lucide-react";
 import { Button, Card } from "../ui";
 import { Odometer } from "../motion/Odometer";
 import { ExerciseGuide } from "../training/ExerciseGuide";
 import { MealPlanCard } from "./MealPlanCard";
-import { exerciseLabel } from "../../lib/exercises";
+import { CATALOG, catalogLabel, type CatalogId } from "../../lib/catalog";
+import { useDoneSets } from "../../hooks/useDoneSets";
+import { setPendingExercise } from "../../lib/pendingExercise";
 import { formatDuration } from "../../lib/format";
 import { currentWeek, goalName, type BodyProfile } from "../../lib/profile";
 import { DAY_NAMES, DAY_SHORT, buildWeekPlan, expectedWeightKg, todayIndex } from "../../lib/weeklyPlan";
 import type { RouteId } from "../../lib/routes";
-import type { ExerciseId, Level } from "../../types";
+import type { Level } from "../../types";
 
 interface WeekPlanViewProps {
   profile: BodyProfile;
@@ -22,7 +24,8 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
   const week = currentWeek(profile);
   const plan = useMemo(() => buildWeekPlan(profile, level, week), [profile, level, week]);
   const [selected, setSelected] = useState(todayIndex());
-  const [openGuide, setOpenGuide] = useState<ExerciseId | null>(null);
+  const [openGuide, setOpenGuide] = useState<CatalogId | null>(null);
+  const { done, mark } = useDoneSets();
   const day = plan.days[selected];
   const weeksLeft = Math.max(0, profile.weeks - week);
   const hasTarget = profile.targetWeightKg !== null;
@@ -82,11 +85,13 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
               {day.items.map((item) => (
                 <li key={item.exercise} className="plan-item">
                   <div className="plan-item__main">
-                    <strong className="plan-item__name">{exerciseLabel(item.exercise)}</strong>
+                    <strong className="plan-item__name">{catalogLabel(item.exercise)}</strong>
+                    <span className="chip">{CATALOG[item.exercise].muscle}</span>
                     <span className="plan-item__dose tabular">
                       <Odometer key={`${week}-${item.exercise}-s`} value={item.sets} stagger={40} /> ×{" "}
                       <Odometer key={`${week}-${item.exercise}-t`} value={item.target} stagger={40} />
                       {item.unit === "seconds" ? " s" : ""}
+                      {item.perSide ? <small> por lado</small> : null}
                     </span>
                     <span className="plan-item__rest">
                       <Timer size={14} aria-hidden="true" /> descanso {formatDuration(item.restSec)}
@@ -102,12 +107,44 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
                     Ver cómo se hace <ChevronDown size={16} aria-hidden="true" />
                   </button>
                   {openGuide === item.exercise && <ExerciseGuide exercise={item.exercise} compact />}
+                  {item.engine ? (
+                    <button
+                      type="button"
+                      className="camera-link"
+                      onClick={() => {
+                        setPendingExercise({ engine: item.engine!, variant: item.exercise });
+                        onNavigate("entrenar");
+                      }}
+                    >
+                      <Camera size={16} aria-hidden="true" /> Entrenar con la cámara
+                    </button>
+                  ) : (
+                    day.index === todayIndex() && (
+                      <div className="set-tracker" role="group" aria-label={`Series de ${catalogLabel(item.exercise)}`}>
+                        <span className="set-tracker__label">
+                          Series hechas {done[item.exercise] ?? 0}/{item.sets}
+                        </span>
+                        {Array.from({ length: item.sets }, (_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className={`set-pill${(done[item.exercise] ?? 0) > index ? " is-done" : ""}`}
+                            aria-pressed={(done[item.exercise] ?? 0) > index}
+                            aria-label={`Serie ${index + 1}`}
+                            onClick={() => mark(item.exercise, index + 1)}
+                          >
+                            {(done[item.exercise] ?? 0) > index ? <Check size={16} aria-hidden="true" /> : index + 1}
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  )}
                 </li>
               ))}
             </ul>
             <div className="row day-actions">
               <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<Dumbbell size={18} />}>
-                Entrenar ahora
+                Ir a entrenar
               </Button>
               <span className="muted tabular">Unos {day.minutes} minutos con calentamiento</span>
             </div>

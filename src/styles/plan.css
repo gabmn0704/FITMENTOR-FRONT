@@ -380,3 +380,67 @@
     padding: var(--space-5);
   }
 }
+
+.plan-item__dose small {
+  margin-left: 6px;
+  font-family: var(--font-body);
+  font-stretch: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.camera-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+  font-size: 14px;
+  font-weight: 800;
+  transition: transform 90ms var(--ease-out), background-color 160ms ease;
+}
+
+.camera-link:active {
+  transform: scale(0.97);
+}
+
+.set-tracker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.set-tracker__label {
+  margin-right: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.set-pill {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-weight: 800;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 90ms var(--ease-out);
+}
+
+.set-pill:active {
+  transform: scale(0.94);
+}
+
+.set-pill.is-done {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+}

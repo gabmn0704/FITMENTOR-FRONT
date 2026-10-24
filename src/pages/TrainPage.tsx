@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RefreshCw, Square, Undo2, Wifi, WifiOff } from "lucide-react";
 import { Button, Card, Notice, ProgressRing } from "../components/ui";
 import { CameraStage } from "../components/training/CameraStage";
@@ -15,6 +15,8 @@ import { EXERCISES, exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
 import { serverStateLabel } from "../lib/contract";
 import { saveLocalSession, syncPendingSessions } from "../lib/sessions";
+import { CATALOG, catalogLabel, type CatalogId } from "../lib/catalog";
+import { takePendingExercise } from "../lib/pendingExercise";
 import type { RouteId } from "../lib/routes";
 import type { SessionPayload } from "../types";
 
@@ -66,8 +68,21 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const session = useTrainingSession({ realtime, video, canvas });
   const [saving, setSaving] = useState(false);
+  // Variante del plan (p. ej. sentadilla sumo) que la cámara mide con el ejercicio base.
+  const [variant, setVariant] = useState<CatalogId | null>(null);
+
+  useEffect(() => {
+    const pending = takePendingExercise();
+    if (pending) {
+      session.actions.selectExercise(pending.engine);
+      setVariant(pending.variant);
+    }
+    // Solo al abrir la pantalla.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const meta = EXERCISES[session.exercise];
+  const guideId: CatalogId = variant && CATALOG[variant].engine === session.exercise ? variant : session.exercise;
   const busy = session.status !== "idle";
   const progress = Math.min(100, Math.round((session.reps / meta.target) * 100));
 
@@ -202,8 +217,13 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
         </div>
       </div>
 
-      <Card as="section" title={`Cómo se hace: ${meta.label}`}>
-        <ExerciseGuide exercise={session.exercise} />
+      <Card as="section" title={`Cómo se hace: ${catalogLabel(guideId)}`}>
+        {guideId !== session.exercise && (
+          <Notice tone="info">
+            Hoy te toca {catalogLabel(guideId).toLowerCase()}. La cámara la mide como {meta.label.toLowerCase()}.
+          </Notice>
+        )}
+        <ExerciseGuide exercise={guideId} />
       </Card>
 
       {session.finished && (
