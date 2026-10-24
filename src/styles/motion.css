@@ -71,14 +71,9 @@ body::before {
   animation: fade-up 700ms var(--ease-out) 420ms both;
 }
 
-.race-hero__hello,
 .race-hero__lead,
 .race-hero .row {
   animation: fade-up 650ms var(--ease-out) both;
-}
-
-.race-hero__hello {
-  animation-delay: 60ms;
 }
 
 .race-hero__lead {
@@ -286,29 +281,6 @@ body::before {
 }
 
 /* ---------- Gráficos ---------- */
-.bars-rect {
-  transform-box: fill-box;
-  transform-origin: bottom;
-  animation: grow-up 900ms var(--ease-out) both;
-}
-
-@keyframes grow-up {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-.chart-value {
-  animation: fade-in 400ms ease both;
-}
-
-.chart-finish {
-  animation: fade-in 500ms ease 900ms both;
-}
-
 .line-path {
   animation: draw-line 1200ms var(--ease-out) 150ms forwards;
 }
@@ -533,4 +505,34 @@ body::before {
   .odo__col {
     transition: none;
   }
+}
+
+/* Carriles del foto-finish: la barra avanza hacia la meta y la línea aparece al final. */
+.lane__bar {
+  animation: lane-run 1000ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 80ms + 250ms);
+}
+
+@keyframes lane-run {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.lanes__finish {
+  animation: fade-in 500ms ease 1100ms both;
+}
+
+.lane .odo {
+  --odo-start: calc(var(--i, 0) * 80ms + 350ms);
+}
+
+/* Barra de progreso con regla: una marca cada 10 %. */
+.bar {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--line-strong) calc(10% - 1px) 10%),
+    var(--surface-3);
 }

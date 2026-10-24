@@ -23,7 +23,7 @@
   --cobalt-deep: #0d21c2;
   --cobalt-soft: rgb(27 59 255 / 0.1);
   --on-cobalt: #f6f8ff;
-  --on-cobalt-muted: #c7d0ff;
+  --on-cobalt-muted: #d9dfff;
   --accent-text: #1b3bff;
 
   /* Bermellón: acción, en vivo, récord y error */
@@ -32,9 +32,7 @@
   --signal-soft: rgb(255 61 31 / 0.12);
   --signal-text: #c42a0f;
 
-  /* Franja de dorsal alternativa y estados */
-  --sun: #ffc400;
-  --sun-ink: #0a0c12;
+  /* Estados */
   --good: #0a7a45;
   --good-soft: rgb(10 122 69 / 0.12);
 

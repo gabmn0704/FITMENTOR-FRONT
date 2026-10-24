@@ -79,7 +79,7 @@
 }
 
 .access__accent {
-  color: var(--sun);
+  color: var(--on-cobalt-muted);
 }
 
 .access__points {
@@ -106,7 +106,7 @@
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  background: var(--sun);
+  background: var(--on-cobalt);
 }
 
 .access__ticker {

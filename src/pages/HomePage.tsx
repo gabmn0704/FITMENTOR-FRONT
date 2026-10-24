@@ -61,10 +61,6 @@ export function HomePage({ onNavigate }: HomePageProps) {
     <div className="stack">
       <section className="race-hero" aria-labelledby="home-title">
         <div className="race-hero__copy">
-          <p className="race-hero__hello">
-            {greeting(new Date().getHours())}
-            {name ? `, ${name}` : ""}
-          </p>
           <h1 id="home-title">
             <span className="mask">
               <span>Hoy se</span>
@@ -74,6 +70,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </span>
           </h1>
           <p className="race-hero__lead">
+            {`${greeting(new Date().getHours())}${name ? `, ${name}` : ""}. `}
             {data.streakDays > 0
               ? `Llevas ${data.streakDays} ${data.streakDays === 1 ? "día" : "días"} seguidos. No la rompas.`
               : "Tu racha empieza con una sesión. Te acompañamos con la técnica."}
@@ -126,19 +123,19 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <Odometer value={data.totalSessions} />
           </span>
         </div>
-        <div className="tile tile--signal" style={{ "--i": 1 } as CSSProperties}>
+        <div className="tile tile--ink" style={{ "--i": 1 } as CSSProperties}>
           <span className="tile__band">Repeticiones</span>
           <span className="tile__value">
             <Odometer value={data.totalReps} />
           </span>
         </div>
-        <div className="tile tile--ink" style={{ "--i": 2 } as CSSProperties}>
+        <div className="tile tile--cobalt" style={{ "--i": 2 } as CSSProperties}>
           <span className="tile__band">Precisión media</span>
           <span className="tile__value">
             <Odometer value={data.avgAccuracy} suffix="%" />
           </span>
         </div>
-        <div className="tile tile--sun" style={{ "--i": 3 } as CSSProperties}>
+        <div className="tile tile--ink" style={{ "--i": 3 } as CSSProperties}>
           <span className="tile__band">Kcal estimadas</span>
           <span className="tile__value">
             <Odometer value={data.totalCalories} />

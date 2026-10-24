@@ -509,40 +509,6 @@
   stroke-width: 1;
 }
 
-.chart-tick {
-  stroke: var(--line-strong);
-  stroke-width: 1;
-}
-
-.chart-value {
-  fill: var(--text);
-  font-size: 12px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.chart-value--best {
-  fill: var(--signal-text);
-}
-
-.chart-finish {
-  stroke: var(--signal);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 4;
-}
-
-.bars-rect {
-  fill: var(--cobalt);
-}
-
-.bars-rect--best {
-  fill: var(--signal);
-}
-
-.bars-empty {
-  fill: var(--surface-3);
-}
-
 .chart-hatch {
   stroke: var(--cobalt);
   stroke-width: 1;
@@ -583,4 +549,118 @@
   width: 100%;
   height: auto;
   overflow: visible;
+}
+
+/* ---------- Franja de foto-finish (carriles por día) ---------- */
+.lanes {
+  --day: 44px;
+  --val: 76px;
+  --gap: 12px;
+  position: relative;
+  display: grid;
+  gap: 10px;
+}
+
+.lanes__ruler {
+  height: 12px;
+  margin: 0 calc(var(--val) + var(--gap)) 0 calc(var(--day) + var(--gap));
+  background:
+    repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 10%) left bottom / 100% 12px no-repeat,
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 2%) left bottom / 100% 6px no-repeat;
+}
+
+.lanes__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lane {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--day) minmax(0, 1fr) var(--val);
+  align-items: center;
+  gap: var(--gap);
+  min-height: 34px;
+}
+
+.lane__day {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.lane__track {
+  position: relative;
+  display: block;
+  height: 28px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.lane__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w, 0%);
+  min-width: 3px;
+  border-radius: 3px;
+  background: var(--cobalt);
+  transform-origin: left;
+}
+
+.lane--best .lane__bar {
+  background: var(--signal);
+}
+
+.lane__value {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  text-align: right;
+  color: var(--text);
+}
+
+.lane--best .lane__value {
+  color: var(--signal-text);
+}
+
+.lane__stamp {
+  position: absolute;
+  left: calc(var(--day) + var(--gap) + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--signal-ink);
+  pointer-events: none;
+}
+
+.lanes__finish {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(var(--val) + var(--gap));
+  width: 0;
+  border-left: 2px dashed var(--signal);
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .lanes {
+    --day: 34px;
+    --val: 60px;
+    --gap: 8px;
+  }
+
+  .lane__value {
+    font-size: 26px;
+  }
 }

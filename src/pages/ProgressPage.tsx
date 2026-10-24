@@ -78,15 +78,15 @@ export function ProgressPage() {
           <span className="tile__band">Sesiones</span>
           <span className="tile__value"><Odometer value={data.totalSessions} /></span>
         </div>
-        <div className="tile tile--signal" style={{ "--i": 1 } as CSSProperties}>
+        <div className="tile tile--ink" style={{ "--i": 1 } as CSSProperties}>
           <span className="tile__band">Repeticiones</span>
           <span className="tile__value"><Odometer value={data.totalReps} /></span>
         </div>
-        <div className="tile tile--ink" style={{ "--i": 2 } as CSSProperties}>
+        <div className="tile tile--cobalt" style={{ "--i": 2 } as CSSProperties}>
           <span className="tile__band">Precisión media</span>
           <span className="tile__value"><Odometer value={data.avgAccuracy} suffix="%" /></span>
         </div>
-        <div className="tile tile--sun" style={{ "--i": 3 } as CSSProperties}>
+        <div className="tile tile--ink" style={{ "--i": 3 } as CSSProperties}>
           <span className="tile__band">Días de racha</span>
           <span className="tile__value"><Odometer value={data.streakDays} /></span>
         </div>
