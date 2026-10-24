@@ -1,6 +1,6 @@
 /* Estilos específicos de cada pantalla. */
 
-/* ---------- Cabeceras de página: campo cobalto con foto en dúo y regla de tiempo ---------- */
+/* ---------- Cabeceras de página: papel con la foto en gris y regla de tiempo ---------- */
 .page-header[data-banner] {
   position: relative;
   isolation: isolate;
@@ -9,9 +9,9 @@
   align-content: end;
   padding: clamp(24px, 3vw, 40px) clamp(24px, 3vw, 44px) clamp(36px, 4vw, 52px);
   border-radius: var(--radius-lg);
-  background: var(--cobalt);
-  color: var(--on-cobalt);
-  box-shadow: var(--shadow-2);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
 }
 
 .page-header[data-banner] h1 {
@@ -19,11 +19,11 @@
   line-height: 0.86;
   font-weight: 900;
   font-stretch: 62%;
-  color: var(--on-cobalt);
+  color: var(--text);
 }
 
 .page-header[data-banner] p {
-  color: var(--on-cobalt-muted);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -35,11 +35,16 @@
   width: min(54%, 640px);
   background-size: cover;
   background-position: center;
-  filter: grayscale(1) contrast(1.1) brightness(1.15);
+  filter: grayscale(1) contrast(1.05);
   mix-blend-mode: multiply;
-  opacity: 1;
+  opacity: 0.5;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 55%);
+}
+
+:root[data-theme="dark"] .page-header[data-banner]::before {
+  mix-blend-mode: screen;
+  opacity: 0.22;
 }
 
 .page-header[data-banner="ropes"]::before { background-image: url("/img/ropes.jpg"); }
@@ -48,7 +53,7 @@
 .page-header[data-banner="deadlift"]::before { background-image: url("/img/deadlift.jpg"); }
 .page-header[data-banner="core"]::before { background-image: url("/img/core.jpg"); }
 
-/* Regla de tiempo: marca larga cada 56 px y cuatro cortas entre medias. */
+/* Regla de tiempo: marca larga cada 56 px (cobalto) y cuatro cortas entre medias. */
 .page-header[data-banner]::after,
 .race-hero::after {
   content: "";
@@ -58,8 +63,13 @@
   height: 16px;
   pointer-events: none;
   background:
-    repeating-linear-gradient(90deg, rgb(246 248 255 / 0.85) 0 2px, transparent 2px 56px) left bottom / 100% 16px no-repeat,
-    repeating-linear-gradient(90deg, rgb(246 248 255 / 0.5) 0 1px, transparent 1px 11.2px) left bottom / 100% 8px no-repeat;
+    repeating-linear-gradient(90deg, var(--ruler-major, var(--cobalt)) 0 2px, transparent 2px 56px) left bottom / 100% 16px no-repeat,
+    repeating-linear-gradient(90deg, var(--ruler-minor, color-mix(in srgb, var(--cobalt) 55%, transparent)) 0 1px, transparent 1px 11.2px) left bottom / 100% 8px no-repeat;
+}
+
+.race-hero {
+  --ruler-major: rgb(244 246 251 / 0.85);
+  --ruler-minor: rgb(244 246 251 / 0.45);
 }
 
 /* ---------- Inicio ---------- */
@@ -71,9 +81,9 @@
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   min-height: 480px;
   border-radius: var(--radius-lg);
-  background: var(--cobalt);
+  background: var(--rail);
   color: var(--on-cobalt);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-1);
 }
 
 .race-hero__copy {
@@ -121,7 +131,7 @@
   position: relative;
   min-height: 260px;
   overflow: hidden;
-  background: var(--cobalt-deep);
+  background: var(--rail);
   clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
 }
 
@@ -413,7 +423,7 @@
 
 /* ---------- Entrenar ---------- */
 .accent-live {
-  color: var(--on-cobalt-muted);
+  color: var(--accent-text);
 }
 
 .train {

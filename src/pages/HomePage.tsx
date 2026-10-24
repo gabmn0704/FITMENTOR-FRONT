@@ -155,7 +155,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           {!token && <EmptyState title="Inicia sesión para ver tu rutina">Tu plan se adapta a tu nivel y progreso.</EmptyState>}
           {token && routine.loading && <div className="skeleton" style={{ height: 160 }} aria-label="Cargando rutina" />}
           {token && routine.error && <EmptyState title="Rutina no disponible">Vuelve a intentarlo más tarde.</EmptyState>}
-          {routine.data && (
+          {routine.data && Array.isArray(routine.data.items) && (
             <div className="stack" style={{ gap: 10 }}>
               {routine.data.items.slice(0, 4).map((item, index) => (
                 <div className="routine-item" key={`${item.exercise}-${index}`}>
