@@ -1,54 +1,88 @@
-/* Primitivos reutilizables: botones, tarjetas de vidrio, chips, anillos y estados. */
+/* Primitivos del mundo "día de carrera": botones, dorsales (tarjetas), campos, marcador rodante. */
 
+/* ---------- Marca ---------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo__word {
+  font-family: var(--font-display);
+  font-stretch: 68%;
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.logo--inverse .logo__word {
+  color: var(--on-cobalt);
+}
+
+.logo--inverse .logo__word span {
+  color: var(--on-cobalt-muted);
+}
+
+.logo--brand .logo__word span {
+  color: var(--accent-text);
+}
+
+/* ---------- Botones ---------- */
 .btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 46px;
+  min-height: 48px;
   padding: 0 var(--space-5);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   font-weight: 700;
   font-size: 15px;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   transition:
     transform var(--dur-fast) var(--ease-out),
     background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
     box-shadow var(--dur-base) var(--ease-out),
     color var(--dur-fast) ease;
 }
 
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
 .btn:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  transition-duration: 90ms;
 }
 
 .btn--primary {
-  background: var(--field-lime);
-  color: var(--field-lime-ink);
+  background: var(--signal);
+  color: var(--signal-ink);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 10px 22px -14px rgb(255 61 31 / 0.9);
 }
 
-.btn--primary:hover:not(:disabled) {
-  box-shadow: var(--shadow-glow);
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 32%, rgb(255 255 255 / 0.5) 50%, transparent 68%);
+  transform: translateX(-120%);
 }
 
 .btn--ghost {
-  background: var(--surface-strong);
-  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  border: 1.5px solid var(--line-strong);
   color: var(--text);
-}
-
-.btn--ghost:hover:not(:disabled) {
-  border-color: var(--lime);
 }
 
 .btn--danger {
   background: transparent;
-  border: 1px solid color-mix(in srgb, var(--danger) 60%, transparent);
-  color: var(--danger);
+  border: 1.5px solid var(--signal);
+  color: var(--signal-text);
 }
 
 .btn--block {
@@ -56,12 +90,13 @@
 }
 
 .btn--lg {
-  min-height: 56px;
-  font-size: 16px;
+  min-height: 58px;
+  padding: 0 var(--space-6);
+  font-size: 17px;
 }
 
 .btn--icon {
-  width: 44px;
+  width: 48px;
   padding: 0;
 }
 
@@ -80,23 +115,40 @@
   }
 }
 
-/* Tarjeta de vidrio con borde sutil y gradiente. */
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 16px 28px -14px rgb(255 61 31 / 1);
+  }
+
+  .btn--primary:hover:not(:disabled)::after {
+    transform: translateX(120%);
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .btn--ghost:hover:not(:disabled) {
+    border-color: var(--cobalt);
+    color: var(--accent-text);
+  }
+
+  .btn--danger:hover:not(:disabled) {
+    background: var(--signal-soft);
+  }
+}
+
+/* ---------- Dorsal (tarjeta) ---------- */
 .card {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
+  background: var(--surface);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
 }
 
 .card--interactive {
-  transition:
-    transform var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) ease;
-}
-
-.card--interactive:hover {
-  transform: translateY(-3px);
-  background: var(--surface);
+  transition: transform var(--dur-base) var(--ease-out);
 }
 
 .card__header {
@@ -108,11 +160,7 @@
 }
 
 .card__title {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 800;
-  text-transform: uppercase;
-  line-height: 1;
+  font-size: 30px;
 }
 
 .chip {
@@ -120,38 +168,42 @@
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   font-size: 12px;
-  font-weight: 600;
-  background: var(--surface-strong);
+  font-weight: 700;
+  background: var(--surface-2);
   color: var(--text-muted);
-  border: 1px solid var(--surface-border);
+  border: 1px solid var(--line);
 }
 
-.chip--lime {
-  background: var(--lime-soft);
-  color: var(--lime);
-  border-color: transparent;
-}
-
-.chip--orange {
-  background: var(--orange-soft);
-  color: var(--orange);
+.chip--cobalt {
+  background: var(--cobalt-soft);
+  color: var(--accent-text);
   border-color: transparent;
 }
 
 .avatar {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--field-orange);
-  color: var(--field-orange-ink);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
   font-weight: 800;
   font-size: 13px;
   flex-shrink: 0;
   overflow: hidden;
+}
+
+.sidebar .avatar {
+  background: var(--on-cobalt);
+  color: var(--cobalt);
+}
+
+.avatar--soft {
+  background: var(--cobalt-soft);
+  color: var(--accent-text);
 }
 
 .avatar img {
@@ -160,56 +212,65 @@
   object-fit: cover;
 }
 
+/* ---------- Campos ---------- */
 .field {
   display: grid;
   gap: var(--space-2);
 }
 
-.field label {
+.field label,
+.field__label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
 }
 
 .input,
 .select {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line-strong);
   background: var(--surface);
   color: var(--text);
-  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-base) var(--ease-out), background-color var(--dur-fast) ease;
+}
+
+.input:hover:not(:focus),
+.select:hover:not(:focus) {
+  border-color: var(--text-subtle);
 }
 
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: var(--lime);
-  box-shadow: 0 0 0 4px var(--lime-soft);
+  border-color: var(--cobalt);
+  box-shadow: 0 0 0 4px var(--cobalt-soft);
 }
 
 .select option {
-  background: var(--bg-elevated);
+  background: var(--surface);
   color: var(--text);
 }
 
 .notice {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: 14px;
+  font-weight: 500;
   border: 1px solid transparent;
 }
 
 .notice--error {
-  background: color-mix(in srgb, var(--danger) 14%, transparent);
-  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
-  color: var(--danger);
+  background: var(--signal-soft);
+  border-color: color-mix(in srgb, var(--signal) 55%, transparent);
+  color: var(--signal-text);
 }
 
 .notice--info {
-  background: var(--lime-soft);
+  background: var(--cobalt-soft);
+  border-color: color-mix(in srgb, var(--cobalt) 30%, transparent);
   color: var(--text);
 }
 
@@ -220,17 +281,20 @@
   padding: var(--space-6) var(--space-4);
   text-align: center;
   color: var(--text-muted);
-  border: 1px dashed var(--surface-border);
-  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-md);
 }
 
 .empty strong {
   color: var(--text);
   font-family: var(--font-display);
-  font-size: 18px;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
 }
 
-/* Anillo de progreso animado por stroke-dashoffset. */
+/* ---------- Anillo ---------- */
 .ring {
   position: relative;
   display: inline-grid;
@@ -242,11 +306,11 @@
 }
 
 .ring__track {
-  stroke: var(--surface-strong);
+  stroke: var(--surface-3);
 }
 
 .ring__value {
-  transition: stroke-dashoffset var(--dur-slow) var(--ease-out);
+  stroke: var(--cobalt);
 }
 
 .ring__content {
@@ -259,25 +323,244 @@
 
 .ring__content strong {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 40px;
   line-height: 1;
 }
 
 .ring__content span {
   font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
   margin-top: 4px;
 }
 
+.ring__content strong span {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+/* ---------- Barras ---------- */
+.bar {
+  height: 10px;
+  border-radius: 2px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.bar__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--cobalt);
+  transform-origin: left;
+}
+
+/* ---------- Marcador rodante (odómetro) ---------- */
+.odo {
+  --cell: 1.1em;
+  display: inline-flex;
+  align-items: flex-start;
+  line-height: var(--cell);
+  height: var(--cell);
+  white-space: nowrap;
+}
+
+.odo__digit {
+  display: inline-block;
+  width: 1ch;
+  height: var(--cell);
+  overflow: hidden;
+}
+
+.odo__col {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--to, 0) * var(--cell) * -1));
+  transition: transform 1250ms var(--ease-out) var(--delay, 0ms);
+  will-change: transform;
+}
+
+.odo__col > span {
+  display: block;
+  height: var(--cell);
+  text-align: center;
+}
+
+.odo__fixed {
+  display: inline-block;
+}
+
+.odo__suffix {
+  margin-left: 0.04em;
+  font-size: 0.62em;
+  font-stretch: 85%;
+  font-weight: 800;
+  line-height: calc(var(--cell) * 1.6);
+}
+
+/* ---------- Interruptor y segmentado ---------- */
+.switch {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-3);
+  border: 1.5px solid var(--line-strong);
+  flex-shrink: 0;
+  transition: background-color var(--dur-base) ease, border-color var(--dur-base) ease;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--text);
+  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-base) ease;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+}
+
+.switch[aria-checked="true"]::after {
+  transform: translateX(22px);
+  background: var(--on-cobalt);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  gap: 4px;
+}
+
+.segmented button {
+  min-height: 38px;
+  padding: 0 var(--space-4);
+  border-radius: 5px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, transform 90ms var(--ease-out);
+}
+
+.segmented button:active {
+  transform: scale(0.96);
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+}
+
+/* ---------- Esqueleto ---------- */
 .skeleton {
   border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-strong) 50%, var(--surface) 100%);
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
   background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  animation: shimmer 1.6s linear infinite;
 }
 
 @keyframes shimmer {
   to {
     background-position: -200% 0;
   }
+}
+
+/* ---------- Gráficos (SVG propio) ---------- */
+.chart-axis {
+  fill: var(--text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.chart-grid {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.chart-tick {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.chart-value {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-value--best {
+  fill: var(--signal-text);
+}
+
+.chart-finish {
+  stroke: var(--signal);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+
+.bars-rect {
+  fill: var(--cobalt);
+}
+
+.bars-rect--best {
+  fill: var(--signal);
+}
+
+.bars-empty {
+  fill: var(--surface-3);
+}
+
+.chart-hatch {
+  stroke: var(--cobalt);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.chart-target {
+  stroke: var(--signal);
+  stroke-width: 1.25;
+  stroke-dasharray: 5 5;
+}
+
+.chart-target-label {
+  fill: var(--signal-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.line-path {
+  fill: none;
+  stroke: var(--cobalt);
+  stroke-width: 3;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-dasharray: var(--len, 1000);
+  stroke-dashoffset: var(--len, 1000);
+}
+
+.line-dot {
+  fill: var(--surface);
+  stroke: var(--cobalt);
+  stroke-width: 2.5;
+}
+
+.chart-card svg,
+.finish-card svg,
+.card svg.chart {
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }

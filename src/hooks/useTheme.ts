@@ -7,7 +7,7 @@ const THEMES: ThemeChoice[] = ["dark", "light", "system"];
 
 export function readStoredTheme(): ThemeChoice {
   const value = storage.getString(STORAGE_KEYS.theme);
-  return THEMES.includes(value as ThemeChoice) ? (value as ThemeChoice) : "dark";
+  return THEMES.includes(value as ThemeChoice) ? (value as ThemeChoice) : "light";
 }
 
 /** Aplica el tema en <html>. "system" retira el atributo y deja decidir a prefers-color-scheme. */

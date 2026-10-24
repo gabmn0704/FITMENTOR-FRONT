@@ -1,8 +1,8 @@
-/* Punto de entrada de estilos. El orden importa: tokens, base, primitivos, layout y páginas. */
+/* Punto de entrada de estilos. El orden importa: tokens, base, primitivos, layout, páginas, acceso y movimiento. */
 @import "./tokens.css";
 @import "./base.css";
 @import "./components.css";
 @import "./layout.css";
 @import "./pages.css";
-@import "./poster.css";
+@import "./access.css";
 @import "./motion.css";
