@@ -2,6 +2,8 @@ import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { Button } from "./components/ui";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
+import { Onboarding } from "./components/onboarding/Onboarding";
+import { ProfileProvider, useProfile } from "./hooks/useProfile";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { usePointerEffects } from "./hooks/usePointerEffects";
 import { syncPendingSessions } from "./lib/sessions";
@@ -45,6 +47,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
 
 function Screens() {
   const { token, user } = useAuth();
+  const { profile, skipped } = useProfile();
   const [route, navigate] = useHashRoute();
   usePointerEffects();
 
@@ -54,6 +57,7 @@ function Screens() {
   }, [token]);
 
   if (!token) return <LoginPage />;
+  if (user && !profile && !skipped) return <Onboarding />;
 
   const page = (id: RouteId) => {
     switch (id) {
@@ -86,7 +90,9 @@ function Screens() {
 export default function App() {
   return (
     <AuthProvider>
-      <Screens />
+      <ProfileProvider>
+        <Screens />
+      </ProfileProvider>
     </AuthProvider>
   );
 }
