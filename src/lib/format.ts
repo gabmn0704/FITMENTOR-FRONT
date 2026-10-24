@@ -24,3 +24,11 @@ export function initials(name: string): string {
     .map((part) => part[0]!.toUpperCase())
     .join("");
 }
+
+const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+
+/** "lun", "mar"… a partir de una fecha "AAAA-MM-DD" (sin desfase de zona horaria). */
+export function weekdayLabel(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  return WEEKDAYS[new Date(year, month - 1, day).getDay()];
+}
