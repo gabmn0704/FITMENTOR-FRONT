@@ -170,6 +170,18 @@ async function send<T>(path: string, options: RequestOptions = {}): Promise<T> {
   return (await response.json()) as T;
 }
 
+/**
+ * Despierta el backend: en el plan gratuito de Render el servicio se duerme y el primer
+ * intento tarda hasta un minuto. Se lanza al abrir el acceso y se ignora cualquier resultado.
+ */
+export function warmUpBackend(): void {
+  try {
+    void fetch(buildApiUrl("/api/exercises"), { method: "GET", mode: "no-cors", cache: "no-store" }).catch(() => undefined);
+  } catch {
+    /* sin red: no hay nada que hacer */
+  }
+}
+
 /** Caché de lectura para búsquedas y respuestas repetidas (LRU con TTL de 5 min). */
 const readCache = new LRUCache<string, unknown>(64, 5 * 60 * 1000);
 
