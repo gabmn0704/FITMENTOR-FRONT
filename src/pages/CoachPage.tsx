@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { Bot, Send, Sparkles } from "lucide-react";
+import { Send, Sparkles } from "lucide-react";
 import { Button, Notice } from "../components/ui";
 import { TypedText } from "../components/motion/TypedText";
 import { useAuth } from "../hooks/useAuth";
@@ -116,10 +116,6 @@ export function CoachPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="gym">
-        <span className="chat-hero-orb" aria-hidden="true">
-          <Bot size={20} />
-        </span>
-        <p className="eyebrow">Coach IA</p>
         <h1>Pregunta lo que quieras</h1>
         <p>Respuestas de técnica y progresión. Ante una molestia, consulta a un profesional.</p>
       </header>

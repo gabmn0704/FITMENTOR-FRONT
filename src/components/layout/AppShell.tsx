@@ -57,7 +57,7 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
 
       <aside className="sidebar">
         <div className="brand">
-          <Logo size={34} />
+          <Logo size={36} tone="inverse" />
         </div>
         <nav className="nav-list" aria-label="Navegación principal">
           <span
@@ -70,11 +70,11 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
           ))}
         </nav>
         {user && (
-          <div className="sidebar__footer row" style={{ paddingInline: 8 }}>
+          <div className="sidebar__footer row">
             <Avatar name={user.name} picture={user.picture} />
             <div className="profile__text" style={{ minWidth: 0 }}>
-              <strong style={{ display: "block", fontSize: 14 }}>{user.name}</strong>
-              <span className="muted" style={{ fontSize: 12 }}>
+              <strong>{user.name}</strong>
+              <span>
                 {isGuest(user) ? `Invitado · ${levelLabel(user.level)}` : levelLabel(user.level)}
               </span>
             </div>

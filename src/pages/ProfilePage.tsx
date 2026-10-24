@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { LogOut, ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import { Avatar, Button, Card, Notice, Segmented, Switch, type SegmentOption } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
@@ -68,13 +68,12 @@ export function ProfilePage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="studio">
-        <p className="eyebrow">Perfil y ajustes</p>
         <h1>Tu espacio</h1>
         <p>Ajusta cómo FitMentor te acompaña en cada sesión.</p>
       </header>
 
       <div className="home-split">
-        <Card eyebrow="Cuenta" title={user.name}>
+        <Card title={user.name}>
           <div className="row" style={{ marginBottom: 16 }}>
             <Avatar name={user.name} picture={user.picture} />
             <span className="muted">{isGuest(user) ? "Modo invitado · tus datos se guardan en el servidor" : user.email}</span>
@@ -90,10 +89,10 @@ export function ProfilePage() {
           </form>
         </Card>
 
-        <Card eyebrow="Entrenamiento" title="Objetivo y nivel">
+        <Card title="Objetivo y nivel">
           <div className="stack">
             <div className="field">
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)" }}>Nivel</span>
+              <span className="field__label">Nivel</span>
               <Segmented
                 label="Nivel de entrenamiento"
                 options={LEVEL_OPTIONS}
@@ -123,10 +122,10 @@ export function ProfilePage() {
 
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
 
-      <Card as="div" title="Preferencias" eyebrow="Experiencia">
+      <Card as="div" title="Preferencias">
         <div className="settings-list">
           <div className="setting">
-            <span className="avatar" style={{ background: "var(--lime-soft)", color: "var(--lime)" } as CSSProperties} aria-hidden="true">
+            <span className="avatar avatar--soft" aria-hidden="true">
               {voice ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </span>
             <div className="setting__text">
@@ -139,13 +138,13 @@ export function ProfilePage() {
           <div className="setting">
             <div className="setting__text">
               <strong>Tema</strong>
-              <small>Oscuro por defecto. El sistema sigue la preferencia de tu dispositivo.</small>
+              <small>Claro por defecto. El sistema sigue la preferencia de tu dispositivo.</small>
             </div>
             <Segmented label="Tema de color" options={THEMES} value={theme} onChange={setTheme} />
           </div>
 
           <div className="setting" role="note">
-            <span className="avatar" style={{ background: "var(--lime-soft)", color: "var(--lime)" } as CSSProperties} aria-hidden="true">
+            <span className="avatar avatar--soft" aria-hidden="true">
               <ShieldCheck size={16} />
             </span>
             <div className="setting__text">

@@ -4,6 +4,7 @@ import { Card, EmptyState, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { achievementsApi } from "../lib/services";
+import { Odometer } from "../components/motion/Odometer";
 import { achievementText, progressPercent } from "../lib/contract";
 
 export function AchievementsPage() {
@@ -22,7 +23,6 @@ export function AchievementsPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="ropes">
-        <p className="eyebrow">Insignias</p>
         <h1>Logros</h1>
         <p>
           {achievements.data
@@ -61,7 +61,7 @@ export function AchievementsPage() {
                 <span className="achievement__icon" aria-hidden="true">
                   {achievement.unlocked ? <Award size={22} /> : <Lock size={20} />}
                 </span>
-                <span className={`chip ${achievement.unlocked ? "chip--lime" : ""}`}>
+                <span className={`chip ${achievement.unlocked ? "chip--cobalt" : ""}`}>
                   {achievement.unlocked ? "Desbloqueado" : "En progreso"}
                 </span>
               </div>
@@ -74,8 +74,8 @@ export function AchievementsPage() {
               <div className="bar" aria-hidden="true">
                 <div className="bar__fill" style={{ width: `${percent}%` }} />
               </div>
-              <span className="muted tabular" style={{ fontSize: 12 }}>
-                {percent}%
+              <span className="achievement__percent tabular">
+                <Odometer value={percent} suffix="%" stagger={70} />
               </span>
             </Card>
           );
