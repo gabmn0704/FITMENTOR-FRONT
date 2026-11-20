@@ -1,4 +1,6 @@
-import { Mic, Volume2 } from "lucide-react";
+import { Mic } from "lucide-react";
+import { Mascot } from "../mascot/Mascot";
+import type { MascotState } from "../../lib/mascot";
 
 export type CoachPresenceState = "idle" | "listening" | "speaking" | "counting";
 
@@ -6,22 +8,27 @@ interface CoachPresenceProps {
   state: CoachPresenceState;
   /** Frase actual del entrenador (corrección o ánimo). */
   message: string;
+  /** Repeticiones hechas; se muestran en la mascota mientras cuenta. */
+  count?: number;
 }
 
-/**
- * Punto de integración del entrenador en la pantalla de entrenamiento.
- * Versión simple (anillo + mensaje): se reemplaza por <Mascot state size message/> cuando
- * llegue el componente de la mascota, manteniendo estas mismas props (state y message).
- */
-export function CoachPresence({ state, message }: CoachPresenceProps) {
+const MASCOT_BY_STATE: Record<CoachPresenceState, MascotState> = {
+  idle: "idle",
+  listening: "wave",
+  speaking: "cheer",
+  counting: "count",
+};
+
+/** Entrenador en la pantalla de entrenamiento: Rep reacciona a la voz y al conteo. */
+export function CoachPresence({ state, message, count }: CoachPresenceProps) {
   return (
     <div className={`coach-presence coach-presence--${state}`} data-coach-state={state}>
-      <span className="coach-presence__orb" aria-hidden="true">
-        {state === "listening" ? <Mic size={18} /> : <Volume2 size={18} />}
-      </span>
-      <p className="coach-presence__message" aria-live="polite">
-        {message}
-      </p>
+      <Mascot state={MASCOT_BY_STATE[state]} size={96} message={message} count={count} placement="right" />
+      {state === "listening" && (
+        <span className="coach-presence__orb" role="status" aria-label="Escuchando comandos de voz">
+          <Mic size={16} aria-hidden="true" />
+        </span>
+      )}
     </div>
   );
 }

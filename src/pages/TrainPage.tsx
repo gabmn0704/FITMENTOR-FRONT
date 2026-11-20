@@ -280,8 +280,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
               <div className="bar__fill" style={{ width: `${progress}%` }} />
             </div>
 
-            {/* Punto de integración: aquí entra <Mascot state size message/> cuando llegue la mascota. */}
-            <CoachPresence state={coachState} message={session.cue} />
+            <CoachPresence state={coachState} message={session.cue} count={session.reps} />
             <p className="muted" style={{ fontSize: 13 }}>
               Fase: {PHASE_LABEL[session.repPhase] ?? session.repPhase}
               {session.angle !== null && ` · Ángulo: ${session.angle}°`}
