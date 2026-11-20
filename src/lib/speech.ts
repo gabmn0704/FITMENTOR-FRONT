@@ -97,7 +97,10 @@ export class VoiceCoach {
    * Encola un mensaje. `options` puede ser `true` (forzar, sin filtro de repetidos) o
    * `{ force, priority }`. Devuelve si se aceptó.
    */
-  say(text: string, options: boolean | { force?: boolean; priority?: VoicePriorityLevel } = false): boolean {
+  say(
+    text: string,
+    options: boolean | { force?: boolean; priority?: VoicePriorityLevel; replace?: boolean } = false,
+  ): boolean {
     const opts = typeof options === "boolean" ? { force: options } : options;
     const message = text.trim();
     if (!this.enabled || !this.synth || !message) return false;
@@ -107,7 +110,12 @@ export class VoiceCoach {
     if (!force && (message === this.lastText || now - this.lastAt < REPEAT_WINDOW_MS)) {
       return false;
     }
-    if (priority >= VoicePriority.count) {
+    if (opts.replace && priority < VoicePriority.count) {
+      // Solo importa lo más reciente: descarta la cola de igual o menor prioridad y corta la frase actual si lo es.
+      this.queue = this.queue.filter((item) => item.priority > priority);
+      this.queue.push({ text: message, priority });
+      if (this.current && this.current.priority <= priority) this.interrupt();
+    } else if (priority >= VoicePriority.count) {
       // El conteo manda: descarta lo menor en cola y corta la frase actual si es menor.
       this.queue = this.queue.filter((item) => item.priority >= VoicePriority.count);
       this.queue.push({ text: message, priority });
