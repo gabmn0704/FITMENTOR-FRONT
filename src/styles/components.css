@@ -1,33 +1,5 @@
 /* Primitivos del mundo "día de carrera": botones, dorsales (tarjetas), campos, marcador rodante. */
 
-/* ---------- Marca ---------- */
-.logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo__word {
-  font-family: var(--font-display);
-  font-stretch: 68%;
-  font-weight: 900;
-  font-size: 28px;
-  line-height: 1;
-  letter-spacing: 0.01em;
-}
-
-.logo--inverse .logo__word {
-  color: var(--on-cobalt);
-}
-
-.logo--inverse .logo__word span {
-  color: var(--on-cobalt-muted);
-}
-
-.logo--brand .logo__word span {
-  color: var(--accent-text);
-}
-
 /* ---------- Botones ---------- */
 .btn {
   position: relative;
@@ -84,8 +56,8 @@
 
 .btn--danger {
   background: transparent;
-  border: 1px solid color-mix(in srgb, var(--signal) 70%, transparent);
-  color: var(--signal-text);
+  border: 1px solid color-mix(in srgb, var(--danger) 60%, transparent);
+  color: var(--danger-text);
 }
 
 .btn--block {
@@ -121,7 +93,7 @@
 @media (hover: hover) and (pointer: fine) {
   .btn--primary:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-signal), 0 18px 36px -14px rgb(255 61 31 / 0.85), inset 0 0 0 1px rgb(255 255 255 / 0.2);
+    box-shadow: var(--shadow-signal), 0 18px 36px -14px rgb(212 255 58 / 0.85), inset 0 0 0 1px rgb(255 255 255 / 0.2);
   }
 
   .btn--primary:hover:not(:disabled)::after {
@@ -130,13 +102,13 @@
   }
 
   .btn--ghost:hover:not(:disabled) {
-    border-color: color-mix(in srgb, var(--cobalt-bright) 70%, transparent);
+    border-color: color-mix(in srgb, var(--brand-bright) 70%, transparent);
     color: var(--accent-text);
     transform: translateY(-1px);
   }
 
   .btn--danger:hover:not(:disabled) {
-    background: var(--signal-soft);
+    background: var(--danger-soft);
   }
 }
 
@@ -183,8 +155,8 @@
   border: 1px solid var(--line);
 }
 
-.chip--cobalt {
-  background: var(--cobalt-soft);
+.chip--brand {
+  background: var(--brand-soft);
   color: var(--accent-text);
   border-color: transparent;
 }
@@ -195,8 +167,8 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-sm);
-  background: var(--cobalt);
-  color: var(--on-cobalt);
+  background: var(--brand);
+  color: var(--on-brand);
   font-weight: 800;
   font-size: 13px;
   flex-shrink: 0;
@@ -204,12 +176,12 @@
 }
 
 .sidebar .avatar {
-  background: var(--on-cobalt);
-  color: var(--cobalt);
+  background: var(--on-brand);
+  color: var(--brand);
 }
 
 .avatar--soft {
-  background: var(--cobalt-soft);
+  background: var(--brand-soft);
   color: var(--accent-text);
 }
 
@@ -252,8 +224,8 @@
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: var(--cobalt);
-  box-shadow: 0 0 0 4px var(--cobalt-soft);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-soft);
 }
 
 .select option {
@@ -270,14 +242,14 @@
 }
 
 .notice--error {
-  background: var(--signal-soft);
-  border-color: color-mix(in srgb, var(--signal) 55%, transparent);
-  color: var(--signal-text);
+  background: var(--danger-soft);
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+  color: var(--danger-text);
 }
 
 .notice--info {
-  background: var(--cobalt-soft);
-  border-color: color-mix(in srgb, var(--cobalt) 30%, transparent);
+  background: var(--brand-soft);
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
   color: var(--text);
 }
 
@@ -317,7 +289,7 @@
 }
 
 .ring__value {
-  stroke: var(--ring-color, var(--cobalt));
+  stroke: var(--ring-color, var(--brand));
   transition: stroke-dashoffset 900ms var(--ease-out-expo);
 }
 
@@ -362,7 +334,7 @@
 .bar__fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--cobalt), var(--cobalt-bright));
+  background: linear-gradient(90deg, var(--brand), var(--brand-bright));
   transform-origin: left;
 }
 
@@ -453,13 +425,13 @@
 }
 
 .switch[aria-checked="true"] {
-  background: var(--cobalt);
-  border-color: var(--cobalt);
+  background: var(--brand);
+  border-color: var(--brand);
 }
 
 .switch[aria-checked="true"]::after {
   transform: translateX(22px);
-  background: var(--on-cobalt);
+  background: var(--on-brand);
 }
 
 .segmented {
@@ -486,8 +458,8 @@
 }
 
 .segmented button[aria-pressed="true"] {
-  background: var(--cobalt);
-  color: var(--on-cobalt);
+  background: var(--brand);
+  color: var(--on-brand);
 }
 
 /* ---------- Gráficos (SVG propio) ---------- */
@@ -503,7 +475,7 @@
 }
 
 .chart-hatch {
-  stroke: var(--cobalt);
+  stroke: var(--brand);
   stroke-width: 1;
   opacity: 0.35;
 }
@@ -522,7 +494,7 @@
 
 .line-path {
   fill: none;
-  stroke: var(--cobalt);
+  stroke: var(--brand);
   stroke-width: 3;
   stroke-linecap: square;
   stroke-linejoin: miter;
@@ -532,7 +504,7 @@
 
 .line-dot {
   fill: var(--surface);
-  stroke: var(--cobalt);
+  stroke: var(--brand);
   stroke-width: 2.5;
 }
 
@@ -601,7 +573,7 @@
   width: var(--w, 0%);
   min-width: 3px;
   border-radius: 3px;
-  background: var(--cobalt);
+  background: var(--brand);
   transform-origin: left;
 }
 

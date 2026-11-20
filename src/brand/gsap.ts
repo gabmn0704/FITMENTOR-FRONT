@@ -1,6 +1,6 @@
 /**
  * GSAP se descarga aparte (unos 27 KB comprimidos) para que la pantalla de acceso pinte sin esperarlo.
- * Logo y mascota se ven completos en su pose final desde el primer instante; cuando llega GSAP, se animan.
+ * El logo se ve completo desde el primer instante; cuando llega GSAP, se anima.
  */
 type Gsap = typeof import("gsap").gsap;
 
@@ -12,7 +12,7 @@ export function loadGsap(): Promise<Gsap | null> {
   pending ??= import("gsap")
     .then((mod) => {
       const gsap = mod.gsap ?? mod.default;
-      // Algunas capas solo existen en ciertos estados de la mascota: no es un error que falten.
+      // Algunos objetivos solo existen en ciertos estados de la pantalla: no es un error que falten.
       gsap.config({ nullTargetWarn: false });
       return gsap;
     })

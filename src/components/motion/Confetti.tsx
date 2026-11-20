@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 const EVENT = "fitmentor:confetti";
-const COLORS = ["#1b3bff", "#ff3d1f", "#ffc400", "#f6f8ff", "#56d596", "#8a9dff"];
+const COLORS = ["#0a7a53", "#d4ff3a", "#ffc400", "#f6f8ff", "#56d596", "#6ff2c5"];
 
 export interface ConfettiOptions {
   /** Origen como fracción de la pantalla (0-1). Por defecto, arriba al centro. */

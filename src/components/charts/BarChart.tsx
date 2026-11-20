@@ -14,7 +14,7 @@ interface BarChartProps {
 }
 
 /**
- * Columnas por día que crecen desde la base al entrar en pantalla. El mejor día va en bermellón con su sello,
+ * Columnas por día que crecen desde la base al entrar en pantalla. El mejor día va en lima con su sello,
  * una línea punteada marca el promedio y cada columna muestra su cifra al pasar el puntero o enfocarla.
  * Es HTML y CSS (no un SVG escalado) para que el texto conserve su tamaño en cualquier pantalla.
  */

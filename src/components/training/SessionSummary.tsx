@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { Trophy } from "lucide-react";
 import { Button, ProgressRing } from "../ui";
 import { Odometer } from "../motion/Odometer";
-import { Mascot } from "../mascot/Mascot";
 import { fireConfetti } from "../motion/Confetti";
 import { exerciseLabel } from "../../lib/exercises";
 import { useProfile } from "../../hooks/useProfile";
@@ -39,13 +38,12 @@ export function SessionSummary({ session, saving, saved, onSave, onDiscard }: Se
         tabIndex={-1}
       >
         <div className="row" style={{ justifyContent: "space-between" }}>
-          <span className="chip chip--cobalt">
+          <span className="chip chip--brand">
             <Trophy size={14} aria-hidden="true" /> Sesión completada
           </span>
           <span className="muted tabular">{formatDuration(session.durationSeconds)}</span>
         </div>
         <div className="summary__hero">
-          <Mascot state={session.score >= 60 ? "celebrate" : "worried"} size={112} message={session.score >= 60 ? true : "Así se aprende. Intentémoslo de nuevo."} />
           <h2 id="summary-title" style={{ fontSize: 34 }}>
             {exerciseLabel(session.exercise)}
           </h2>

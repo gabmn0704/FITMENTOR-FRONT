@@ -80,8 +80,8 @@ export function WeightChart({ entries, plan, height = 220 }: WeightChartProps) {
       <svg ref={svg} width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Evolución del peso. ${summary}`}>
         <defs>
           <linearGradient id={`wfill-${uid}`} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="var(--cobalt)" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="var(--cobalt)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
           </linearGradient>
         </defs>
         {ticks.map((tick) => (

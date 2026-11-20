@@ -1,6 +1,4 @@
 import { useRef, type ReactNode } from "react";
-import { PageMascot } from "../mascot/PageMascot";
-import type { MascotState } from "../../lib/mascot";
 import { gsap, useGSAP, withMotion } from "./motion";
 
 interface PageHeroProps {
@@ -11,15 +9,16 @@ interface PageHeroProps {
   /** Línea del título que va en color de acento. */
   accent?: 0 | 1;
   lead?: ReactNode;
-  mascot?: MascotState;
+  /** Datos útiles al costado (cifras, semana). Solo contenido real, nunca decoración. */
+  aside?: ReactNode;
   tone?: "paper" | "ink";
   /** Cifras o acciones bajo el texto. */
   children?: ReactNode;
   className?: string;
 }
 
-/** Cabecera de las páginas internas: título en máscara que sube línea a línea, cifras clave y Rep al costado. */
-export function PageHero({ kicker, title, accent, lead, mascot = "idle", tone = "paper", children, className = "" }: PageHeroProps) {
+/** Cabecera de las páginas internas: título en máscara que sube línea a línea, y cifras clave. */
+export function PageHero({ kicker, title, accent, lead, aside, tone = "paper", children, className = "" }: PageHeroProps) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -34,7 +33,7 @@ export function PageHero({ kicker, title, accent, lead, mascot = "idle", tone = 
   );
 
   return (
-    <header ref={root} className={`p2-hero p2-hero--${tone} ${className}`.trim()}>
+    <header ref={root} className={`p2-hero p2-hero--${tone} ${aside ? "p2-hero--aside" : ""} ${className}`.trim()}>
       <span className="p2-hero__glow" aria-hidden="true" />
       <span className="p2-hero__grid" aria-hidden="true" />
       <div className="p2-hero__copy">
@@ -63,7 +62,48 @@ export function PageHero({ kicker, title, accent, lead, mascot = "idle", tone = 
           </div>
         )}
       </div>
-      <PageMascot state={mascot} size={112} />
+      {aside && (
+        <div className="p2-hero__aside" data-hero-fade>
+          {aside}
+        </div>
+      )}
     </header>
+  );
+}
+
+export interface HeroFigure {
+  label: string;
+  value: ReactNode;
+  note?: string;
+}
+
+/** Cifras clave de la cabecera: valor grande y etiqueta corta. */
+export function HeroFigures({ items }: { items: HeroFigure[] }) {
+  return (
+    <dl className="p2-figures">
+      {items.map((item) => (
+        <div key={item.label}>
+          <dt>{item.label}</dt>
+          <dd className="tabular">{item.value}</dd>
+          {item.note && <small>{item.note}</small>}
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** Siete columnas con las repeticiones de cada día; hoy resaltado. */
+export function HeroWeek({ days }: { days: Array<{ label: string; value: number; today?: boolean }> }) {
+  const max = Math.max(1, ...days.map((d) => d.value));
+  return (
+    <ol className="p2-week" aria-label="Repeticiones de los últimos siete días">
+      {days.map((day, index) => (
+        <li key={`${day.label}-${index}`} className={day.today ? "is-today" : undefined}>
+          <span className="p2-week__bar" style={{ ["--v" as string]: Math.max(0.06, day.value / max) }} />
+          <span className="p2-week__num tabular">{day.value}</span>
+          <span className="p2-week__day">{day.label}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

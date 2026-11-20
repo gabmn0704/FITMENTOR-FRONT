@@ -1,5 +1,5 @@
-/* Tokens "arena nocturna": estadio de noche con cobalto eléctrico y un solo bermellón de señal.
-   El oscuro es el escenario principal; el claro es la misma arena a pleno día, igual de cuidada.
+/* Tokens FitMentor v2: tinta, esmeralda de marca y lima de señal.
+   El oscuro es el escenario principal; el claro es la misma paleta a pleno día, igual de cuidada.
    Todo lo demás (superficies de cristal, sombras en capas, escala tipográfica, curvas) sale de aquí. */
 :root {
   color-scheme: light;
@@ -23,66 +23,69 @@
   --tracking-display: -0.035em;
   --tracking-label: 0.14em;
 
-  /* ---------- Arena de día ---------- */
-  --bg: #eceef3;
-  --bg-deep: #e2e5ec;
+  /* ---------- Claro: aire fresco ---------- */
+  --bg: #eef1ef;
+  --bg-deep: #e3e8e5;
   --surface: #ffffff;
-  --surface-2: #f4f5f8;
-  --surface-3: #e6e9ef;
-  --line: rgb(12 16 28 / 0.1);
-  --line-strong: rgb(12 16 28 / 0.22);
+  --surface-2: #f5f7f6;
+  --surface-3: #e7ece9;
+  --line: rgb(10 14 19 / 0.1);
+  --line-strong: rgb(10 14 19 / 0.22);
 
   /* Tinta */
-  --text: #0b0d14;
-  --text-muted: #3f4656;
-  --text-subtle: #586072;
+  --text: #0a0e13;
+  --text-muted: #3b4540;
+  --text-subtle: #56615b;
 
   /* Campos de tinta: riel, portada y acceso */
-  --rail: #0b0d14;
-  --on-ink: #f4f6fb;
-  --on-ink-muted: #b8bfcf;
+  --rail: #0a0e13;
+  --on-ink: #f3f7f5;
+  --on-ink-muted: #b6c1bb;
 
-  /* Cobalto eléctrico: marca, datos, selección */
-  --cobalt: #2343ff;
-  --cobalt-deep: #1128d6;
-  --cobalt-bright: #4d68ff;
-  --cobalt-soft: rgb(35 67 255 / 0.1);
-  --on-cobalt: #f6f8ff;
-  --on-cobalt-muted: #d9dfff;
-  --accent-text: #1f3df0;
+  /* Esmeralda: marca, datos, selección */
+  --brand: #0a7a53;
+  --brand-deep: #065c3e;
+  --brand-bright: #19e3a1;
+  --brand-soft: rgb(10 122 83 / 0.1);
+  --on-brand: #f2fff9;
+  --on-brand-muted: #c9f5e3;
+  --accent-text: #067a50;
 
-  /* Bermellón: acción, en vivo, récord y error */
-  --signal: #ff3d1f;
-  --signal-bright: #ff6a3d;
-  --signal-ink: #0b0d14;
-  --signal-soft: rgb(255 61 31 / 0.12);
-  --signal-text: #c22a0e;
+  /* Lima: acción principal, en vivo y récord */
+  --signal: #d4ff3a;
+  --signal-bright: #e6ff7a;
+  --signal-ink: #0a0e13;
+  --signal-soft: rgb(212 255 58 / 0.4);
+  --signal-text: #4d6b00;
 
   /* Estados */
   --good: #0a7a45;
   --good-soft: rgb(10 122 69 / 0.12);
-  --warn: #b26b00;
+  --warn: #9a5b00;
+  --danger: #c8283a;
+  --danger-soft: rgb(200 40 58 / 0.1);
+  --danger-text: #b01f30;
 
   /* ---------- Cristal ---------- */
   --glass: rgb(255 255 255 / 0.72);
-  --glass-strong: rgb(255 255 255 / 0.86);
-  --glass-border: rgb(12 16 28 / 0.09);
+  --glass-strong: rgb(255 255 255 / 0.88);
+  --glass-border: rgb(10 14 19 / 0.09);
   --glass-hi: rgb(255 255 255 / 0.9);
   --glass-blur: 22px;
 
   /* Degradado de malla del fondo */
-  --mesh-a: rgb(35 67 255 / 0.12);
-  --mesh-b: rgb(255 61 31 / 0.08);
-  --mesh-c: rgb(120 140 255 / 0.1);
-  --grain-opacity: 0.045;
+  --mesh-a: rgb(25 227 161 / 0.12);
+  --mesh-b: rgb(212 255 58 / 0.14);
+  --mesh-c: rgb(10 122 83 / 0.08);
+  --grain-opacity: 0.04;
 
   /* ---------- Sombras en capas ---------- */
   --shadow-1: 0 1px 1px rgb(12 16 28 / 0.04), 0 2px 4px -1px rgb(12 16 28 / 0.05), 0 12px 28px -14px rgb(12 16 28 / 0.22);
-  --shadow-2: 0 1px 1px rgb(12 16 28 / 0.04), 0 6px 12px -4px rgb(12 16 28 / 0.08), 0 28px 56px -24px rgb(17 40 214 / 0.38);
+  --shadow-2: 0 1px 1px rgb(10 14 19 / 0.04), 0 6px 12px -4px rgb(10 14 19 / 0.08), 0 28px 56px -24px rgb(6 92 62 / 0.34);
   --shadow-3: 0 2px 2px rgb(12 16 28 / 0.05), 0 12px 24px -8px rgb(12 16 28 / 0.12), 0 48px 96px -32px rgb(12 16 28 / 0.4);
-  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 10px 24px -10px rgb(255 61 31 / 0.75);
+  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 10px 24px -10px rgb(120 160 0 / 0.55);
   --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.9);
-  --focus: 0 0 0 3px var(--bg), 0 0 0 5px var(--cobalt);
+  --focus: 0 0 0 3px var(--bg), 0 0 0 5px var(--brand);
 
   /* ---------- Radios ---------- */
   --radius-xs: 6px;
@@ -133,84 +136,94 @@
   --z-sweep: 80;
 }
 
-/* ---------- Arena nocturna ---------- */
+/* ---------- Oscuro: tinta con esmeralda ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --rail: #0a0c12;
-  --bg: #06070b;
-  --bg-deep: #030406;
-  --surface: #0e1017;
-  --surface-2: #141721;
-  --surface-3: #1c202c;
-  --line: rgb(226 232 255 / 0.08);
-  --line-strong: rgb(226 232 255 / 0.18);
-  --text: #f1f3f9;
-  --text-muted: #a9b0c2;
-  --text-subtle: #858da2;
-  --cobalt: #3352ff;
-  --cobalt-deep: #1b33d9;
-  --cobalt-bright: #6b82ff;
-  --cobalt-soft: rgb(97 125 255 / 0.15);
-  --accent-text: #93a5ff;
-  --signal-text: #ff8a6e;
-  --signal-soft: rgb(255 61 31 / 0.16);
+  --rail: #080b0f;
+  --bg: #07090c;
+  --bg-deep: #040507;
+  --surface: #0e1217;
+  --surface-2: #141a20;
+  --surface-3: #1c242b;
+  --line: rgb(226 244 236 / 0.08);
+  --line-strong: rgb(226 244 236 / 0.18);
+  --text: #f1f6f3;
+  --text-muted: #a8b4ae;
+  --text-subtle: #86928c;
+  --brand: #19e3a1;
+  --brand-deep: #0fb982;
+  --brand-bright: #4ff0b6;
+  --brand-soft: rgb(25 227 161 / 0.14);
+  --on-brand: #04140d;
+  --on-brand-muted: #0b3a28;
+  --accent-text: #5df0bd;
+  --signal-soft: rgb(212 255 58 / 0.16);
+  --signal-text: #d4ff3a;
   --good: #4fd89b;
   --good-soft: rgb(79 216 155 / 0.13);
   --warn: #ffb547;
-  --glass: rgb(20 23 33 / 0.58);
-  --glass-strong: rgb(16 18 26 / 0.82);
-  --glass-border: rgb(226 232 255 / 0.09);
+  --danger: #ff6b78;
+  --danger-soft: rgb(255 107 120 / 0.14);
+  --danger-text: #ff8d97;
+  --glass: rgb(20 26 32 / 0.58);
+  --glass-strong: rgb(14 18 23 / 0.84);
+  --glass-border: rgb(226 244 236 / 0.09);
   --glass-hi: rgb(255 255 255 / 0.07);
-  --mesh-a: rgb(51 82 255 / 0.2);
-  --mesh-b: rgb(255 61 31 / 0.1);
-  --mesh-c: rgb(110 70 255 / 0.1);
+  --mesh-a: rgb(25 227 161 / 0.16);
+  --mesh-b: rgb(212 255 58 / 0.07);
+  --mesh-c: rgb(25 227 161 / 0.07);
   --grain-opacity: 0.05;
   --shadow-1: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.35), 0 18px 36px -18px rgb(0 0 0 / 0.75);
-  --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(51 82 255 / 0.5);
+  --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(25 227 161 / 0.28);
   --shadow-3: 0 2px 2px rgb(0 0 0 / 0.35), 0 16px 32px -10px rgb(0 0 0 / 0.55), 0 56px 110px -36px rgb(0 0 0 / 0.9);
-  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -10px rgb(255 61 31 / 0.7);
+  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -12px rgb(212 255 58 / 0.5);
   --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.06);
-  --focus: 0 0 0 3px var(--bg), 0 0 0 5px #93a5ff;
+  --focus: 0 0 0 3px var(--bg), 0 0 0 5px #6ff2c5;
 }
 
 /* "Sistema": sigue la preferencia del dispositivo solo si no se eligió claro u oscuro. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
     color-scheme: dark;
-    --rail: #0a0c12;
-    --bg: #06070b;
-    --bg-deep: #030406;
-    --surface: #0e1017;
-    --surface-2: #141721;
-    --surface-3: #1c202c;
-    --line: rgb(226 232 255 / 0.08);
-    --line-strong: rgb(226 232 255 / 0.18);
-    --text: #f1f3f9;
-    --text-muted: #a9b0c2;
-    --text-subtle: #858da2;
-    --cobalt: #3352ff;
-    --cobalt-deep: #1b33d9;
-    --cobalt-bright: #6b82ff;
-    --cobalt-soft: rgb(97 125 255 / 0.15);
-    --accent-text: #93a5ff;
-    --signal-text: #ff8a6e;
-    --signal-soft: rgb(255 61 31 / 0.16);
+    --rail: #080b0f;
+    --bg: #07090c;
+    --bg-deep: #040507;
+    --surface: #0e1217;
+    --surface-2: #141a20;
+    --surface-3: #1c242b;
+    --line: rgb(226 244 236 / 0.08);
+    --line-strong: rgb(226 244 236 / 0.18);
+    --text: #f1f6f3;
+    --text-muted: #a8b4ae;
+    --text-subtle: #86928c;
+    --brand: #19e3a1;
+    --brand-deep: #0fb982;
+    --brand-bright: #4ff0b6;
+    --brand-soft: rgb(25 227 161 / 0.14);
+    --on-brand: #04140d;
+    --on-brand-muted: #0b3a28;
+    --accent-text: #5df0bd;
+    --signal-soft: rgb(212 255 58 / 0.16);
+    --signal-text: #d4ff3a;
     --good: #4fd89b;
     --good-soft: rgb(79 216 155 / 0.13);
     --warn: #ffb547;
-    --glass: rgb(20 23 33 / 0.58);
-    --glass-strong: rgb(16 18 26 / 0.82);
-    --glass-border: rgb(226 232 255 / 0.09);
+    --danger: #ff6b78;
+    --danger-soft: rgb(255 107 120 / 0.14);
+    --danger-text: #ff8d97;
+    --glass: rgb(20 26 32 / 0.58);
+    --glass-strong: rgb(14 18 23 / 0.84);
+    --glass-border: rgb(226 244 236 / 0.09);
     --glass-hi: rgb(255 255 255 / 0.07);
-    --mesh-a: rgb(51 82 255 / 0.2);
-    --mesh-b: rgb(255 61 31 / 0.1);
-    --mesh-c: rgb(110 70 255 / 0.1);
+    --mesh-a: rgb(25 227 161 / 0.16);
+    --mesh-b: rgb(212 255 58 / 0.07);
+    --mesh-c: rgb(25 227 161 / 0.07);
     --grain-opacity: 0.05;
     --shadow-1: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.35), 0 18px 36px -18px rgb(0 0 0 / 0.75);
-    --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(51 82 255 / 0.5);
+    --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(25 227 161 / 0.28);
     --shadow-3: 0 2px 2px rgb(0 0 0 / 0.35), 0 16px 32px -10px rgb(0 0 0 / 0.55), 0 56px 110px -36px rgb(0 0 0 / 0.9);
-    --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -10px rgb(255 61 31 / 0.7);
+    --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -12px rgb(212 255 58 / 0.5);
     --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.06);
-    --focus: 0 0 0 3px var(--bg), 0 0 0 5px #93a5ff;
+    --focus: 0 0 0 3px var(--bg), 0 0 0 5px #6ff2c5;
   }
 }

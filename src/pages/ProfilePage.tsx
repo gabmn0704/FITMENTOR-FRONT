@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { LogOut, Plus, RotateCcw, Scale, ShieldCheck, Volume2, VolumeX, X } from "lucide-react";
 import { Avatar, Button, Notice, Segmented, Switch, type SegmentOption } from "../components/ui";
-import { PageHero } from "../components/p2/PageHero";
+import { HeroFigures, PageHero } from "../components/p2/PageHero";
 import { useReveal } from "../components/p2/motion";
 import { Odometer } from "../components/motion/Odometer";
 import { WeightChart } from "../components/charts/WeightChart";
@@ -120,7 +120,19 @@ export function ProfilePage() {
 
   return (
     <div className="p2-page" ref={page}>
-      <PageHero title={["Tu espacio,", "a tu medida"]} accent={1} kicker={isGuest(user) ? "Modo invitado" : "Perfil y ajustes"} lead="Tu cuerpo, tu plan y cómo te acompaña FitMentor en cada sesión." mascot="idle">
+      <PageHero title={["Tu espacio,", "a tu medida"]} accent={1} kicker={isGuest(user) ? "Modo invitado" : "Perfil y ajustes"} lead="Tu cuerpo, tu plan y cómo te acompaña FitMentor en cada sesión."
+        aside={
+          profile ? (
+            <HeroFigures
+              items={[
+                { label: "Peso actual", value: `${profile.weightKg} kg` },
+                ...(profile.targetWeightKg ? [{ label: "Meta", value: `${profile.targetWeightKg} kg` }] : []),
+                { label: "Semana", value: `${currentWeek(profile)}/${profile.weeks}` },
+              ]}
+            />
+          ) : undefined
+        }
+      >
         <div className="p3-who">
           <Avatar name={user.name} picture={user.picture} />
           <div>

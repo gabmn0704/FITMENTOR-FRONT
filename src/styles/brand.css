@@ -1,7 +1,7 @@
-/* Marca: F atlética en un arco de repetición. El SVG ya trae la pose final; GSAP la dibuja si hay movimiento. */
+/* Marca: F inclinada + flecha de progreso sobre baldosa oscura. La baldosa es igual en claro y oscuro. */
 .logo {
-  --logo-ink: #0a0c12;
-  --logo-ink-soft: #434a59;
+  --logo-ink: #0b0f14;
+  --logo-ink-soft: #4a5463;
   display: inline-flex;
   align-items: center;
   gap: calc(var(--logo-size, 36px) * 0.3);
@@ -10,63 +10,26 @@
 }
 
 .logo--inverse {
-  --logo-ink: #f6f8ff;
-  --logo-ink-soft: #b4bccd;
+  --logo-ink: #f3f6f9;
+  --logo-ink-soft: #b3bcc8;
 }
 
 :root[data-theme="dark"] .logo--brand {
-  --logo-ink: #f4f6fb;
-  --logo-ink-soft: #adb5c6;
+  --logo-ink: #f3f6f9;
+  --logo-ink-soft: #aab3bf;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) .logo--brand {
-    --logo-ink: #f4f6fb;
-    --logo-ink-soft: #adb5c6;
+    --logo-ink: #f3f6f9;
+    --logo-ink-soft: #aab3bf;
   }
 }
 
 .logo-mark {
   flex-shrink: 0;
   overflow: visible;
-  color: #0a0c12;
-}
-
-.logo-mark--inverse,
-.logo--inverse .logo-mark {
-  color: #f6f8ff;
-}
-
-.logo--brand .logo-mark {
-  color: var(--logo-ink);
-}
-
-.logo-mark .lm__f {
-  stroke: currentColor;
-}
-
-.logo-mark .lm__plate {
-  fill: currentColor;
-}
-
-.logo-mark .lm__arc,
-.logo-mark .lm__stem,
-.logo-mark .lm__mid {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-}
-
-/* Antes de que llegue GSAP: la marca espera sin dibujar para que no aparezca y desaparezca. */
-.logo-mark.is-pending .lm__arc,
-.logo-mark.is-pending .lm__stem,
-.logo-mark.is-pending .lm__mid {
-  stroke-dashoffset: 1;
-}
-
-.logo-mark.is-pending .lm__plate,
-.logo-mark.is-pending .lm__dot,
-.logo-mark.is-pending .lm__halo {
-  opacity: 0;
+  border-radius: 22.6%;
 }
 
 .logo__text {
@@ -76,44 +39,20 @@
   min-width: 0;
 }
 
-.logo .logo__word {
+.logo__word {
   display: inline-flex;
-  overflow: hidden;
-  padding-block: 0.08em;
-  margin-block: -0.08em;
   font-family: var(--font-display);
-  font-size: calc(var(--logo-size, 36px) * 0.62);
+  font-size: calc(var(--logo-size, 36px) * 0.6);
   font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.035em;
-  font-stretch: 100%;
+  letter-spacing: -0.03em;
   color: var(--logo-ink);
   white-space: nowrap;
 }
 
-.logo .logo__word span {
-  color: inherit;
-}
-
-@media (max-width: 1024px) {
-  .sidebar .logo__text {
-    display: none;
-  }
-}
-
 .logo__mentor {
-  font-weight: 350;
+  font-weight: 400;
   letter-spacing: -0.02em;
-}
-
-.logo__ch {
-  display: inline-block;
-  will-change: transform;
-}
-
-.logo__text.is-pending .logo__ch,
-.logo__text.is-pending .logo__tag {
-  opacity: 0;
 }
 
 .logo__tag {
@@ -125,35 +64,8 @@
   white-space: nowrap;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .logo-mark {
-    transition: transform 520ms var(--ease-settle);
-  }
-
-  .logo:hover .logo-mark,
-  a:hover > .logo-mark {
-    transform: rotate(-8deg) scale(1.05);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .logo-mark.is-pending .lm__arc,
-  .logo-mark.is-pending .lm__stem,
-  .logo-mark.is-pending .lm__mid {
-    stroke-dashoffset: 0;
-  }
-
-  .logo-mark.is-pending .lm__plate,
-  .logo-mark.is-pending .lm__dot,
-  .logo-mark.is-pending .lm__halo,
-  .logo__text.is-pending .logo__ch,
-  .logo__text.is-pending .logo__tag {
-    opacity: 1;
-  }
-
-  .logo-mark,
-  .logo:hover .logo-mark {
-    transition: none;
-    transform: none;
+@media (max-width: 1024px) {
+  .sidebar .logo__text {
+    display: none;
   }
 }

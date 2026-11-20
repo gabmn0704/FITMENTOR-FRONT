@@ -6,14 +6,14 @@ import { useAsync } from "../hooks/useAsync";
 import { useProfile } from "../hooks/useProfile";
 import { WeekPlanView } from "../components/plan/WeekPlanView";
 import { Odometer } from "../components/motion/Odometer";
-import { PageHero } from "../components/p2/PageHero";
+import { HeroFigures, PageHero } from "../components/p2/PageHero";
 import { gsap, useGSAP, useReveal, withMotion } from "../components/p2/motion";
 import { SinglyLinkedList, type SinglyNode } from "../structures";
 import { routineApi } from "../lib/services";
 import { exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
 import { levelLabel, routineNote, routineReason } from "../lib/contract";
-import { goalName } from "../lib/profile";
+import { currentWeek, goalName } from "../lib/profile";
 import type { RouteId } from "../lib/routes";
 import type { Routine, RoutineItem } from "../types";
 
@@ -89,7 +89,17 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
           )
         }
         lead={routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}
-        mascot="wave"
+        aside={
+          profile ? (
+            <HeroFigures
+              items={[
+                { label: "Semana", value: `${currentWeek(profile)}/${profile.weeks}` },
+                { label: "Días por semana", value: profile.daysPerWeek },
+                { label: "Nivel", value: levelLabel(user?.level ?? "BEGINNER") },
+              ]}
+            />
+          ) : undefined
+        }
       />
 
       {profile ? (

@@ -9,9 +9,6 @@ import { ApiError, pingBackend } from "../../lib/api";
 export type AuthMode = "login" | "register";
 type Mode = AuthMode;
 
-/** Estado de ánimo del formulario: la pantalla de acceso lo traduce en la mascota. */
-export type AuthMood = "welcome" | "typing" | "register" | "busy" | "error";
-
 const RETRY_ATTEMPTS = 4;
 const RETRY_DELAY_MS = 8000;
 
@@ -29,7 +26,7 @@ export function passwordStrength(password: string): number {
 }
 
 const STRENGTH_LABELS = ["", "Débil", "Aceptable", "Buena", "Fuerte"];
-const STRENGTH_COLORS = ["", "var(--signal)", "var(--signal)", "var(--cobalt)", "var(--good)"];
+const STRENGTH_COLORS = ["", "var(--danger)", "var(--warn)", "var(--brand)", "var(--good)"];
 
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 404) {
@@ -53,10 +50,9 @@ export function validateCredentials(mode: Mode, name: string, email: string, pas
 
 interface AuthPanelProps {
   onModeChange?: (mode: AuthMode) => void;
-  onMood?: (mood: AuthMood) => void;
 }
 
-export function AuthPanel({ onModeChange, onMood }: AuthPanelProps = {}) {
+export function AuthPanel({ onModeChange }: AuthPanelProps = {}) {
   const { loginWithGoogle, loginAsGuest, loginWithEmail, registerWithEmail, authNotice } = useAuth();
   const googleSlot = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("login");
@@ -68,15 +64,10 @@ export function AuthPanel({ onModeChange, onMood }: AuthPanelProps = {}) {
   const [googleReady, setGoogleReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const strength = passwordStrength(password);
-  const typing = Boolean(email || password || name);
 
   useEffect(() => {
     onModeChange?.(mode);
   }, [mode, onModeChange]);
-
-  useEffect(() => {
-    onMood?.(busy ? "busy" : error ? "error" : mode === "register" ? "register" : typing ? "typing" : "welcome");
-  }, [busy, error, mode, typing, onMood]);
 
   useEffect(() => {
     if (!isGoogleEnabled) return;

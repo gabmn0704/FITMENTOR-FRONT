@@ -287,7 +287,7 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
                     {item.engine ? (
                       <button
                         type="button"
-                        className="p2-chipbtn p2-chipbtn--cobalt"
+                        className="p2-chipbtn p2-chipbtn--brand"
                         onClick={() => {
                           setPendingExercise({ engine: item.engine!, variant: item.exercise });
                           onNavigate("entrenar");
