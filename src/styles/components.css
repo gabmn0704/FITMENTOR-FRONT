@@ -1,33 +1,5 @@
 /* Primitivos del mundo "día de carrera": botones, dorsales (tarjetas), campos, marcador rodante. */
 
-/* ---------- Marca ---------- */
-.logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo__word {
-  font-family: var(--font-display);
-  font-stretch: 68%;
-  font-weight: 900;
-  font-size: 28px;
-  line-height: 1;
-  letter-spacing: 0.01em;
-}
-
-.logo--inverse .logo__word {
-  color: var(--on-cobalt);
-}
-
-.logo--inverse .logo__word span {
-  color: var(--on-cobalt-muted);
-}
-
-.logo--brand .logo__word span {
-  color: var(--accent-text);
-}
-
 /* ---------- Botones ---------- */
 .btn {
   position: relative;

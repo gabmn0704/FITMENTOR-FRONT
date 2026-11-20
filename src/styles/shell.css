@@ -60,11 +60,6 @@ body::before {
   padding: 0 var(--space-3);
 }
 
-.rail__brand .logo__word {
-  font-size: 24px;
-  color: var(--text);
-}
-
 .rail__mark {
   display: none;
 }
