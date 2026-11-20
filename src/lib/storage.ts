@@ -5,6 +5,8 @@ export const STORAGE_KEYS = {
   sessions: "fitmentor.sessions",
   theme: "fitmentor.theme",
   voice: "fitmentor.voice",
+  voiceVolume: "fitmentor.voiceVolume",
+  voiceCommands: "fitmentor.voiceCommands",
   profile: "fitmentor.profile",
 } as const;
 
