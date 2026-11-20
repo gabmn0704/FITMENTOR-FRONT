@@ -18,7 +18,7 @@ export function usePointerEffects(): void {
       const { clientX, clientY } = event;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        const lit = target.closest<HTMLElement>(".card, .tile, .routine-item");
+        const lit = target.closest<HTMLElement>(".bento > *, .stat-tile, .cockpit-panel, .card, .tile, .routine-item");
         if (lit) {
           const box = lit.getBoundingClientRect();
           lit.style.setProperty("--mx", `${clientX - box.left}px`);
