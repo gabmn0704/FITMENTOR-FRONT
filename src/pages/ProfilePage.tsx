@@ -36,7 +36,7 @@ const signed = (value: number) => `${value > 0 ? "+" : value < 0 ? "−" : ""}${
 export function ProfilePage() {
   const { user, updateUser, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { profile, reset } = useProfile();
+  const { profile, openWizard } = useProfile();
   const [name, setName] = useState(user?.name ?? "");
   const [voice, setVoice] = useState(() => storage.getString(STORAGE_KEYS.voice) !== "off");
   const [saving, setSaving] = useState(false);
@@ -272,7 +272,7 @@ export function ProfilePage() {
                 <strong className="tabular">{profile.heightCm} cm</strong>
               </li>
             </ul>
-            <button type="button" className="p2-chipbtn" onClick={reset}>
+            <button type="button" className="p2-chipbtn" onClick={openWizard}>
               <RotateCcw size={14} aria-hidden="true" /> Rehacer mi plan
             </button>
           </aside>
@@ -284,7 +284,7 @@ export function ProfilePage() {
             <h2 className="p3-cta__title">Crea tu plan para seguir tu peso</h2>
             <p className="p3-cta__lead">Con tu objetivo y tus medidas calculamos calorías, ritmo y semanas, y aquí verás tu avance real.</p>
           </div>
-          <Button variant="primary" large onClick={reset}>
+          <Button variant="primary" large onClick={openWizard}>
             Crear mi plan
           </Button>
         </section>
