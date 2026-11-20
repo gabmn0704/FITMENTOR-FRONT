@@ -175,6 +175,22 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
     void loadGsap().catch(() => undefined);
   }, []);
 
+  // Atajos globales: las teclas 1 a 7 abren cada sección (se ignoran al escribir o con modificadores).
+  const navigate = useRef(onNavigate);
+  navigate.current = onNavigate;
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      const index = Number(event.key) - 1;
+      const next = Number.isInteger(index) ? ROUTES[index] : undefined;
+      if (next) navigate.current(next.id);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
