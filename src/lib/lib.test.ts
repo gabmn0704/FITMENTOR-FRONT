@@ -100,6 +100,23 @@ describe("VoiceCoach", () => {
     expect(spoken).toEqual(["uno", "dos"]);
   });
 
+  it("replace: corta la frase vieja y no encola avisos atrasados", () => {
+    const voice = make();
+    voice.say("vieja", { force: true });
+    voice.say("intermedia", { force: true });
+    voice.say("reciente", { force: true, replace: true });
+    synth.finish();
+    expect(spoken).toEqual(["vieja", "reciente"]);
+  });
+
+  it("replace no corta el conteo en curso", () => {
+    const voice = make();
+    voice.say("tres", { force: true, priority: 2 });
+    voice.say("aviso", { force: true, replace: true });
+    synth.finish();
+    expect(spoken).toEqual(["tres", "aviso"]);
+  });
+
   it("descarta repeticiones dentro de la ventana de 4.5 s", () => {
     const voice = make();
     expect(voice.say("corrige la cadera")).toBe(true);
