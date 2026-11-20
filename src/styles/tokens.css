@@ -1,55 +1,99 @@
-/* Tokens del mundo "día de carrera": dorsal Tyvek, cobalto de pista y un solo bermellón de señal.
-   Claro por defecto; el oscuro es la misma carrera de noche. */
+/* Tokens "arena nocturna": estadio de noche con cobalto eléctrico y un solo bermellón de señal.
+   El oscuro es el escenario principal; el claro es la misma arena a pleno día, igual de cuidada.
+   Todo lo demás (superficies de cristal, sombras en capas, escala tipográfica, curvas) sale de aquí. */
 :root {
   color-scheme: light;
-  --font-display: "Outfit Variable", "Archivo", system-ui, sans-serif;
-  --font-body: "Geist Variable", "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Outfit Variable", "Outfit", system-ui, sans-serif;
+  --font-body: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Terreno y papel */
-  --bg: #e7eaee;
+  /* ---------- Escala tipográfica fluida (360 px → 1440 px) ---------- */
+  --fs-2xs: 0.6875rem; /* 11 */
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.875rem; /* 14 */
+  --fs-base: 1rem; /* 16 */
+  --fs-md: clamp(1.0625rem, 0.98rem + 0.3vw, 1.1875rem);
+  --fs-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-xl: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  --fs-2xl: clamp(1.875rem, 1.45rem + 1.7vw, 2.75rem);
+  --fs-3xl: clamp(2.375rem, 1.7rem + 2.8vw, 4rem);
+  --fs-display: clamp(2.75rem, 1.6rem + 4.6vw, 5.75rem);
+  --fs-giant: clamp(5.5rem, 3rem + 9vw, 11rem);
+  --lh-tight: 0.95;
+  --lh-snug: 1.15;
+  --tracking-display: -0.035em;
+  --tracking-label: 0.14em;
+
+  /* ---------- Arena de día ---------- */
+  --bg: #eceef3;
+  --bg-deep: #e2e5ec;
   --surface: #ffffff;
-  --surface-2: #f2f4f7;
-  --surface-3: #e1e5eb;
-  --line: rgb(10 12 18 / 0.14);
-  --line-strong: rgb(10 12 18 / 0.28);
+  --surface-2: #f4f5f8;
+  --surface-3: #e6e9ef;
+  --line: rgb(12 16 28 / 0.1);
+  --line-strong: rgb(12 16 28 / 0.22);
 
   /* Tinta */
-  --text: #0a0c12;
-  --text-muted: #434a59;
-  --text-subtle: #5b6272;
+  --text: #0b0d14;
+  --text-muted: #3f4656;
+  --text-subtle: #586072;
 
-  /* Tinta: campo oscuro del riel, la portada y el acceso */
-  --rail: #0a0c12;
+  /* Campos de tinta: riel, portada y acceso */
+  --rail: #0b0d14;
   --on-ink: #f4f6fb;
-  --on-ink-muted: #b4bccd;
+  --on-ink-muted: #b8bfcf;
 
-  /* Cobalto: color de marca, reservado a datos, selección y acentos */
-  --cobalt: #1b3bff;
-  --cobalt-deep: #0d21c2;
-  --cobalt-soft: rgb(27 59 255 / 0.1);
+  /* Cobalto eléctrico: marca, datos, selección */
+  --cobalt: #2343ff;
+  --cobalt-deep: #1128d6;
+  --cobalt-bright: #4d68ff;
+  --cobalt-soft: rgb(35 67 255 / 0.1);
   --on-cobalt: #f6f8ff;
   --on-cobalt-muted: #d9dfff;
-  --accent-text: #1b3bff;
+  --accent-text: #1f3df0;
 
   /* Bermellón: acción, en vivo, récord y error */
   --signal: #ff3d1f;
-  --signal-ink: #0a0c12;
+  --signal-bright: #ff6a3d;
+  --signal-ink: #0b0d14;
   --signal-soft: rgb(255 61 31 / 0.12);
-  --signal-text: #c42a0f;
+  --signal-text: #c22a0e;
 
   /* Estados */
   --good: #0a7a45;
   --good-soft: rgb(10 122 69 / 0.12);
+  --warn: #b26b00;
 
-  --shadow-1: 0 1px 0 rgb(10 12 18 / 0.05), 0 10px 28px -16px rgb(10 12 18 / 0.35);
-  --shadow-2: 0 2px 0 rgb(10 12 18 / 0.06), 0 22px 48px -22px rgb(13 33 194 / 0.55);
+  /* ---------- Cristal ---------- */
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(12 16 28 / 0.09);
+  --glass-hi: rgb(255 255 255 / 0.9);
+  --glass-blur: 22px;
+
+  /* Degradado de malla del fondo */
+  --mesh-a: rgb(35 67 255 / 0.12);
+  --mesh-b: rgb(255 61 31 / 0.08);
+  --mesh-c: rgb(120 140 255 / 0.1);
+  --grain-opacity: 0.045;
+
+  /* ---------- Sombras en capas ---------- */
+  --shadow-1: 0 1px 1px rgb(12 16 28 / 0.04), 0 2px 4px -1px rgb(12 16 28 / 0.05), 0 12px 28px -14px rgb(12 16 28 / 0.22);
+  --shadow-2: 0 1px 1px rgb(12 16 28 / 0.04), 0 6px 12px -4px rgb(12 16 28 / 0.08), 0 28px 56px -24px rgb(17 40 214 / 0.38);
+  --shadow-3: 0 2px 2px rgb(12 16 28 / 0.05), 0 12px 24px -8px rgb(12 16 28 / 0.12), 0 48px 96px -32px rgb(12 16 28 / 0.4);
+  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 10px 24px -10px rgb(255 61 31 / 0.75);
+  --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.9);
   --focus: 0 0 0 3px var(--bg), 0 0 0 5px var(--cobalt);
 
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* ---------- Radios ---------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+  --radius-pill: 999px;
 
+  /* ---------- Espacio ---------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -58,18 +102,28 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 72px;
+  --space-9: 112px;
+  --gutter: clamp(16px, 2.4vw, 32px);
+  --bento-gap: clamp(12px, 1.3vw, 18px);
 
+  /* ---------- Movimiento ---------- */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-instant: 90ms;
   --dur-fast: 140ms;
   --dur-base: 240ms;
+  --dur-med: 420ms;
   --dur-slow: 700ms;
+  --dur-cinematic: 1200ms;
 
+  /* ---------- Estructura ---------- */
   --nav-height: 68px;
-  --sidebar-width: 248px;
-  --content-max: 1280px;
+  --sidebar-width: 264px;
+  --content-max: 1320px;
 
   /* Capas */
   --z-rail: 20;
@@ -79,55 +133,84 @@
   --z-sweep: 80;
 }
 
+/* ---------- Arena nocturna ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --rail: #0c111c;
-  --bg: #05070c;
-  --surface: #0e131d;
-  --surface-2: #151b28;
-  --surface-3: #1e2636;
-  --line: rgb(237 240 246 / 0.12);
-  --line-strong: rgb(237 240 246 / 0.26);
-  --text: #edf0f6;
-  --text-muted: #adb5c6;
-  --text-subtle: #8c95a9;
-  --cobalt: #2a47ff;
-  --cobalt-deep: #1328cf;
-  --cobalt-soft: rgb(110 135 255 / 0.16);
-  --accent-text: #8a9dff;
-  --signal-text: #ff7d66;
-  --signal-soft: rgb(255 61 31 / 0.18);
-  --good: #56d596;
-  --good-soft: rgb(86 213 150 / 0.14);
-  --shadow-1: 0 1px 0 rgb(255 255 255 / 0.04), 0 14px 32px -18px rgb(0 0 0 / 0.8);
-  --shadow-2: 0 2px 0 rgb(255 255 255 / 0.05), 0 26px 56px -24px rgb(42 71 255 / 0.65);
-  --focus: 0 0 0 3px var(--bg), 0 0 0 5px #8a9dff;
+  --rail: #0a0c12;
+  --bg: #06070b;
+  --bg-deep: #030406;
+  --surface: #0e1017;
+  --surface-2: #141721;
+  --surface-3: #1c202c;
+  --line: rgb(226 232 255 / 0.08);
+  --line-strong: rgb(226 232 255 / 0.18);
+  --text: #f1f3f9;
+  --text-muted: #a9b0c2;
+  --text-subtle: #858da2;
+  --cobalt: #3352ff;
+  --cobalt-deep: #1b33d9;
+  --cobalt-bright: #6b82ff;
+  --cobalt-soft: rgb(97 125 255 / 0.15);
+  --accent-text: #93a5ff;
+  --signal-text: #ff8a6e;
+  --signal-soft: rgb(255 61 31 / 0.16);
+  --good: #4fd89b;
+  --good-soft: rgb(79 216 155 / 0.13);
+  --warn: #ffb547;
+  --glass: rgb(20 23 33 / 0.58);
+  --glass-strong: rgb(16 18 26 / 0.82);
+  --glass-border: rgb(226 232 255 / 0.09);
+  --glass-hi: rgb(255 255 255 / 0.07);
+  --mesh-a: rgb(51 82 255 / 0.2);
+  --mesh-b: rgb(255 61 31 / 0.1);
+  --mesh-c: rgb(110 70 255 / 0.1);
+  --grain-opacity: 0.05;
+  --shadow-1: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.35), 0 18px 36px -18px rgb(0 0 0 / 0.75);
+  --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(51 82 255 / 0.5);
+  --shadow-3: 0 2px 2px rgb(0 0 0 / 0.35), 0 16px 32px -10px rgb(0 0 0 / 0.55), 0 56px 110px -36px rgb(0 0 0 / 0.9);
+  --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -10px rgb(255 61 31 / 0.7);
+  --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --focus: 0 0 0 3px var(--bg), 0 0 0 5px #93a5ff;
 }
 
 /* "Sistema": sigue la preferencia del dispositivo solo si no se eligió claro u oscuro. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
     color-scheme: dark;
-    --rail: #0c111c;
-    --bg: #05070c;
-    --surface: #0e131d;
-    --surface-2: #151b28;
-    --surface-3: #1e2636;
-    --line: rgb(237 240 246 / 0.12);
-    --line-strong: rgb(237 240 246 / 0.26);
-    --text: #edf0f6;
-    --text-muted: #adb5c6;
-    --text-subtle: #8c95a9;
-    --cobalt: #2a47ff;
-    --cobalt-deep: #1328cf;
-    --cobalt-soft: rgb(110 135 255 / 0.16);
-    --accent-text: #8a9dff;
-    --signal-text: #ff7d66;
-    --signal-soft: rgb(255 61 31 / 0.18);
-    --good: #56d596;
-    --good-soft: rgb(86 213 150 / 0.14);
-    --shadow-1: 0 1px 0 rgb(255 255 255 / 0.04), 0 14px 32px -18px rgb(0 0 0 / 0.8);
-    --shadow-2: 0 2px 0 rgb(255 255 255 / 0.05), 0 26px 56px -24px rgb(42 71 255 / 0.65);
-    --focus: 0 0 0 3px var(--bg), 0 0 0 5px #8a9dff;
+    --rail: #0a0c12;
+    --bg: #06070b;
+    --bg-deep: #030406;
+    --surface: #0e1017;
+    --surface-2: #141721;
+    --surface-3: #1c202c;
+    --line: rgb(226 232 255 / 0.08);
+    --line-strong: rgb(226 232 255 / 0.18);
+    --text: #f1f3f9;
+    --text-muted: #a9b0c2;
+    --text-subtle: #858da2;
+    --cobalt: #3352ff;
+    --cobalt-deep: #1b33d9;
+    --cobalt-bright: #6b82ff;
+    --cobalt-soft: rgb(97 125 255 / 0.15);
+    --accent-text: #93a5ff;
+    --signal-text: #ff8a6e;
+    --signal-soft: rgb(255 61 31 / 0.16);
+    --good: #4fd89b;
+    --good-soft: rgb(79 216 155 / 0.13);
+    --warn: #ffb547;
+    --glass: rgb(20 23 33 / 0.58);
+    --glass-strong: rgb(16 18 26 / 0.82);
+    --glass-border: rgb(226 232 255 / 0.09);
+    --glass-hi: rgb(255 255 255 / 0.07);
+    --mesh-a: rgb(51 82 255 / 0.2);
+    --mesh-b: rgb(255 61 31 / 0.1);
+    --mesh-c: rgb(110 70 255 / 0.1);
+    --grain-opacity: 0.05;
+    --shadow-1: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.35), 0 18px 36px -18px rgb(0 0 0 / 0.75);
+    --shadow-2: 0 1px 1px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45), 0 32px 64px -28px rgb(51 82 255 / 0.5);
+    --shadow-3: 0 2px 2px rgb(0 0 0 / 0.35), 0 16px 32px -10px rgb(0 0 0 / 0.55), 0 56px 110px -36px rgb(0 0 0 / 0.9);
+    --shadow-signal: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 12px 30px -10px rgb(255 61 31 / 0.7);
+    --edge-light: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    --focus: 0 0 0 3px var(--bg), 0 0 0 5px #93a5ff;
   }
 }

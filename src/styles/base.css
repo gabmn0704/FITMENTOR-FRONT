@@ -29,9 +29,16 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   font-stretch: 100%;
+  font-feature-settings: "ss01" 1, "cv11" 1;
   line-height: 1.5;
   color: var(--text);
-  background: var(--bg);
+  /* Malla de luz del estadio: cobalto arriba, brasa bermellón abajo; fija para que no "nade" al desplazar. */
+  background:
+    radial-gradient(1100px 760px at 12% -8%, var(--mesh-a), transparent 62%),
+    radial-gradient(900px 700px at 100% 12%, var(--mesh-c), transparent 60%),
+    radial-gradient(1000px 680px at 88% 108%, var(--mesh-b), transparent 64%),
+    var(--bg);
+  background-attachment: fixed;
   caret-color: var(--signal);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -41,18 +48,15 @@ body {
   min-height: 100dvh;
 }
 
-/* Titulares: ancho condensado y peso máximo, como el número de un dorsal. */
+/* Titulares: Outfit apretado, en caja normal; el peso hace el trabajo, no las mayúsculas. */
 h1,
 h2,
 h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-stretch: 100%;
-  font-weight: 850;
-  line-height: 0.92;
-  letter-spacing: -0.015em;
-  word-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 
