@@ -2,6 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { applyTheme, readStoredTheme } from "./hooks/useTheme";
+import "@fontsource-variable/outfit";
+import "@fontsource-variable/geist";
 import "./styles/index.css";
 
 // Aplica el tema guardado antes del primer render para evitar parpadeos.
