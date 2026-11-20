@@ -47,7 +47,7 @@ h2,
 h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-stretch: 68%;
+  font-stretch: 100%;
   font-weight: 850;
   line-height: 0.92;
   letter-spacing: -0.015em;

@@ -2,8 +2,8 @@
    Claro por defecto; el oscuro es la misma carrera de noche. */
 :root {
   color-scheme: light;
-  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --font-body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Outfit Variable", "Archivo", system-ui, sans-serif;
+  --font-body: "Geist Variable", "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Terreno y papel */
   --bg: #e7eaee;
