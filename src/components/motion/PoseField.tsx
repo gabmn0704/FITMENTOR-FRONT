@@ -185,19 +185,32 @@ export function PoseField() {
       ctx.fill();
 
       const angle = kneeAngle(j);
-      const lx = knee[0] + 46 * scale;
-      const ly = knee[1] - 10 * scale;
-      ctx.font = `900 ${Math.round(Math.max(22, 44 * scale))}px Archivo, "Arial Narrow", sans-serif`;
-      ctx.fillStyle = "#f6f8ff";
+      // Lectura fija a la izquierda del cuerpo; una línea fina la une con la rodilla.
+      const rx = baseX - 78 * scale;
+      const ry = baseY - 150 * scale;
+      const big = Math.round(Math.max(22, 42 * scale));
+      ctx.save();
+      ctx.textAlign = "right";
       ctx.textBaseline = "alphabetic";
-      ctx.fillText(`${angle}°`, lx, ly);
+      ctx.strokeStyle = "rgba(255,61,31,0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 5]);
+      ctx.beginPath();
+      ctx.moveTo(rx + 8, ry - big * 0.35);
+      ctx.lineTo(knee[0] - 12 * scale, knee[1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = `900 ${big}px Archivo, "Arial Narrow", sans-serif`;
+      ctx.fillStyle = "#f6f8ff";
+      ctx.fillText(`${kneeAngle(j)}°`, rx, ry);
       ctx.font = `800 ${Math.round(Math.max(10, 13 * scale))}px Archivo, sans-serif`;
       ctx.fillStyle = "rgba(244,246,251,0.7)";
-      ctx.fillText("RODILLA", lx + 2, ly + 18 * scale + 4);
+      ctx.fillText("RODILLA", rx, ry + 18 * scale + 4);
       if (reps > 0 || reduce) {
         ctx.fillStyle = "#ff3d1f";
-        ctx.fillText(`REP ${reduce ? 8 : reps}`, lx + 2, ly - Math.max(22, 44 * scale) - 2);
+        ctx.fillText(`REP ${reduce ? 8 : reps}`, rx, ry - big - 2);
       }
+      ctx.restore();
     };
 
     const draw = (time: number) => {
