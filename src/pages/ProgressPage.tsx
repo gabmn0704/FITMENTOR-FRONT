@@ -112,7 +112,7 @@ export function ProgressPage() {
       ? "Esta semana aún no hay sesiones. Con una sola ya empiezas a sumar."
       : compare.current.reps >= compare.previous.reps
         ? "Vas por encima de la semana pasada. Mantén el ritmo y cuida la técnica."
-        : `Te faltan ${compare.previous.reps - compare.current.reps} repeticiones para igualar la semana pasada. ¡Pa' lante!`;
+        : `Te faltan ${compare.previous.reps - compare.current.reps} repeticiones para igualar la semana pasada. Una sesión más te acerca.`;
 
   const rows: Array<{ label: string; now: number; before: number; unit: string }> = [
     { label: "Repeticiones", now: compare.current.reps, before: compare.previous.reps, unit: "" },
