@@ -128,6 +128,7 @@ export function ProgressPage() {
         accent={1}
         kicker={`${data.totalSessions} ${data.totalSessions === 1 ? "sesión registrada" : "sesiones registradas"}`}
         lead="Cada sesión suma control y consistencia. Aquí ves cómo vas, día a día y semana a semana."
+        mascot="cheer"
         aside={
           <HeroWeek
             days={data.weekly.map((d, i) => ({ label: weekLabels[i], value: d.reps, today: i === data.weekly.length - 1 }))}

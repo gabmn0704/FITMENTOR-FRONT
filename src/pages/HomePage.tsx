@@ -3,6 +3,8 @@ import { ArrowRight, ArrowUpRight, Camera, Clock, Droplets, Flame as FlameIcon, 
 import { Button, Card } from "../components/ui";
 import { BarChart } from "../components/charts/BarChart";
 import { Odometer } from "../components/motion/Odometer";
+import { Mascot } from "../components/mascot/Mascot";
+import type { MascotState } from "../lib/mascot";
 import { useGsap } from "../components/motion/useGsap";
 import { ChallengesCard, GoalCard, LevelCard, MedalStrip, MentorQuote, StreakCard } from "../components/engage/Engage";
 import { useEngagement } from "../components/engage/useEngagement";
@@ -172,6 +174,15 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const goal = weeklyProgress(data);
   const streak = Math.max(data.streakDays, local.streakDays);
   const engage = useEngagement(user?.id, streak);
+  const heroMood: MascotState = streak >= 3 ? "cheer" : streak > 0 ? "wave" : engage.hasSessions ? "worried" : "wave";
+  const heroMessage =
+    streak >= 3
+      ? `${streak} días seguidos. Mantengamos la racha.`
+      : streak > 0
+        ? "Buen ritmo. Hoy sumamos otro día."
+        : engage.hasSessions
+          ? "Qué bueno verte de vuelta. Retomemos con calma."
+          : "Hola, soy Rep. Yo cuento las repeticiones; tú cuidas la técnica.";
   const suggestion = suggestNextExercise(data.byExercise);
   const name = user?.name?.split(" ")[0] ?? "";
   const topAchievements = (achievements.data ?? [])
@@ -312,6 +323,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
               </Button>
             </div>
           </div>
+          <div className="hero__mascot">
+            <Mascot state={heroMood} size={150} message={heroMessage} placement="top" interactive />
+          </div>
           <dl className="hero__panel" aria-label="Tu pulso de hoy">
             <div>
               <dt>Racha</dt>
@@ -423,7 +437,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       {day && <PlanDeck day={day} onNavigate={onNavigate} />}
 
       <section className="mentor-scrub" aria-label="Frase del día">
-        <MentorQuote userId={user?.id} />
+        <MentorQuote userId={user?.id} state={streak > 0 ? "cheer" : "idle"} size={150} />
       </section>
 
       <section className="bento bento--lower" aria-label="Tu semana y tus logros">

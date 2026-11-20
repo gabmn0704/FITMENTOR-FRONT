@@ -2,7 +2,9 @@ import { useEffect, useId, useState, type CSSProperties } from "react";
 import { Award, Check, Lock, Minus, Plus, Sparkles, Target } from "lucide-react";
 import { Odometer } from "../motion/Odometer";
 import { fireConfetti } from "../motion/Confetti";
+import { Mascot } from "../mascot/Mascot";
 import { WEEKLY_GOAL_RANGE, quoteOfTheDay, type WeekDay } from "../../lib/engagement";
+import type { MascotState } from "../../lib/mascot";
 import type { useEngagement } from "./useEngagement";
 
 type Engagement = ReturnType<typeof useEngagement>;
@@ -227,15 +229,26 @@ export function ChallengesCard({ challenges }: { challenges: Engagement["challen
   );
 }
 
-/** Consejo del día: una idea corta de entrenamiento, distinta cada jornada. */
-export function MentorQuote({ userId, className = "" }: { userId?: string; className?: string }) {
+/** Frase del día dicha por la mascota. */
+export function MentorQuote({
+  userId,
+  state = "idle",
+  size = 132,
+  className = "",
+}: {
+  userId?: string;
+  state?: MascotState;
+  size?: number;
+  className?: string;
+}) {
   const quote = quoteOfTheDay(new Date(), userId);
   // Cada palabra en su propio span: Inicio las enciende una a una al desplazar (scrub).
   const words = quote.split(/\s+/);
   return (
-    <section className={`engage-card mentor-quote ${className}`.trim()} aria-label="Consejo del día">
+    <section className={`engage-card mentor-quote ${className}`.trim()} aria-label="Frase del día del mentor">
+      <Mascot state={state} size={size} interactive />
       <blockquote>
-        <span className="engage-label">Consejo del día</span>
+        <span className="engage-label">Frase del día de Rep</span>
         <p>
           {words.map((word, index) => (
             <span className="scrub-word" key={`${index}-${word}`}>

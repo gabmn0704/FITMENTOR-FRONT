@@ -1,12 +1,29 @@
-import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent, type RefObject } from "react";
 import { Lock } from "lucide-react";
 import { Logo } from "../brand/Logo";
 import { MOTION_OK, loadGsap, prefersReducedMotion } from "../brand/gsap";
-import { AuthPanel, type AuthMode } from "../components/auth/AuthPanel";
+import { AuthPanel, type AuthMode, type AuthMood } from "../components/auth/AuthPanel";
+import { Mascot } from "../components/mascot/Mascot";
 import { Marquee } from "../components/motion/Marquee";
-import { PoseField } from "../components/motion/PoseField";
+import type { MascotState } from "../lib/mascot";
 
 const TICKER = ["Sentadilla", "Flexión", "Plancha", "Peso muerto", "Zancada", "Coach IA", "Tu cámara, tu privacidad"];
+
+/** Traduce el ánimo del formulario en lo que hace y dice la mascota. */
+function mascotFor(mood: AuthMood): { state: MascotState; message: string | true } {
+  switch (mood) {
+    case "busy":
+      return { state: "count", message: "Un momento, estoy abriendo tu sesión…" };
+    case "error":
+      return { state: "worried", message: true };
+    case "register":
+      return { state: "cheer", message: "Crea tu cuenta y empezamos a entrenar." };
+    case "typing":
+      return { state: "idle", message: "Tus datos están protegidos. No veo tu contraseña." };
+    default:
+      return { state: "wave", message: true };
+  }
+}
 
 /** Entrada coreografiada de la escena y del panel. Sin GSAP o con "menos movimiento", todo ya está en su sitio. */
 function useIntro(root: RefObject<HTMLDivElement>) {
@@ -45,6 +62,8 @@ function useIntro(root: RefObject<HTMLDivElement>) {
  */
 export function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
+  const [mood, setMood] = useState<AuthMood>("welcome");
+  const mascot = useMemo(() => mascotFor(mood), [mood]);
   const register = mode === "register";
   const root = useRef<HTMLDivElement>(null);
   useIntro(root);
@@ -63,7 +82,6 @@ export function LoginPage() {
         <img className="access__photo" src="/img/ropes.jpg" alt="" />
         <span className="access__orb access__orb--a" aria-hidden="true" />
         <span className="access__orb access__orb--b" aria-hidden="true" />
-        <PoseField />
 
         <a className="access__brand" href="#main" aria-label="FitMentor">
           <Logo size={44} tone="inverse" />
@@ -80,6 +98,10 @@ export function LoginPage() {
               </span>
             </h1>
             <p className="access__lede">Tu coach con IA mira tu postura, cuenta tus repeticiones y te corrige al instante.</p>
+          </div>
+
+          <div className="access__mascot">
+            <Mascot state={mascot.state} size={190} message={mascot.message} interactive />
           </div>
 
           <dl className="access__facts" aria-label="Cómo funciona">
@@ -130,7 +152,7 @@ export function LoginPage() {
           <p className="login-glass__lead">
             {register ? "Un minuto para registrarte y tu primera sesión queda lista." : "Entra para seguir donde dejaste tu entrenamiento."}
           </p>
-          <AuthPanel onModeChange={setMode} />
+          <AuthPanel onModeChange={setMode} onMood={setMood} />
         </div>
       </main>
     </div>
