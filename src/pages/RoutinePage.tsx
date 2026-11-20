@@ -32,7 +32,7 @@ const pad = (value: number) => String(value).padStart(2, "0");
 
 export function RoutinePage({ onNavigate }: RoutinePageProps) {
   const { token, user } = useAuth();
-  const { profile, reset } = useProfile();
+  const { profile, openWizard } = useProfile();
   const routine = useAsync(() => routineApi.get(token!), [token], Boolean(token));
   const list = useMemo(() => buildList(routine.data), [routine.data]);
   const [node, setNode] = useState<SinglyNode<RoutineItem> | null>(null);
@@ -105,7 +105,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
               Cuéntanos tu objetivo, peso, altura y plazo, y armamos tu rutina semanal con la alimentación de cada día.
             </p>
           </div>
-          <Button variant="primary" large onClick={reset} icon={<ArrowRight size={18} />}>
+          <Button variant="primary" large onClick={openWizard} icon={<ArrowRight size={18} />}>
             Crear mi plan
           </Button>
         </section>
