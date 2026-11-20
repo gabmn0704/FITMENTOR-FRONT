@@ -6,7 +6,11 @@ import { GOOGLE_CLIENT_ID, isGoogleEnabled } from "../../lib/config";
 import { loadGoogleIdentity } from "../../lib/google";
 import { ApiError, pingBackend } from "../../lib/api";
 
-type Mode = "login" | "register";
+export type AuthMode = "login" | "register";
+type Mode = AuthMode;
+
+/** Estado de ánimo del formulario: la pantalla de acceso lo traduce en la mascota. */
+export type AuthMood = "welcome" | "typing" | "register" | "busy" | "error";
 
 const RETRY_ATTEMPTS = 4;
 const RETRY_DELAY_MS = 8000;
@@ -47,7 +51,12 @@ export function validateCredentials(mode: Mode, name: string, email: string, pas
   return null;
 }
 
-export function AuthPanel() {
+interface AuthPanelProps {
+  onModeChange?: (mode: AuthMode) => void;
+  onMood?: (mood: AuthMood) => void;
+}
+
+export function AuthPanel({ onModeChange, onMood }: AuthPanelProps = {}) {
   const { loginWithGoogle, loginAsGuest, loginWithEmail, registerWithEmail, authNotice } = useAuth();
   const googleSlot = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("login");
@@ -59,6 +68,15 @@ export function AuthPanel() {
   const [googleReady, setGoogleReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const strength = passwordStrength(password);
+  const typing = Boolean(email || password || name);
+
+  useEffect(() => {
+    onModeChange?.(mode);
+  }, [mode, onModeChange]);
+
+  useEffect(() => {
+    onMood?.(busy ? "busy" : error ? "error" : mode === "register" ? "register" : typing ? "typing" : "welcome");
+  }, [busy, error, mode, typing, onMood]);
 
   useEffect(() => {
     if (!isGoogleEnabled) return;
@@ -187,17 +205,21 @@ export function AuthPanel() {
 
       <form className="stack" onSubmit={onSubmit} noValidate>
         {mode === "register" && (
-          <div className="field field--enter">
-            <label htmlFor="auth-name">Nombre</label>
-            <input
-              id="auth-name"
-              className="input"
-              value={name}
-              maxLength={60}
-              autoComplete="given-name"
-              placeholder="Cómo quieres que te llame"
-              onChange={(event) => setName(event.target.value)}
-            />
+          <div className="reveal">
+            <div className="reveal__inner">
+              <div className="field">
+                <label htmlFor="auth-name">Nombre</label>
+                <input
+                  id="auth-name"
+                  className="input"
+                  value={name}
+                  maxLength={60}
+                  autoComplete="given-name"
+                  placeholder="Cómo quieres que te llame"
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </div>
+            </div>
           </div>
         )}
         <div className="field">
@@ -248,7 +270,9 @@ export function AuthPanel() {
           </div>
         )}
         <Button type="submit" variant="primary" large block loading={busy}>
-          {mode === "login" ? "Entrar" : "Crear mi cuenta"}
+          <span className="swap" key={mode}>
+            {mode === "login" ? "Entrar" : "Crear mi cuenta"}
+          </span>
         </Button>
       </form>
 
