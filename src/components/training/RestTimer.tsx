@@ -21,7 +21,7 @@ export function RestTimer({ seconds = 60 }: { seconds?: number }) {
     <div className="row" style={{ justifyContent: "space-between" }}>
       {(running || done) && (
         <div className="rest-mascot">
-          <Mascot state={running ? "rest" : "cheer"} size={84} message={running ? true : "¡Listo! A la siguiente serie."} lookAt={false} />
+          <Mascot state={running ? "rest" : "cheer"} size={84} message={running ? true : "Listo. Vamos a la siguiente serie."} lookAt={false} />
         </div>
       )}
       <div className="row" aria-live="polite">

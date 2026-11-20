@@ -1,4 +1,4 @@
-/** Estados de "Rep", la mascota de FitMentor, y sus frases en español colombiano. */
+/** Estados de "Rep", la mascota de FitMentor, y sus frases: tono claro, cercano y profesional. */
 export type MascotState = "idle" | "wave" | "cheer" | "count" | "rest" | "celebrate" | "worried";
 
 export const MASCOT_STATES: MascotState[] = ["idle", "wave", "cheer", "count", "rest", "celebrate", "worried"];
@@ -7,46 +7,46 @@ export const MASCOT_NAME = "Rep";
 
 export const MASCOT_PHRASES: Record<MascotState, string[]> = {
   idle: [
-    "¿Listo para sudar la camiseta?",
-    "Hoy es buen día para moverse, parce.",
-    "Yo cuento, usted se luce.",
-    "Pa' lante, que el cuerpo responde.",
+    "Cuando quieras, empezamos.",
+    "Hoy es un buen día para moverse.",
+    "Yo llevo la cuenta; tú cuida la técnica.",
+    "Un poco cada día construye mucho.",
   ],
   wave: [
-    "¡Quiubo! Qué bueno verlo por acá.",
-    "¡Bienvenido de nuevo, campeón!",
-    "¡Hola, hola! Vamos a entrenar bonito.",
-    "¡Ey! Estaba esperándolo.",
+    "Hola, qué bueno verte de nuevo.",
+    "Bienvenido. Tu entrenamiento te espera.",
+    "Hola. Vamos a entrenar con buena técnica.",
+    "Te estaba esperando. ¿Empezamos?",
   ],
   cheer: [
-    "¡Dele con toda, que usted puede!",
-    "¡Eso es, mi rey, así se hace!",
-    "¡Qué nota esa técnica!",
-    "¡Hágale pues, sin pereza!",
+    "Muy bien, mantén ese ritmo.",
+    "Así se hace: control y constancia.",
+    "Excelente técnica. Sigue así.",
+    "Vas muy bien. Una serie más.",
   ],
   count: [
-    "Yo llevo la cuenta, usted concéntrese.",
-    "Una más y ya, ¡sin trampa!",
-    "Bajando controlado, subiendo con fuerza.",
-    "Cuenta limpia, repetición limpia.",
+    "Yo cuento; tú concéntrate en la forma.",
+    "Una más, con control.",
+    "Baja despacio, sube con fuerza.",
+    "Repetición limpia, repetición que cuenta.",
   ],
   rest: [
-    "Respire profundo y tome agüita.",
-    "Descanse tranquilo, que lo bueno se gana.",
-    "Hidrátese, estire un poquito.",
-    "El músculo crece cuando uno descansa.",
+    "Respira profundo e hidrátate.",
+    "Descansa: el músculo también crece ahora.",
+    "Toma agua y suelta los hombros.",
+    "Recupera el aliento. Ya casi seguimos.",
   ],
   celebrate: [
-    "¡Lo logró! ¡Qué chimba de sesión!",
-    "¡Eso, crack! Otro logro pa' la colección.",
-    "¡Tenemos fiesta! Usted es una máquina.",
-    "¡Brutal! Hoy sí que se ganó el postre.",
+    "Lo lograste. Gran sesión.",
+    "Nuevo logro desbloqueado. Bien hecho.",
+    "Excelente trabajo. Ese progreso es tuyo.",
+    "Sesión completa. Te lo ganaste.",
   ],
   worried: [
-    "Tranqui, un mal día no borra el progreso.",
-    "Ánimo, parce, mañana lo hacemos mejor.",
-    "Hey, sin afán. Empecemos suave.",
-    "No pasa nada, aquí estoy con usted.",
+    "Un mal día no borra tu progreso.",
+    "Tranquilo: mañana lo haremos mejor.",
+    "Empecemos suave y con buena técnica.",
+    "Aquí estoy. Vamos paso a paso.",
   ],
 };
 
