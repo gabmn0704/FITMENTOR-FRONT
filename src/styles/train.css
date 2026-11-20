@@ -1,0 +1,601 @@
+/* Entrenar: cabina de cámara. Rejilla asimétrica sin huecos (paneles separados por costuras de 1 px, no por cards
+   anidadas), contador gigante que golpea con cada repetición, mazo de ejercicios con foto y guía de técnica. */
+
+.cockpit {
+  display: grid;
+  gap: clamp(40px, 5vw, 88px);
+}
+
+.cockpit-label {
+  display: block;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* ---------- Cabecera ---------- */
+.cockpit-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  align-items: end;
+  gap: var(--space-6);
+}
+
+.cockpit-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-4);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cockpit-eyebrow__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-subtle);
+}
+
+.cockpit-eyebrow__dot.is-live {
+  background: var(--signal);
+  animation: pulse-dot 1.4s ease-out infinite;
+}
+
+.cockpit-title {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.22em;
+  font-size: var(--fs-display);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+.cockpit-title__mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.cockpit-title__mask > span {
+  display: inline-block;
+}
+
+.cockpit-title__live {
+  font-weight: 300;
+  font-style: italic;
+  color: var(--signal-text);
+}
+
+.cockpit-head__side {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.cockpit-head__lede {
+  margin: 0;
+  max-width: 38ch;
+  font-size: var(--fs-md);
+  color: var(--text-muted);
+}
+
+.cockpit-today {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.cockpit-today > div {
+  padding: var(--space-3) var(--space-3) 0 0;
+}
+
+.cockpit-today > div + div {
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--line);
+}
+
+.cockpit-today dt {
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.cockpit-today dd {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- Rejilla de la cabina ---------- */
+.cockpit-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    "stage stage stage stage stage stage stage stage count count count count"
+    "stage stage stage stage stage stage stage stage coach coach coach coach"
+    "stage stage stage stage stage stage stage stage rest rest rest rest"
+    "voice voice voice voice voice voice voice tele tele tele tele tele";
+  gap: 1px;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--glass-border);
+  background: var(--line-strong);
+  box-shadow: var(--shadow-3);
+}
+
+.cockpit-stage { grid-area: stage; }
+.cockpit-count { grid-area: count; }
+.cockpit-coach { grid-area: coach; }
+.cockpit-rest { grid-area: rest; }
+.cockpit-voice { grid-area: voice; }
+.cockpit-telemetry { grid-area: tele; }
+
+.cockpit-panel {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: clamp(18px, 1.8vw, 26px);
+  background: var(--surface);
+}
+
+/* Componentes internos van planos: la costura del panel ya los separa. */
+.cockpit-panel .coach-presence,
+.cockpit-panel .channel-status {
+  background: transparent;
+  border: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Escenario: cámara de borde a borde y barra de mando de tinta debajo. */
+.cockpit-stage {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 100%;
+  background: #05070d;
+  color: #f4f6fb;
+}
+
+.cockpit-stage .camera {
+  aspect-ratio: auto;
+  min-height: 440px;
+  border-radius: 0;
+}
+
+.cockpit-stage__error {
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.cockpit-controls {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) clamp(16px, 1.8vw, 24px) var(--space-4);
+  border-top: 1px solid rgb(244 246 251 / 0.1);
+}
+
+.cockpit-next {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: #d5daea;
+}
+
+.cockpit-next svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--signal-bright);
+}
+
+.cockpit-controls__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cockpit-controls__row .btn--primary {
+  flex: 1 1 220px;
+}
+
+.cockpit-stage .btn--ghost {
+  background: rgb(244 246 251 / 0.06);
+  border-color: rgb(244 246 251 / 0.16);
+  color: #f4f6fb;
+}
+
+.cockpit-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: #9aa3ba;
+}
+
+.cockpit-keys kbd {
+  display: inline-block;
+  min-width: 22px;
+  margin-right: 4px;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgb(244 246 251 / 0.2);
+  border-bottom-width: 2px;
+  font: 600 11px/1.5 var(--font-body);
+  text-align: center;
+  color: #f4f6fb;
+}
+
+/* Contador gigante: el número es la pantalla. La barra inferior marca el avance hacia la meta. */
+.cockpit-count {
+  overflow: hidden;
+  align-content: space-between;
+  min-height: 230px;
+  background:
+    radial-gradient(420px 260px at 100% 0%, var(--signal-soft), transparent 70%),
+    var(--surface);
+}
+
+.cockpit-count__flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 60%, rgb(255 106 61 / 0.45), transparent 65%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cockpit-count__num {
+  font-family: var(--font-display);
+  font-size: var(--fs-giant);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  transform-origin: 0% 100%;
+}
+
+.cockpit-count__foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.cockpit-count__foot b {
+  color: var(--text);
+}
+
+.cockpit-count__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--surface-3);
+}
+
+.cockpit-count__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--p, 0%);
+  background: linear-gradient(90deg, var(--signal), var(--signal-bright));
+  transition: width 600ms var(--ease-out-expo);
+}
+
+.cockpit-coach__score {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.cockpit-coach__trend {
+  display: grid;
+  gap: 6px;
+}
+
+.cockpit-coach .sparkline {
+  height: 52px;
+}
+
+/* Telemetría en lectura de instrumento: tres columnas con costura. */
+.telemetry {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.telemetry > div + div {
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--line);
+}
+
+.telemetry dt {
+  font-size: var(--fs-xs);
+  color: var(--text-subtle);
+}
+
+.telemetry dd {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Mazo de ejercicios ---------- */
+.cockpit-deck {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.cockpit-deck__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.cockpit-deck__head h2 {
+  font-size: var(--fs-2xl);
+}
+
+.cockpit-deck__note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* Del selector clásico solo se usa el buscador (trie de alias); los botones los reemplaza el mazo con foto. */
+.cockpit-search {
+  width: min(100%, 360px);
+}
+
+.cockpit-search .exercise-picker {
+  display: none;
+}
+
+.deck-row {
+  display: flex;
+  gap: 1px;
+  height: clamp(220px, 24vw, 320px);
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background: var(--line-strong);
+}
+
+/* El ejercicio activo se abre y empuja a los demás: lectura asimétrica sin cambiar de pantalla. */
+.deck-tile {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  display: grid;
+  align-content: space-between;
+  padding: var(--space-4);
+  border: 0;
+  background: #0b0d14;
+  color: #f4f6fb;
+  text-align: left;
+  transition: flex-grow 700ms var(--ease-out-expo);
+}
+
+.deck-tile[aria-pressed="true"] {
+  flex-grow: 2.6;
+}
+
+.deck-tile img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.85) contrast(1.05);
+  opacity: 0.55;
+  transform: scale(1.04);
+  transition:
+    filter 700ms var(--ease-out-expo),
+    opacity 700ms var(--ease-out-expo),
+    transform 900ms var(--ease-out-expo);
+}
+
+.deck-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(5 7 13 / 0.1) 30%, rgb(5 7 13 / 0.88));
+}
+
+.deck-tile[aria-pressed="true"] img {
+  filter: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.deck-tile__index {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  color: rgb(244 246 251 / 0.7);
+}
+
+.deck-tile[aria-pressed="true"] .deck-tile__index {
+  color: var(--signal-bright);
+}
+
+.deck-tile__body {
+  display: grid;
+  gap: 2px;
+}
+
+.deck-tile__body strong {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-tile[aria-pressed="true"] .deck-tile__body strong {
+  font-size: var(--fs-2xl);
+}
+
+.deck-tile__body span {
+  font-size: var(--fs-xs);
+  color: rgb(244 246 251 / 0.72);
+}
+
+.deck-tile:disabled {
+  cursor: not-allowed;
+}
+
+.deck-tile:disabled:not([aria-pressed="true"]) {
+  opacity: 0.6;
+}
+
+.deck-tile:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px var(--cobalt-bright);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .deck-tile:hover:not(:disabled) img {
+    filter: grayscale(0.2);
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+/* ---------- Guía de técnica ---------- */
+.cockpit-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line-strong);
+}
+
+.cockpit-guide__aside {
+  position: relative;
+  align-self: start;
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 1025px) {
+  .cockpit-guide__aside {
+    position: sticky;
+    top: calc(var(--nav-height) + var(--space-5));
+  }
+}
+
+.cockpit-guide__aside h2 {
+  font-size: var(--fs-2xl);
+}
+
+.cockpit-guide__ghost {
+  position: absolute;
+  z-index: -1;
+  top: -0.35em;
+  right: 0;
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 4rem + 10vw, 14rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line-strong);
+  pointer-events: none;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1180px) {
+  .cockpit-grid {
+    grid-template-areas:
+      "stage stage stage stage stage stage stage stage stage stage stage stage"
+      "count count count count count count coach coach coach coach coach coach"
+      "rest rest rest rest rest rest tele tele tele tele tele tele"
+      "voice voice voice voice voice voice voice voice voice voice voice voice";
+  }
+}
+
+@media (max-width: 1024px) {
+  .cockpit-head,
+  .cockpit-guide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* En pantallas estrechas el contador ya va sobre la imagen; el panel queda compacto. */
+  .cockpit-count {
+    min-height: 0;
+  }
+
+  .cockpit-count__num {
+    font-size: var(--fs-3xl);
+  }
+}
+
+@media (max-width: 720px) {
+  .cockpit-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "count" "coach" "rest" "tele" "voice";
+    border-radius: var(--radius-xl);
+  }
+
+  .cockpit-stage .camera {
+    min-height: 0;
+    aspect-ratio: 3 / 4;
+  }
+
+  .cockpit-keys {
+    display: none;
+  }
+
+  .deck-row {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .deck-tile {
+    min-height: 76px;
+  }
+
+  .deck-tile[aria-pressed="true"] {
+    min-height: 180px;
+  }
+
+  .cockpit-search {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-tile,
+  .deck-tile img,
+  .cockpit-count__bar::after {
+    transition: none;
+  }
+
+  .cockpit-eyebrow__dot.is-live {
+    animation: none;
+  }
+}
