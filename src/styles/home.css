@@ -1087,3 +1087,166 @@
     top: auto;
   }
 }
+
+/* El anillo de la meta usa el tamaño que recibe por props (más grande en Inicio). */
+.bento .goal-card__ring {
+  width: auto;
+  height: auto;
+}
+
+.hero__lead {
+  max-width: 36ch;
+}
+
+/* ---------- Hoy: siguiente paso, resumen del día y atajos, en una sola franja con costuras ---------- */
+.today-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 1px;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--glass-border);
+  background: var(--line-strong);
+  box-shadow: var(--shadow-1);
+}
+
+.today-bar > * {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  margin: 0;
+  padding: clamp(20px, 2vw, 30px);
+  background: var(--surface);
+}
+
+.today-bar__next {
+  background:
+    radial-gradient(520px 260px at 0% 0%, var(--signal-soft), transparent 70%),
+    var(--surface) !important;
+}
+
+.today-bar__next .btn {
+  justify-self: start;
+}
+
+.today-bar__title {
+  font-size: var(--fs-2xl);
+}
+
+.today-bar__next p {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--text-muted);
+}
+
+.today-bar__log {
+  grid-template-columns: 1fr;
+  align-content: stretch;
+}
+
+.today-bar__log > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.today-bar__log > div:last-child {
+  border-bottom: 0;
+}
+
+.today-bar__log dt {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.today-bar__log dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.today-bar__keys ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-bar__keys button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-align: left;
+  transition: background-color var(--dur-fast) ease, transform var(--dur-instant) var(--ease-out);
+}
+
+.today-bar__keys button:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .today-bar__keys button:hover {
+    background: var(--surface-2);
+  }
+}
+
+.today-bar__keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  font: 600 12px/1 var(--font-body);
+  color: var(--text-muted);
+}
+
+@media (max-width: 1100px) {
+  .today-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .today-bar__next {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .today-bar {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: var(--radius-xl);
+  }
+
+  /* En táctil no hay teclado: los atajos sobran. */
+  .today-bar__keys {
+    display: none !important;
+  }
+}
+
+@media (hover: none) {
+  .today-bar__keys {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-bar__keys button {
+    transition: none;
+  }
+}

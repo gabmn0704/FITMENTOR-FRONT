@@ -24,7 +24,7 @@ import { CATALOG, catalogLabel } from "../lib/catalog";
 import { catalogArt, EXERCISE_ART } from "../lib/exerciseArt";
 import { setPendingExercise } from "../lib/pendingExercise";
 import { achievementText, progressPercent, routineNote, routineReason } from "../lib/contract";
-import type { RouteId } from "../lib/routes";
+import { ROUTES, type RouteId } from "../lib/routes";
 import type { Stats } from "../types";
 
 interface HomePageProps {
@@ -191,6 +191,50 @@ export function HomePage({ onNavigate }: HomePageProps) {
     .slice(0, 3);
   const day = profile ? buildWeekPlan(profile, user?.level ?? "BEGINNER", currentWeek(profile)).days[todayIndex()] : null;
 
+  const todayLog = useMemo(() => {
+    const now = new Date();
+    const sessions = readLocalSessions().filter((item) => {
+      const d = new Date(item.date);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+    });
+    return { sessions: sessions.length, reps: sessions.reduce((sum, item) => sum + (item.reps ?? 0), 0) };
+  }, []);
+
+  /** Lleva a Entrenar con el ejercicio sugerido ya elegido. */
+  const trainSuggestion = () => {
+    setPendingExercise({ engine: suggestion.exercise, variant: suggestion.exercise });
+    onNavigate("entrenar");
+  };
+
+  /** Siguiente acción clara: una sola recomendación según perfil, plan del día y lo ya hecho hoy. */
+  const nextAction: { title: string; detail: string; cta: string; run: () => void } = !profile
+    ? {
+        title: "Completa tu perfil",
+        detail: "Con tu meta y tu nivel, FitMentor arma la rutina y la alimentación de la semana.",
+        cta: "Completar perfil",
+        run: () => onNavigate("perfil"),
+      }
+    : todayLog.sessions > 0
+      ? {
+          title: "Sesión de hoy completada",
+          detail: `Llevas ${todayLog.reps} repeticiones hoy. Revisa cómo evoluciona tu técnica.`,
+          cta: "Ver progreso",
+          run: () => onNavigate("progreso"),
+        }
+      : day?.kind === "rest"
+        ? {
+            title: "Hoy toca recuperar",
+            detail: "Día de descanso del plan: estira, hidrátate y prepara la próxima sesión.",
+            cta: "Ver mi plan",
+            run: () => onNavigate("rutina"),
+          }
+        : {
+            title: `Entrena ${exerciseLabel(suggestion.exercise).toLowerCase()}`,
+            detail: day ? `Hoy toca ${day.title.toLowerCase()} · unos ${day.minutes} min. Empieza por aquí.` : suggestion.reason,
+            cta: "Empezar ahora",
+            run: trainSuggestion,
+          };
+
   // Movimiento ligado al scroll: la foto del héroe se desplaza lento, las tarjetas del plan se apilan
   // (la de atrás se encoge y se oscurece) y la frase de Rep se enciende palabra por palabra.
   useGsap(
@@ -267,8 +311,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <p className="hero__lead">
               {name ? `${name}, ` : ""}
               {streak > 0
-                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. Rep cuenta, la cámara corrige y tú te luces.`
-                : "tu racha empieza con una sesión. Rep cuenta, la cámara corrige y tú te luces."}
+                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. Rep cuenta y la cámara corrige tu técnica.`
+                : "tu racha empieza con una sesión. Rep cuenta y la cámara corrige tu técnica."}
             </p>
             <div className="hero__actions">
               <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={20} />}>
@@ -308,6 +352,46 @@ export function HomePage({ onNavigate }: HomePageProps) {
         <StreakCard streak={streak} week={engage.week} />
         <LevelCard level={engage.level} />
         <ChallengesCard challenges={engage.challenges} />
+      </section>
+
+      <section className="today-bar" aria-label="Hoy">
+        <div className="today-bar__next">
+          <span className="engage-label">
+            <Sparkles size={14} aria-hidden="true" /> Siguiente paso
+          </span>
+          <h2 className="today-bar__title">{nextAction.title}</h2>
+          <p>{nextAction.detail}</p>
+          <Button variant="primary" onClick={nextAction.run} icon={<ArrowRight size={16} />}>
+            {nextAction.cta}
+          </Button>
+        </div>
+        <dl className="today-bar__log" aria-label="Resumen de hoy">
+          <div>
+            <dt>Sesiones hoy</dt>
+            <dd className="tabular">{todayLog.sessions}</dd>
+          </div>
+          <div>
+            <dt>Reps hoy</dt>
+            <dd className="tabular">{todayLog.reps}</dd>
+          </div>
+          <div>
+            <dt>Plan de hoy</dt>
+            <dd>{day ? (day.kind === "rest" ? "Descanso" : `${day.minutes} min`) : "Sin plan"}</dd>
+          </div>
+        </dl>
+        <div className="today-bar__keys">
+          <span className="engage-label">Atajos de teclado</span>
+          <ul>
+            {ROUTES.map((route, index) => (
+              <li key={route.id}>
+                <button type="button" onClick={() => onNavigate(route.id)}>
+                  <kbd>{index + 1}</kbd>
+                  {route.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="stat-strip" aria-label="Tus números">
@@ -382,7 +466,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </span>
             <h2 id="next-title">{exerciseLabel(suggestion.exercise)}</h2>
             <p>{suggestion.reason}</p>
-            <Button variant="primary" onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={16} />}>
+            <Button variant="primary" onClick={trainSuggestion} icon={<ArrowRight size={16} />}>
               Probar ahora
             </Button>
           </div>
