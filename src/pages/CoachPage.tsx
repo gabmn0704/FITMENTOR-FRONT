@@ -1,4 +1,3 @@
-import { PageMascot } from "../components/mascot/PageMascot";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Send, Sparkles } from "lucide-react";
 import { Button, Notice } from "../components/ui";
@@ -103,7 +102,6 @@ export function CoachPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="gym">
-        <PageMascot state="idle" />
         <h1>Pregunta lo que quieras</h1>
         <p>Técnica, rutinas y alimentación según tu objetivo. Ante una molestia, consulta a un profesional.</p>
       </header>

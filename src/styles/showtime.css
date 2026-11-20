@@ -3,8 +3,8 @@
 /* ---------- Escena de acceso ---------- */
 .access__field {
   background:
-    radial-gradient(900px 600px at 82% 18%, rgb(27 59 255 / 0.55), transparent 60%),
-    radial-gradient(700px 520px at 8% 96%, rgb(255 61 31 / 0.22), transparent 62%),
+    radial-gradient(900px 600px at 82% 18%, rgb(10 122 83 / 0.55), transparent 60%),
+    radial-gradient(700px 520px at 8% 96%, rgb(212 255 58 / 0.22), transparent 62%),
     var(--rail);
 }
 
@@ -15,7 +15,7 @@
 
 .access__field::before {
   z-index: 0;
-  background: linear-gradient(95deg, rgb(10 12 18 / 0.72) 0 24%, transparent 70%);
+  background: linear-gradient(95deg, rgb(10 14 19 / 0.72) 0 24%, transparent 70%);
 }
 
 .access__brand,
@@ -46,14 +46,14 @@
 .access__orb--a {
   top: -14vmin;
   right: -10vmin;
-  background: radial-gradient(circle, rgb(75 100 255 / 0.5), transparent 68%);
+  background: radial-gradient(circle, rgb(79 240 182 / 0.5), transparent 68%);
   animation: orb-a 16s ease-in-out infinite alternate;
 }
 
 .access__orb--b {
   bottom: -18vmin;
   left: 24%;
-  background: radial-gradient(circle, rgb(255 61 31 / 0.28), transparent 68%);
+  background: radial-gradient(circle, rgb(212 255 58 / 0.28), transparent 68%);
   animation: orb-b 20s ease-in-out infinite alternate;
 }
 
@@ -71,17 +71,6 @@
 
 .access__title {
   font-size: clamp(88px, min(13vw, 22vh), 8.5rem);
-}
-
-.access__mascot {
-  align-self: flex-start;
-  margin-bottom: 4px;
-  animation: fade-up 800ms var(--ease-out) 900ms both;
-}
-
-.access__mascot .mascot__bubble {
-  max-width: 280px;
-  font-size: 15px;
 }
 
 /* El dorsal cambia de color al registrarse. */
@@ -151,7 +140,7 @@
   }
 }
 
-/* Campos con foco: el borde dibuja un halo cobalto. */
+/* Campos con foco: el borde dibuja un halo esmeralda. */
 .auth-panel .input {
   transition:
     box-shadow 220ms var(--ease-out),
@@ -274,7 +263,7 @@
 
 .pulse-chip.is-hot {
   background: var(--signal-soft);
-  box-shadow: inset 0 0 0 1px rgb(255 61 31 / 0.35);
+  box-shadow: inset 0 0 0 1px rgb(212 255 58 / 0.35);
 }
 
 .pulse-chip__title {
@@ -299,7 +288,7 @@
 }
 
 .flame--lit .flame__outer {
-  fill: #ff3d1f;
+  fill: #d4ff3a;
   animation: flame-a 1.5s ease-in-out infinite;
 }
 
@@ -349,43 +338,8 @@
   }
 }
 
-/* ---------- Mascota en encabezados de página ---------- */
-.page-header__mascot {
-  position: absolute;
-  right: clamp(16px, 4vw, 56px);
-  bottom: 26px;
-  z-index: 2;
-}
-
-.page-header__mascot .mascot__bubble {
-  max-width: 240px;
-}
-
-@media (max-width: 1320px) {
-  .page-header__mascot .mascot__bubble {
-    display: none;
-  }
-}
-
-@media (max-width: 700px) {
-  .page-header__mascot {
-    right: 12px;
-    bottom: 22px;
-    opacity: 0.95;
-  }
-}
-
 /* ---------- Teléfonos ---------- */
 @media (max-width: 900px) {
-  .access__mascot {
-    position: absolute;
-    right: 12px;
-    bottom: 56px;
-  }
-
-  .access__mascot .mascot__bubble {
-    display: none;
-  }
 
   .unlock-toast {
     right: 12px;
@@ -410,37 +364,19 @@
   }
 }
 
-@media (max-width: 900px) {
-  .access__mascot .mascot__svg {
-    width: auto;
-    height: 118px;
-  }
-
-  .access__mascot {
-    right: 10px;
-    bottom: 58px;
-  }
-}
-
-/* Resumen y descanso con la mascota */
 .summary__hero {
   display: grid;
   justify-items: start;
   gap: 8px;
 }
 
-.summary__hero .mascot {
-  margin-bottom: 4px;
-}
-
-.rest-mascot {
-  display: flex;
-  align-items: flex-end;
-  margin-right: auto;
-  padding-right: 12px;
-}
-
-.rest-mascot .mascot__bubble {
-  max-width: 200px;
-  font-size: 13px;
+.unlock-toast__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--signal);
+  color: var(--signal-ink);
 }

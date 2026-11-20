@@ -120,7 +120,7 @@ export function ProfilePage() {
 
   return (
     <div className="p2-page" ref={page}>
-      <PageHero title={["Tu espacio,", "a tu medida"]} accent={1} kicker={isGuest(user) ? "Modo invitado" : "Perfil y ajustes"} lead="Tu cuerpo, tu plan y cómo te acompaña FitMentor en cada sesión." mascot="idle">
+      <PageHero title={["Tu espacio,", "a tu medida"]} accent={1} kicker={isGuest(user) ? "Modo invitado" : "Perfil y ajustes"} lead="Tu cuerpo, tu plan y cómo te acompaña FitMentor en cada sesión.">
         <div className="p3-who">
           <Avatar name={user.name} picture={user.picture} />
           <div>

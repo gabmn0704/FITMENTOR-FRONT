@@ -32,7 +32,7 @@ body {
   font-feature-settings: "ss01" 1, "cv11" 1;
   line-height: 1.5;
   color: var(--text);
-  /* Malla de luz del estadio: cobalto arriba, brasa bermellón abajo; fija para que no "nade" al desplazar. */
+  /* Malla de luz del estadio: esmeralda arriba, brasa lima abajo; fija para que no "nade" al desplazar. */
   background:
     radial-gradient(1100px 760px at 12% -8%, var(--mesh-a), transparent 62%),
     radial-gradient(900px 700px at 100% 12%, var(--mesh-c), transparent 60%),
@@ -97,8 +97,8 @@ a {
 }
 
 ::selection {
-  background: var(--cobalt);
-  color: var(--on-cobalt);
+  background: var(--brand);
+  color: var(--on-brand);
 }
 
 ::placeholder {

@@ -1,6 +1,4 @@
 import { useRef, type ReactNode } from "react";
-import { PageMascot } from "../mascot/PageMascot";
-import type { MascotState } from "../../lib/mascot";
 import { gsap, useGSAP, withMotion } from "./motion";
 
 interface PageHeroProps {
@@ -11,15 +9,14 @@ interface PageHeroProps {
   /** Línea del título que va en color de acento. */
   accent?: 0 | 1;
   lead?: ReactNode;
-  mascot?: MascotState;
   tone?: "paper" | "ink";
   /** Cifras o acciones bajo el texto. */
   children?: ReactNode;
   className?: string;
 }
 
-/** Cabecera de las páginas internas: título en máscara que sube línea a línea, cifras clave y Rep al costado. */
-export function PageHero({ kicker, title, accent, lead, mascot = "idle", tone = "paper", children, className = "" }: PageHeroProps) {
+/** Cabecera de las páginas internas: título en máscara que sube línea a línea, y cifras clave. */
+export function PageHero({ kicker, title, accent, lead, tone = "paper", children, className = "" }: PageHeroProps) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -63,7 +60,6 @@ export function PageHero({ kicker, title, accent, lead, mascot = "idle", tone = 
           </div>
         )}
       </div>
-      <PageMascot state={mascot} size={112} />
     </header>
   );
 }

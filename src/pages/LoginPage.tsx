@@ -1,36 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent, type RefObject } from "react";
-import { Activity, Lock, Mic, ScanLine } from "lucide-react";
+import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
+import { Lock } from "lucide-react";
 import { Logo } from "../brand/Logo";
 import { MOTION_OK, loadGsap, prefersReducedMotion } from "../brand/gsap";
-import { AuthPanel, type AuthMode, type AuthMood } from "../components/auth/AuthPanel";
-import { Mascot } from "../components/mascot/Mascot";
+import { AuthPanel, type AuthMode } from "../components/auth/AuthPanel";
 import { Marquee } from "../components/motion/Marquee";
 import { PoseField } from "../components/motion/PoseField";
-import type { MascotState } from "../lib/mascot";
 
 const TICKER = ["Sentadilla", "Flexión", "Plancha", "Peso muerto", "Zancada", "Coach IA", "Tu cámara, tu privacidad"];
-
-const PROOFS = [
-  { icon: ScanLine, text: "Postura corregida en tiempo real" },
-  { icon: Mic, text: "Conteo y guía por voz" },
-  { icon: Activity, text: "Progreso semana a semana" },
-];
-
-/** Traduce el ánimo del formulario en lo que hace y dice la mascota. */
-function mascotFor(mood: AuthMood): { state: MascotState; message: string | true } {
-  switch (mood) {
-    case "busy":
-      return { state: "count", message: "Un momento, estoy abriendo tu sesión…" };
-    case "error":
-      return { state: "worried", message: true };
-    case "register":
-      return { state: "cheer", message: "Crea tu cuenta y empezamos a entrenar." };
-    case "typing":
-      return { state: "idle", message: "Tus datos están protegidos. No veo tu contraseña." };
-    default:
-      return { state: "wave", message: true };
-  }
-}
 
 /** Entrada coreografiada de la escena y del panel. Sin GSAP o con "menos movimiento", todo ya está en su sitio. */
 function useIntro(root: RefObject<HTMLDivElement>) {
@@ -45,7 +21,7 @@ function useIntro(root: RefObject<HTMLDivElement>) {
       mm.add(MOTION_OK, () => {
         const q = gsap.utils.selector(el);
         const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
-        tl.from(q(".access__lede, .access__proofs li"), { y: 18, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.55)
+        tl.from(q(".access__lede, .access__facts > div"), { y: 18, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.55)
           .from(q(".login-glass"), { y: 40, opacity: 0, scale: 0.97, duration: 1.1 }, 0.25)
           .from(q(".login-glass__secure, .login-glass__lead"), { y: 14, opacity: 0, duration: 0.8, stagger: 0.06 }, 0.5)
           .from(q(".login-glass .auth-panel > *"), { y: 16, opacity: 0, duration: 0.8, stagger: 0.05 }, 0.65)
@@ -63,14 +39,12 @@ function useIntro(root: RefObject<HTMLDivElement>) {
 }
 
 /**
- * Primera pantalla: una sola escena oscura. A la izquierda, foto en movimiento con el esqueleto de postura y Rep;
+ * Primera pantalla: una sola escena oscura. A la izquierda, foto en movimiento con el esqueleto de postura;
  * a la derecha, el acceso en un panel de vidrio sobre un arco de luz (el arco de la marca), con un reflejo
  * que sigue al puntero.
  */
 export function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
-  const [mood, setMood] = useState<AuthMood>("welcome");
-  const mascot = useMemo(() => mascotFor(mood), [mood]);
   const register = mode === "register";
   const root = useRef<HTMLDivElement>(null);
   useIntro(root);
@@ -106,19 +80,22 @@ export function LoginPage() {
               </span>
             </h1>
             <p className="access__lede">Tu coach con IA mira tu postura, cuenta tus repeticiones y te corrige al instante.</p>
-            <ul className="access__proofs">
-              {PROOFS.map(({ icon: Icon, text }) => (
-                <li key={text}>
-                  <Icon size={16} strokeWidth={2.2} aria-hidden="true" />
-                  {text}
-                </li>
-              ))}
-            </ul>
           </div>
 
-          <div className="access__mascot">
-            <Mascot state={mascot.state} size={190} message={mascot.message} interactive />
-          </div>
+          <dl className="access__facts" aria-label="Cómo funciona">
+            <div>
+              <dt>33</dt>
+              <dd>puntos del cuerpo que sigue la cámara</dd>
+            </div>
+            <div>
+              <dt>0</dt>
+              <dd>videos que salen de tu dispositivo</dd>
+            </div>
+            <div>
+              <dt>5</dt>
+              <dd>ejercicios con corrección de técnica</dd>
+            </div>
+          </dl>
         </div>
 
         <div className="access__ticker">
@@ -130,9 +107,8 @@ export function LoginPage() {
         <svg className="access__arc" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
           <defs>
             <linearGradient id="access-arc" x1="6" y1="30" x2="42" y2="30" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stopColor="#3b5bff" />
-              <stop offset="0.5" stopColor="#8f46ff" />
-              <stop offset="1" stopColor="#ff3d1f" />
+              <stop offset="0" stopColor="#19e3a1" />
+              <stop offset="1" stopColor="#d4ff3a" />
             </linearGradient>
           </defs>
           <path d="M12.3 38.97A19 19 0 1 1 35.7 38.97" fill="none" stroke="url(#access-arc)" strokeWidth="0.5" strokeLinecap="round" />
@@ -154,7 +130,7 @@ export function LoginPage() {
           <p className="login-glass__lead">
             {register ? "Un minuto para registrarte y tu primera sesión queda lista." : "Entra para seguir donde dejaste tu entrenamiento."}
           </p>
-          <AuthPanel onModeChange={setMode} onMood={setMood} />
+          <AuthPanel onModeChange={setMode} />
         </div>
       </main>
     </div>

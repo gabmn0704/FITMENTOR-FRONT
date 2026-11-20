@@ -4,10 +4,8 @@ import { Button, Card } from "../components/ui";
 import { BarChart } from "../components/charts/BarChart";
 import { Odometer } from "../components/motion/Odometer";
 import { useGsap } from "../components/motion/useGsap";
-import { Mascot } from "../components/mascot/Mascot";
 import { ChallengesCard, GoalCard, LevelCard, MedalStrip, MentorQuote, StreakCard } from "../components/engage/Engage";
 import { useEngagement } from "../components/engage/useEngagement";
-import type { MascotState } from "../lib/mascot";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { useProfile } from "../hooks/useProfile";
@@ -174,15 +172,6 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const goal = weeklyProgress(data);
   const streak = Math.max(data.streakDays, local.streakDays);
   const engage = useEngagement(user?.id, streak);
-  const heroMood: MascotState = streak >= 3 ? "cheer" : streak > 0 ? "wave" : engage.hasSessions ? "worried" : "wave";
-  const heroMessage =
-    streak >= 3
-      ? `${streak} días seguidos. Mantengamos la racha.`
-      : streak > 0
-        ? "Buen ritmo. Hoy sumamos otro día."
-        : engage.hasSessions
-          ? "Qué bueno verte de vuelta. Retomemos con calma."
-          : "Hola, soy Rep. Yo cuento las repeticiones; tú cuidas la técnica.";
   const suggestion = suggestNextExercise(data.byExercise);
   const name = user?.name?.split(" ")[0] ?? "";
   const topAchievements = (achievements.data ?? [])
@@ -236,7 +225,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           };
 
   // Movimiento ligado al scroll: la foto del héroe se desplaza lento, las tarjetas del plan se apilan
-  // (la de atrás se encoge y se oscurece) y la frase de Rep se enciende palabra por palabra.
+  // (la de atrás se encoge y se oscurece) y el consejo del día se enciende palabra por palabra.
   useGsap(
     root,
     ({ gsap, reduce }) => {
@@ -311,8 +300,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <p className="hero__lead">
               {name ? `${name}, ` : ""}
               {streak > 0
-                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. Rep cuenta y la cámara corrige tu técnica.`
-                : "tu racha empieza con una sesión. Rep cuenta y la cámara corrige tu técnica."}
+                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. la cámara cuenta cada repetición y corrige tu técnica.`
+                : "tu racha empieza con una sesión. la cámara cuenta cada repetición y corrige tu técnica."}
             </p>
             <div className="hero__actions">
               <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={20} />}>
@@ -323,9 +312,27 @@ export function HomePage({ onNavigate }: HomePageProps) {
               </Button>
             </div>
           </div>
-          <div className="hero__mascot">
-            <Mascot state={heroMood} size={150} message={heroMessage} placement="top" interactive />
-          </div>
+          <dl className="hero__panel" aria-label="Tu pulso de hoy">
+            <div>
+              <dt>Racha</dt>
+              <dd className="tabular">
+                <Odometer value={streak} />
+                <small>{streak === 1 ? "día" : "días"}</small>
+              </dd>
+            </div>
+            <div>
+              <dt>Reps hoy</dt>
+              <dd className="tabular">
+                <Odometer value={todayLog.reps} />
+              </dd>
+            </div>
+            <div>
+              <dt>Meta semanal</dt>
+              <dd className="tabular">
+                <Odometer value={goal.percent} suffix="%" />
+              </dd>
+            </div>
+          </dl>
         </article>
 
         <GoalCard
@@ -416,7 +423,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       {day && <PlanDeck day={day} onNavigate={onNavigate} />}
 
       <section className="mentor-scrub" aria-label="Frase del día">
-        <MentorQuote userId={user?.id} state={streak > 0 ? "cheer" : "idle"} size={150} />
+        <MentorQuote userId={user?.id} />
       </section>
 
       <section className="bento bento--lower" aria-label="Tu semana y tus logros">

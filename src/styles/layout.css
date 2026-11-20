@@ -44,10 +44,10 @@
   background: var(--bg);
 }
 
-/* Campos de tinta: dentro de ellos el texto "sobre cobalto" pasa a ser texto sobre tinta. */
+/* Campos de tinta: dentro de ellos el texto "sobre esmeralda" pasa a ser texto sobre tinta. */
 .race-hero,
 .access__field,
 .ink-field {
-  --on-cobalt: var(--on-ink);
-  --on-cobalt-muted: var(--on-ink-muted);
+  --on-brand: var(--on-ink);
+  --on-brand-muted: var(--on-ink-muted);
 }

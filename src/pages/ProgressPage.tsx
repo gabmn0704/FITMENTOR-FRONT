@@ -128,7 +128,6 @@ export function ProgressPage() {
         accent={1}
         kicker={`${data.totalSessions} ${data.totalSessions === 1 ? "sesión registrada" : "sesiones registradas"}`}
         lead="Cada sesión suma control y consistencia. Aquí ves cómo vas, día a día y semana a semana."
-        mascot="cheer"
       >
         {pending > 0 ? (
           <div className="p2-sync">
@@ -179,7 +178,7 @@ export function ProgressPage() {
             <h2 className="p2-tile__title">Precisión media</h2>
             <p className="p2-tile__note">Meta: 85 %</p>
           </div>
-          <Ring value={data.avgAccuracy} size={104} stroke={10} tone={data.avgAccuracy >= 85 ? "good" : "cobalt"} label={`Precisión media ${data.avgAccuracy} por ciento`}>
+          <Ring value={data.avgAccuracy} size={104} stroke={10} tone={data.avgAccuracy >= 85 ? "good" : "brand"} label={`Precisión media ${data.avgAccuracy} por ciento`}>
             <strong className="tabular">
               {data.avgAccuracy}
               <small>%</small>

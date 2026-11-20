@@ -38,7 +38,7 @@ body::before {
   overflow: hidden;
 }
 
-/* Brillo cobalto en la parte alta del riel: la luz de un reflector sobre el cristal. */
+/* Brillo esmeralda en la parte alta del riel: la luz de un reflector sobre el cristal. */
 .rail::before {
   content: "";
   position: absolute;
@@ -77,10 +77,10 @@ body::before {
   width: var(--ind-w, 0);
   height: var(--ind-h, 46px);
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--cobalt-bright), var(--cobalt) 55%, var(--cobalt-deep));
+  background: linear-gradient(135deg, var(--brand-bright), var(--brand) 55%, var(--brand-deep));
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.28),
-    0 10px 26px -10px rgb(35 67 255 / 0.85);
+    0 10px 26px -10px rgb(10 122 83 / 0.85);
   transform: translate3d(var(--ind-x, 0), var(--ind-y, 0), 0);
   transition:
     transform 620ms cubic-bezier(0.34, 1.32, 0.64, 1),
@@ -120,7 +120,7 @@ body::before {
 }
 
 .nav-link:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--cobalt-bright);
+  box-shadow: inset 0 0 0 2px var(--brand-bright);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -148,7 +148,7 @@ body::before {
 
 .rail__user .avatar {
   border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, var(--cobalt-bright), var(--cobalt-deep));
+  background: linear-gradient(135deg, var(--brand-bright), var(--brand-deep));
   color: #fff;
 }
 
@@ -325,7 +325,7 @@ body::before {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: conic-gradient(var(--cobalt-bright) var(--lvl, 0%), color-mix(in srgb, var(--text) 10%, transparent) 0);
+  background: conic-gradient(var(--brand-bright) var(--lvl, 0%), color-mix(in srgb, var(--text) 10%, transparent) 0);
 }
 
 .pulse-chip__ring::before {
@@ -358,8 +358,8 @@ body::before {
   width: var(--ind-w, 0);
   height: var(--ind-h, 0);
   border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, var(--cobalt-bright), var(--cobalt) 60%, var(--cobalt-deep));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 20px -8px rgb(35 67 255 / 0.9);
+  background: linear-gradient(135deg, var(--brand-bright), var(--brand) 60%, var(--brand-deep));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 20px -8px rgb(10 122 83 / 0.9);
   transform: translate3d(var(--ind-x, 0), var(--ind-y, 0), 0);
   transition: transform 560ms cubic-bezier(0.34, 1.32, 0.64, 1), width var(--dur-med) var(--ease-out-expo);
   pointer-events: none;
@@ -373,7 +373,7 @@ body::before {
   right: 0;
   width: auto;
   height: 2px;
-  background: linear-gradient(90deg, var(--cobalt-bright), var(--signal));
+  background: linear-gradient(90deg, var(--brand-bright), var(--signal));
   transform-origin: left;
   animation: route-line 900ms var(--ease-out-expo) both;
 }

@@ -226,7 +226,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       c.height = v.videoHeight || 480;
       ctx.clearRect(0, 0, c.width, c.height);
       ctx.strokeStyle = "#f4f6fb";
-      ctx.fillStyle = "#ff3d1f";
+      ctx.fillStyle = "#d4ff3a";
       ctx.lineWidth = 4;
       ctx.lineCap = "round";
       for (const [a, b] of SKELETON_EDGES) {

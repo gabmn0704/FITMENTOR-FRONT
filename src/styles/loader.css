@@ -5,7 +5,7 @@
  */
 .skeleton {
   --bone: color-mix(in srgb, var(--surface) 62%, var(--bg));
-  --bone-shine: color-mix(in srgb, var(--surface) 96%, var(--cobalt) 4%);
+  --bone-shine: color-mix(in srgb, var(--surface) 96%, var(--brand) 4%);
   display: block;
   min-width: 0;
   border-radius: var(--radius-md);
@@ -27,13 +27,13 @@
 
 :root[data-theme="dark"] .skeleton {
   --bone: color-mix(in srgb, var(--surface-2) 80%, var(--bg));
-  --bone-shine: color-mix(in srgb, var(--surface-3) 85%, #8a9dff 15%);
+  --bone-shine: color-mix(in srgb, var(--surface-3) 85%, #6ff2c5 15%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .skeleton {
     --bone: color-mix(in srgb, var(--surface-2) 80%, var(--bg));
-    --bone-shine: color-mix(in srgb, var(--surface-3) 85%, #8a9dff 15%);
+    --bone-shine: color-mix(in srgb, var(--surface-3) 85%, #6ff2c5 15%);
   }
 }
 
@@ -156,7 +156,7 @@
   letter-spacing: 0.01em;
 }
 
-/* Barra indeterminada: un tramo cobalto-bermellón que recorre la línea base. */
+/* Barra indeterminada: un tramo esmeralda-lima que recorre la línea base. */
 .page-loader__progress {
   position: absolute;
   inset: auto 0 0;
@@ -172,7 +172,7 @@
   inset: 0;
   width: 40%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--cobalt), var(--signal));
+  background: linear-gradient(90deg, var(--brand), var(--signal));
   animation: loader-progress 1.4s var(--ease-in-out) infinite;
 }
 
