@@ -1,5 +1,6 @@
 import { useMemo, type CSSProperties } from "react";
 import { Award, Lock } from "lucide-react";
+import { PageMascot } from "../components/mascot/PageMascot";
 import { BadgeGrid } from "../components/engage/Engage";
 import { useEngagement } from "../components/engage/useEngagement";
 import { Card, EmptyState, Notice } from "../components/ui";
@@ -28,6 +29,7 @@ export function AchievementsPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="ropes">
+        <PageMascot state={medals > 0 ? "celebrate" : "cheer"} />
         <h1>Logros</h1>
         <p>
           {achievements.data
@@ -38,7 +40,7 @@ export function AchievementsPage() {
 
       <section className="stack" aria-labelledby="medals-title" style={{ gap: 14 }}>
         <div className="row" style={{ justifyContent: "space-between" }}>
-          <h2 id="medals-title" style={{ fontSize: 28 }}>Medallas</h2>
+          <h2 id="medals-title" style={{ fontSize: 28 }}>Medallas de Rep</h2>
           <span className="chip chip--brand tabular">
             {medals} / {engage.badges.length}
           </span>

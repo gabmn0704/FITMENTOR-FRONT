@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Timer } from "lucide-react";
 import { Button } from "../ui";
 import { formatDuration } from "../../lib/format";
+import { Mascot } from "../mascot/Mascot";
 
 /** Temporizador de descanso entre series. Se reinicia al cambiar la duración. */
 export function RestTimer({ seconds = 60 }: { seconds?: number }) {
@@ -18,6 +19,11 @@ export function RestTimer({ seconds = 60 }: { seconds?: number }) {
 
   return (
     <div className="row" style={{ justifyContent: "space-between" }}>
+      {(running || done) && (
+        <div className="rest-mascot">
+          <Mascot state={running ? "rest" : "cheer"} size={84} message={running ? true : "Listo. Vamos a la siguiente serie."} lookAt={false} />
+        </div>
+      )}
       <div className="row" aria-live="polite">
         <Timer size={18} aria-hidden="true" />
         <span className="tabular" style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700 }}>

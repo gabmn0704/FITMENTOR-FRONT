@@ -89,6 +89,7 @@ export function RoutinePage({ onNavigate }: RoutinePageProps) {
           )
         }
         lead={routine.data ? routineReason(routine.data.reason, routine.data.level) : "La IA ajusta series y repeticiones según tu nivel y tu última sesión."}
+        mascot="wave"
         aside={
           profile ? (
             <HeroFigures

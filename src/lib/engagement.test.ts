@@ -13,6 +13,7 @@ import {
   weekDays,
   weeklyGoalProgress,
 } from "./engagement";
+import { MASCOT_PHRASES, MASCOT_STATES, mascotPhrase } from "./mascot";
 import type { SessionRecord } from "../types";
 
 // Miércoles 18 de noviembre de 2026, mediodía local.
@@ -102,5 +103,12 @@ describe("sincronización por usuario", () => {
 describe("frases", () => {
   it("la frase del día es estable por día y usuario", () => {
     expect(quoteOfTheDay(NOW, "a")).toBe(quoteOfTheDay(NOW, "a"));
+  });
+
+  it("la mascota tiene frases para cada estado", () => {
+    for (const state of MASCOT_STATES) {
+      expect(MASCOT_PHRASES[state].length).toBeGreaterThanOrEqual(3);
+      expect(mascotPhrase(state, 1)).toBe(MASCOT_PHRASES[state][1]);
+    }
   });
 });

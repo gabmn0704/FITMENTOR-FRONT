@@ -48,11 +48,15 @@ export function validateCredentials(mode: Mode, name: string, email: string, pas
   return null;
 }
 
+/** Estado de ánimo del formulario: la pantalla de acceso lo traduce en la mascota. */
+export type AuthMood = "welcome" | "typing" | "register" | "busy" | "error";
+
 interface AuthPanelProps {
   onModeChange?: (mode: AuthMode) => void;
+  onMood?: (mood: AuthMood) => void;
 }
 
-export function AuthPanel({ onModeChange }: AuthPanelProps = {}) {
+export function AuthPanel({ onModeChange, onMood }: AuthPanelProps = {}) {
   const { loginWithGoogle, loginAsGuest, loginWithEmail, registerWithEmail, authNotice } = useAuth();
   const googleSlot = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("login");
@@ -68,6 +72,11 @@ export function AuthPanel({ onModeChange }: AuthPanelProps = {}) {
   useEffect(() => {
     onModeChange?.(mode);
   }, [mode, onModeChange]);
+
+  const typing = Boolean(email || password || name);
+  useEffect(() => {
+    onMood?.(busy ? "busy" : error ? "error" : mode === "register" ? "register" : typing ? "typing" : "welcome");
+  }, [busy, error, mode, typing, onMood]);
 
   useEffect(() => {
     if (!isGoogleEnabled) return;

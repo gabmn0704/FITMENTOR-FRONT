@@ -1,4 +1,6 @@
 import { useRef, type ReactNode } from "react";
+import { PageMascot } from "../mascot/PageMascot";
+import type { MascotState } from "../../lib/mascot";
 import { gsap, useGSAP, withMotion } from "./motion";
 
 interface PageHeroProps {
@@ -11,6 +13,8 @@ interface PageHeroProps {
   lead?: ReactNode;
   /** Datos útiles al costado (cifras, semana). Solo contenido real, nunca decoración. */
   aside?: ReactNode;
+  /** Rep, la mascota, al costado de la cabecera. */
+  mascot?: MascotState;
   tone?: "paper" | "ink";
   /** Cifras o acciones bajo el texto. */
   children?: ReactNode;
@@ -18,7 +22,7 @@ interface PageHeroProps {
 }
 
 /** Cabecera de las páginas internas: título en máscara que sube línea a línea, y cifras clave. */
-export function PageHero({ kicker, title, accent, lead, aside, tone = "paper", children, className = "" }: PageHeroProps) {
+export function PageHero({ kicker, title, accent, lead, aside, mascot, tone = "paper", children, className = "" }: PageHeroProps) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -67,6 +71,7 @@ export function PageHero({ kicker, title, accent, lead, aside, tone = "paper", c
           {aside}
         </div>
       )}
+      {mascot && <PageMascot state={mascot} size={112} />}
     </header>
   );
 }

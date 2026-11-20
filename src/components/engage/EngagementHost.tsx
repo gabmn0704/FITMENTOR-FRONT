@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Trophy, X } from "lucide-react";
+import { X } from "lucide-react";
+import { Mascot } from "../mascot/Mascot";
 import { fireConfetti } from "../motion/Confetti";
 import { syncEngagement } from "../../lib/engagement";
 import { readLocalSessions } from "../../lib/sessions";
@@ -12,7 +13,7 @@ interface Toast {
 
 /**
  * Revisa al cambiar de pantalla si hubo retos cumplidos o medallas nuevas y los celebra una sola vez:
- * confeti y un aviso que se cierra solo.
+ * confeti, la mascota saltando y un aviso que se cierra solo.
  */
 export function EngagementHost({ userId, route }: { userId: string | undefined; route: string }) {
   const [toast, setToast] = useState<Toast | null>(null);
@@ -35,9 +36,7 @@ export function EngagementHost({ userId, route }: { userId: string | undefined; 
   if (!toast) return null;
   return (
     <div className="unlock-toast" role="status" aria-live="polite">
-      <span className="unlock-toast__icon" aria-hidden="true">
-        <Trophy size={28} />
-      </span>
+      <Mascot state="celebrate" size={92} lookAt={false} />
       <div className="unlock-toast__text">
         <strong>{toast.title}</strong>
         <ul>
