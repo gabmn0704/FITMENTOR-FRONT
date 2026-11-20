@@ -210,7 +210,6 @@
 }
 
 .goal-card__value {
-  stroke: url(#goal-grad);
   animation: ring-in 1400ms var(--ease-out) 300ms both;
 }
 

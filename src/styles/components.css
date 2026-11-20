@@ -39,10 +39,10 @@
   gap: var(--space-2);
   min-height: 48px;
   padding: 0 var(--space-5);
-  border-radius: var(--radius-sm);
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
   font-size: 15px;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.005em;
   white-space: nowrap;
   transition:
     transform var(--dur-fast) var(--ease-out),
@@ -58,9 +58,9 @@
 }
 
 .btn--primary {
-  background: var(--signal);
+  background: linear-gradient(180deg, var(--signal-bright), var(--signal) 60%);
   color: var(--signal-ink);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 10px 22px -14px rgb(255 61 31 / 0.9);
+  box-shadow: var(--shadow-signal), inset 0 0 0 1px rgb(255 255 255 / 0.14);
 }
 
 .btn--primary::after {
@@ -74,14 +74,17 @@
 }
 
 .btn--ghost {
-  background: var(--surface);
-  border: 1.5px solid var(--line-strong);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--edge-light);
   color: var(--text);
 }
 
 .btn--danger {
   background: transparent;
-  border: 1.5px solid var(--signal);
+  border: 1px solid color-mix(in srgb, var(--signal) 70%, transparent);
   color: var(--signal-text);
 }
 
@@ -90,7 +93,7 @@
 }
 
 .btn--lg {
-  min-height: 58px;
+  min-height: 60px;
   padding: 0 var(--space-6);
   font-size: 17px;
 }
@@ -118,7 +121,7 @@
 @media (hover: hover) and (pointer: fine) {
   .btn--primary:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 16px 28px -14px rgb(255 61 31 / 1);
+    box-shadow: var(--shadow-signal), 0 18px 36px -14px rgb(255 61 31 / 0.85), inset 0 0 0 1px rgb(255 255 255 / 0.2);
   }
 
   .btn--primary:hover:not(:disabled)::after {
@@ -127,8 +130,9 @@
   }
 
   .btn--ghost:hover:not(:disabled) {
-    border-color: var(--cobalt);
+    border-color: color-mix(in srgb, var(--cobalt-bright) 70%, transparent);
     color: var(--accent-text);
+    transform: translateY(-1px);
   }
 
   .btn--danger:hover:not(:disabled) {
@@ -142,9 +146,12 @@
   isolation: isolate;
   overflow: hidden;
   padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-1), var(--edge-light);
 }
 
 .card--interactive {
@@ -160,17 +167,17 @@
 }
 
 .card__title {
-  font-size: 30px;
+  font-size: var(--fs-xl);
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  border-radius: var(--radius-xs);
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   background: var(--surface-2);
   color: var(--text-muted);
   border: 1px solid var(--line);
@@ -310,7 +317,8 @@
 }
 
 .ring__value {
-  stroke: var(--cobalt);
+  stroke: var(--ring-color, var(--cobalt));
+  transition: stroke-dashoffset 900ms var(--ease-out-expo);
 }
 
 .ring__content {
@@ -323,10 +331,10 @@
 
 .ring__content strong {
   font-family: var(--font-display);
-  font-stretch: 62%;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 40px;
   line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .ring__content span {
@@ -346,15 +354,15 @@
 /* ---------- Barras ---------- */
 .bar {
   height: 10px;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   background: var(--surface-3);
   overflow: hidden;
 }
 
 .bar__fill {
   height: 100%;
-  border-radius: 2px;
-  background: var(--cobalt);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cobalt), var(--cobalt-bright));
   transform-origin: left;
 }
 
@@ -415,9 +423,8 @@
 
 .odo__suffix {
   margin-left: 0.04em;
-  font-size: 0.62em;
-  font-stretch: 85%;
-  font-weight: 800;
+  font-size: 0.56em;
+  font-weight: 600;
   line-height: calc(var(--cell) * 1.6);
 }
 

@@ -1,155 +1,20 @@
-/* Estructura de la app: riel de tinta en escritorio, barra inferior en móvil. */
-
-.app-shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  min-height: 100dvh;
-  background: var(--bg);
-}
-
-/* Riel de navegación: el cobalto de la carrera, con borde perforado como el de un dorsal. */
-.sidebar {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-rail);
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-4) var(--space-5) var(--space-4);
-  background: var(--rail);
-  color: var(--on-cobalt);
-}
-
-.sidebar::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 5px;
-  bottom: 0;
-  width: 6px;
-  pointer-events: none;
-  background: radial-gradient(circle at 3px 50%, var(--bg) 2.4px, transparent 3px) 0 0 / 6px 18px repeat-y;
-  opacity: 0.9;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2);
-}
-
-.nav-list {
-  position: relative;
-  display: grid;
-  gap: 4px;
-}
-
-.nav-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  background: var(--cobalt);
-  box-shadow: 0 10px 24px -12px rgb(27 59 255 / 0.9);
-  transform: translateY(calc(var(--idx, 0) * 48px));
-  transition: transform 460ms var(--ease-drawer);
-  pointer-events: none;
-}
-
-.nav-link {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 44px;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--on-cobalt-muted);
-  font-weight: 700;
-  text-decoration: none;
-  transition: color var(--dur-base) ease, transform 100ms var(--ease-out);
-}
-
-.nav-link:active {
-  transform: scale(0.97);
-}
-
-.nav-link[aria-current="page"] {
-  color: #ffffff;
-}
-
-.sidebar .nav-link:focus-visible {
-  box-shadow: 0 0 0 2px var(--on-cobalt);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .nav-link:not([aria-current="page"]):hover {
-    color: var(--on-cobalt);
-  }
-}
-
-.sidebar__footer {
-  margin-top: auto;
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: rgb(255 255 255 / 0.07);
-}
-
-.sidebar__footer strong {
-  display: block;
-  font-size: 14px;
-  color: var(--on-cobalt);
-}
-
-.sidebar__footer span {
-  font-size: 12px;
-  color: var(--on-cobalt-muted);
-}
-
-.main {
-  position: relative;
-  min-width: 0;
-  padding: var(--space-5) var(--space-6) var(--space-8);
-}
-
-.main__inner {
-  max-width: var(--content-max);
-  margin: 0 auto;
-  display: grid;
-  gap: var(--space-5);
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.topbar__title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
+/* Utilidades de estructura compartidas por todas las pantallas. El marco de la app (riel, cabecera y
+   píldora móvil) vive en shell.css. */
 
 .page-header {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding-top: var(--space-2);
 }
 
 .page-header h1 {
-  font-size: clamp(44px, 5.2vw, 76px);
+  font-size: var(--fs-display);
 }
 
 .page-header p {
   color: var(--text-muted);
-  max-width: 60ch;
+  font-size: var(--fs-md);
+  max-width: 62ch;
 }
 
 .grid-cards {
@@ -170,11 +35,6 @@
   flex-wrap: wrap;
 }
 
-/* Barra inferior: solo visible en móvil. */
-.bottom-nav {
-  display: none;
-}
-
 .auth-shell {
   min-height: 100dvh;
   display: grid;
@@ -184,107 +44,10 @@
   background: var(--bg);
 }
 
-@media (max-width: 1024px) {
-  :root {
-    --sidebar-width: 88px;
-  }
-
-  .sidebar .logo__word,
-  .sidebar .nav-link__label,
-  .sidebar__footer .profile__text {
-    display: none;
-  }
-
-  .sidebar {
-    align-items: center;
-    padding-inline: var(--space-2);
-  }
-
-  .nav-list,
-  .nav-indicator {
-    width: 56px;
-  }
-
-  .nav-link {
-    justify-content: center;
-    width: 56px;
-    padding: 0;
-  }
-
-  .sidebar__footer {
-    padding: var(--space-2);
-    background: transparent;
-  }
-
-  .main {
-    padding-inline: var(--space-5);
-  }
-}
-
-@media (max-width: 760px) {
-  .app-shell {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .nav-indicator {
-    display: none;
-  }
-
-  .main {
-    padding: var(--space-4) var(--space-4) calc(var(--nav-height) + 32px + env(safe-area-inset-bottom));
-  }
-
-  .bottom-nav {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: var(--z-bar);
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 2px;
-    height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-    background: var(--rail);
-    box-shadow: 0 -12px 32px -16px rgb(10 12 18 / 0.7);
-  }
-
-  .bottom-nav .nav-link {
-    flex-direction: column;
-    justify-content: center;
-    gap: 3px;
-    width: 100%;
-    min-height: 48px;
-    padding: 0;
-    font-size: 10px;
-    border-radius: var(--radius-sm);
-    color: var(--on-cobalt-muted);
-    transition: background-color var(--dur-base) ease, color var(--dur-base) ease, transform 100ms var(--ease-out);
-  }
-
-  .bottom-nav .nav-link[aria-current="page"] {
-    background: var(--cobalt);
-    color: #ffffff;
-  }
-
-  .topbar__title {
-    display: none;
-  }
-}
-
-@media (max-width: 360px) {
-  .bottom-nav .nav-link {
-    font-size: 9px;
-  }
-}
-
 /* Campos de tinta: dentro de ellos el texto "sobre cobalto" pasa a ser texto sobre tinta. */
-.sidebar,
-.bottom-nav,
 .race-hero,
-.access__field {
+.access__field,
+.ink-field {
   --on-cobalt: var(--on-ink);
   --on-cobalt-muted: var(--on-ink-muted);
 }
