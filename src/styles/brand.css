@@ -1,0 +1,164 @@
+/* Logo vivo: la F se dibuja, el punto late como un pulso y salta al pasar el cursor. */
+.logo-mark {
+  overflow: visible;
+}
+
+.logo-mark .lm__dot,
+.logo-mark .lm__ring {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.logo-mark .lm__ring {
+  opacity: 0;
+}
+
+.logo-mark--live .lm__tile {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lm-tile 620ms var(--ease-settle) both;
+}
+
+.logo-mark--live .lm__stroke {
+  stroke-dasharray: 1;
+  animation: lm-draw 640ms var(--ease-in-out) 280ms backwards;
+}
+
+.logo-mark--live .lm__stroke--b {
+  animation-delay: 780ms;
+  animation-duration: 360ms;
+}
+
+.logo-mark--live .lm__dot {
+  animation:
+    lm-pop 560ms cubic-bezier(0.34, 1.7, 0.64, 1) 1050ms both,
+    lm-beat 2.4s ease-in-out 1800ms infinite;
+}
+
+.logo-mark--live .lm__ring {
+  animation: lm-ring 2.4s ease-out 1800ms infinite;
+}
+
+@keyframes lm-tile {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lm-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes lm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Lub-dub: dos golpes seguidos y una pausa. */
+@keyframes lm-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.28);
+  }
+  16% {
+    transform: scale(1);
+  }
+  24% {
+    transform: scale(1.2);
+  }
+  34% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lm-ring {
+  0%,
+  6% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  9% {
+    opacity: 0.85;
+  }
+  36% {
+    opacity: 0;
+    transform: scale(3.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.1);
+  }
+}
+
+.logo__word {
+  display: inline-block;
+}
+
+.logo-mark--live ~ .logo__word {
+  animation: lm-word 700ms var(--ease-out) 600ms both;
+}
+
+@keyframes lm-word {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .logo:hover .lm__dot,
+  .logo-mark:hover .lm__dot {
+    animation: lm-bounce 700ms cubic-bezier(0.34, 1.7, 0.64, 1) both;
+  }
+
+  .logo:hover .logo-mark {
+    transform: rotate(-4deg) scale(1.06);
+  }
+
+  .logo-mark {
+    transition: transform 360ms var(--ease-settle);
+  }
+}
+
+@keyframes lm-bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-7px) scale(0.9, 1.15);
+  }
+  60% {
+    transform: translateY(0) scale(1.25, 0.8);
+  }
+  80% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: none;
+  }
+}
