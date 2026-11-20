@@ -12,13 +12,13 @@ const TICKER = ["Sentadilla", "Flexión", "Plancha", "Peso muerto", "Zancada", "
 function mascotFor(mood: AuthMood): { state: MascotState; message: string | true } {
   switch (mood) {
     case "busy":
-      return { state: "count", message: "Un momentico, ya le abro la puerta…" };
+      return { state: "count", message: "Un momento, estoy abriendo tu sesión…" };
     case "error":
       return { state: "worried", message: true };
     case "register":
-      return { state: "cheer", message: "¡Qué chimba que se una! Cree su cuenta y arrancamos." };
+      return { state: "cheer", message: "Crea tu cuenta y empezamos a entrenar." };
     case "typing":
-      return { state: "idle", message: "Eso, ahí va. Yo no miro la contraseña, lo juro." };
+      return { state: "idle", message: "Tus datos están protegidos. No veo tu contraseña." };
     default:
       return { state: "wave", message: true };
   }

@@ -230,7 +230,7 @@ const MENTOR_QUOTES = [
   "Un día malo entrenando sigue siendo mejor que ninguno.",
   "Lo difícil no es entrenar, es volver mañana. Vuelve.",
   "Tus rodillas, tu espalda y tu futuro te lo agradecen.",
-  "Pa' lante, sin afán pero sin pausa.",
+  "Avanza sin prisa, pero sin pausa.",
   "Entrenar es la única conversación donde tu cuerpo siempre te responde.",
 ];
 

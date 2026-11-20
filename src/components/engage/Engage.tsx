@@ -61,7 +61,7 @@ export function StreakCard({ streak, week }: { streak: number; week: WeekDay[] }
             ? "Buen arranque. Con 3 días seguidos la llama crece."
             : streak < 7
               ? "¡Va ardiendo! Siete días y se pone al rojo vivo."
-              : "Llama al rojo vivo. ¡Eso es constancia, parce!"}
+              : "Llama al rojo vivo. Eso es constancia."}
       </p>
     </section>
   );

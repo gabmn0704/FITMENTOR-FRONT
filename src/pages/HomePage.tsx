@@ -93,12 +93,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const heroMood: MascotState = streak >= 3 ? "cheer" : streak > 0 ? "wave" : engage.hasSessions ? "worried" : "wave";
   const heroMessage =
     streak >= 3
-      ? `¡${streak} días seguidos! No la vayamos a soltar.`
+      ? `${streak} días seguidos. Mantengamos la racha.`
       : streak > 0
-        ? "¡Ahí vamos! Hoy sumamos otro día."
+        ? "Buen ritmo. Hoy sumamos otro día."
         : engage.hasSessions
-          ? "Se me extrañó por acá. Retomemos suave, ¿sí?"
-          : "¡Quiubo! Soy Rep. Yo cuento, usted se luce.";
+          ? "Qué bueno verte de vuelta. Retomemos con calma."
+          : "Hola, soy Rep. Yo cuento las repeticiones; tú cuidas la técnica.";
   const suggestion = suggestNextExercise(data.byExercise);
   const name = user?.name?.split(" ")[0] ?? "";
   const topAchievements = (achievements.data ?? [])
