@@ -1054,6 +1054,173 @@
   }
 }
 
+/* ---------- Registro de hoy: ingesta, agua y comidas hechas ---------- */
+.p3-intake {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--p2-radius-sm);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--p2-hair);
+}
+
+.p3-intake__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.p3-intake__row strong {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.p3-intake__row small {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-subtle);
+}
+
+.p3-intake__row span:last-child {
+  margin-left: auto;
+}
+
+.p3-intake__meter {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.p3-intake__meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--good), var(--cobalt));
+  transition: width 600ms var(--p2-ease);
+}
+
+.p3-water {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--p2-hair);
+}
+
+.p3-water__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.p3-water__head svg {
+  color: var(--accent-text);
+}
+
+.p3-water__head span {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.p3-water__hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.p3-water__glasses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.p3-glass {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px 8px 12px 12px;
+  color: var(--text-subtle);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  transition:
+    background-color 240ms var(--ease-out),
+    color 240ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.p3-glass:active {
+  transform: scale(0.9);
+}
+
+.p3-glass.is-full {
+  color: var(--on-cobalt);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cobalt) 70%, white) 0%, var(--cobalt) 100%);
+  box-shadow: none;
+}
+
+.p3-meal__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  font: 600 12.5px/1 var(--font-body);
+  color: var(--text-muted);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  transition:
+    background-color 220ms var(--ease-out),
+    color 220ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.p3-meal__check:active {
+  transform: scale(0.96);
+}
+
+.p3-meal__check.is-on {
+  color: var(--on-cobalt);
+  background: var(--good);
+  box-shadow: none;
+}
+
+.p3-meal.is-done .p3-meal__dot {
+  color: #fff;
+  background: var(--good);
+  box-shadow: none;
+}
+
+.p3-meal.is-done .p3-meal__dish,
+.p3-meal.is-done .p3-meal__items {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p3-intake__meter span,
+  .p3-glass,
+  .p3-meal__check {
+    transition: none;
+  }
+}
+
 /* ---------- Ajuste de la IA ---------- */
 .p3-ai {
   display: grid;

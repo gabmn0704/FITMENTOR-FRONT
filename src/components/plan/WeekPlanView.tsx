@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
-import { Camera, Check, ChevronDown, ChevronLeft, ChevronRight, Dumbbell, Moon, RotateCcw, Timer } from "lucide-react";
+import { CalendarPlus, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, Dumbbell, Moon, RotateCcw, Timer } from "lucide-react";
 import { Button } from "../ui";
 import { Odometer } from "../motion/Odometer";
 import { ExerciseGuide } from "../training/ExerciseGuide";
@@ -11,6 +11,7 @@ import { formatDuration } from "../../lib/format";
 import { currentWeek, goalName, type BodyProfile } from "../../lib/profile";
 import { DAY_NAMES, DAY_SHORT, buildWeekPlan, expectedWeightKg, todayIndex } from "../../lib/weeklyPlan";
 import { gsap, useGSAP, withMotion } from "../p2/motion";
+import { downloadText, mondayOf, weekToIcs } from "../../lib/tracking";
 import type { RouteId } from "../../lib/routes";
 import type { Level } from "../../types";
 
@@ -62,6 +63,13 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
     setOpenGuide(null);
   };
 
+  // La semana elegida, como eventos de calendario a las 18:00 con aviso 30 minutos antes.
+  const exportWeek = () => {
+    const monday = mondayOf();
+    monday.setDate(monday.getDate() + (week - thisWeek) * 7);
+    downloadText(`fitmentor-semana-${week}.ics`, weekToIcs(plan, monday, catalogLabel), "text/calendar;charset=utf-8");
+  };
+
   // Cambio de semana: el tablero sale y entra hacia el lado al que se avanza.
   useGSAP(
     () =>
@@ -108,6 +116,9 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
             </p>
           </div>
           <div className="p2-week__nav" role="group" aria-label="Cambiar de semana">
+            <button type="button" className="p2-chipbtn" onClick={exportWeek} title="Descarga un archivo .ics para Google Calendar, Outlook o tu teléfono">
+              <CalendarPlus size={15} aria-hidden="true" /> Añadir al calendario
+            </button>
             {!isThisWeek && (
               <button type="button" className="p2-chipbtn" onClick={() => goWeek(thisWeek)}>
                 <RotateCcw size={14} aria-hidden="true" /> Semana actual
@@ -326,7 +337,7 @@ export function WeekPlanView({ profile, level, onNavigate }: WeekPlanViewProps) 
         )}
       </section>
 
-      <MealPlanCard profile={profile} dayIndex={day.index} week={week} trainingDay={day.kind === "train"} />
+      <MealPlanCard profile={profile} dayIndex={day.index} week={week} trainingDay={day.kind === "train"} isToday={isThisWeek && day.index === today} />
     </div>
   );
 }
