@@ -505,7 +505,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
                 setVariant(null);
               }}
             >
-              <img src={EXERCISE_ART[item.id]} alt="" loading="lazy" decoding="async" />
+              <img src={EXERCISE_ART[item.id]} alt="" decoding="async" />
               <span className="deck-tile__index tabular">{String(index + 1).padStart(2, "0")}</span>
               <span className="deck-tile__body">
                 <strong>{item.label}</strong>
