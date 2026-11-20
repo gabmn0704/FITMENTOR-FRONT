@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   theme: "fitmentor.theme",
   voice: "fitmentor.voice",
   profile: "fitmentor.profile",
+  engagement: "fitmentor.engagement",
 } as const;
 
 /**
