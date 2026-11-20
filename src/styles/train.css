@@ -60,7 +60,8 @@
 .cockpit-title__mask {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.08em;
+  padding: 0 0.1em 0.08em 0;
+  margin-right: -0.1em;
 }
 
 .cockpit-title__mask > span {
@@ -513,17 +514,14 @@
 }
 
 .cockpit-guide__ghost {
-  position: absolute;
-  z-index: -1;
-  top: -0.35em;
-  right: 0;
+  display: block;
   font-family: var(--font-display);
-  font-size: clamp(7rem, 4rem + 10vw, 14rem);
+  font-size: clamp(5rem, 3rem + 6vw, 9rem);
   font-weight: 800;
-  line-height: 1;
+  line-height: 0.8;
   letter-spacing: -0.06em;
   color: transparent;
-  -webkit-text-stroke: 1px var(--line-strong);
+  -webkit-text-stroke: 1.5px var(--line-strong);
   pointer-events: none;
 }
 
