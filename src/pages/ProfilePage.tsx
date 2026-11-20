@@ -1,3 +1,4 @@
+import { PageMascot } from "../components/mascot/PageMascot";
 import { useEffect, useState, type FormEvent } from "react";
 import { LogOut, ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import { Avatar, Button, Card, Notice, Segmented, Switch, type SegmentOption } from "../components/ui";
@@ -72,6 +73,7 @@ export function ProfilePage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="studio">
+        <PageMascot state="idle" />
         <h1>Tu espacio</h1>
         <p>Ajusta cómo FitMentor te acompaña en cada sesión.</p>
       </header>

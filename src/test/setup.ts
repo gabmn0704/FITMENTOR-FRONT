@@ -6,6 +6,9 @@ afterEach(() => {
   cleanup();
 });
 
+// jsdom no implementa canvas: los lienzos decorativos (confeti, escena de acceso) simplemente no dibujan.
+HTMLCanvasElement.prototype.getContext = (() => null) as unknown as HTMLCanvasElement["getContext"];
+
 // jsdom no implementa matchMedia, que GSAP usa para respetar prefers-reduced-motion.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) =>

@@ -1,0 +1,139 @@
+/* Voz y presencia del entrenador en la pantalla de entrenamiento. */
+
+.coach-presence {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px);
+  border-radius: var(--radius-md, 12px);
+  background: var(--surface-2, #f2f4f7);
+  border: 1px solid var(--surface-3, #e1e5eb);
+}
+
+.coach-presence__orb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-3, #e1e5eb);
+  color: var(--text-muted, #434a59);
+  transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.coach-presence--speaking .coach-presence__orb,
+.coach-presence--counting .coach-presence__orb {
+  background: var(--accent-text, #1b3bff);
+  color: #fff;
+  animation: coach-pulse 1s ease-in-out infinite;
+}
+
+.coach-presence--listening .coach-presence__orb {
+  background: #12805c;
+  color: #fff;
+  animation: coach-pulse 1.4s ease-in-out infinite;
+}
+
+.coach-presence__message {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.voice-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.voice-controls__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-controls__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--surface-3, #e1e5eb);
+  background: var(--surface, #fff);
+  color: var(--text, #0a0c12);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.voice-controls__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.voice-controls__btn:focus-visible,
+.voice-controls__volume input:focus-visible {
+  outline: 3px solid var(--accent-text, #1b3bff);
+  outline-offset: 2px;
+}
+
+.voice-controls__mic.is-listening {
+  border-color: #12805c;
+  color: #12805c;
+}
+
+.voice-controls__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #12805c;
+  animation: coach-pulse 1.2s ease-in-out infinite;
+}
+
+.voice-controls__volume {
+  flex: 1 1 120px;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+}
+
+.voice-controls__volume input {
+  width: 100%;
+  accent-color: var(--accent-text, #1b3bff);
+}
+
+.voice-controls__hint {
+  margin: 0;
+  font-size: 13px;
+}
+
+.voice-controls__heard {
+  font-weight: 700;
+}
+
+.camera__ai-badge {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes coach-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(27 59 255 / 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(27 59 255 / 0);
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-presence__orb,
+  .voice-controls__pulse {
+    animation: none !important;
+  }
+}

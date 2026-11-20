@@ -1,17 +1,23 @@
 import { useEffect, useRef, useState } from "react";
+import "../styles/training-voice.css";
 import { Pause, Play, RefreshCw, Square, Undo2, Wifi, WifiOff } from "lucide-react";
 import { Button, Card, Notice, ProgressRing } from "../components/ui";
 import { CameraStage } from "../components/training/CameraStage";
 import { ExercisePicker } from "../components/training/ExercisePicker";
 import { ExerciseGuide } from "../components/training/ExerciseGuide";
+import { CoachPresence, type CoachPresenceState } from "../components/training/CoachPresence";
+import { VoiceControls } from "../components/training/VoiceControls";
 import { RestTimer } from "../components/training/RestTimer";
 import { SessionSummary } from "../components/training/SessionSummary";
 import { Sparkline } from "../components/charts/Sparkline";
 import { Odometer } from "../components/motion/Odometer";
 import { useAuth } from "../hooks/useAuth";
 import { useRealtime } from "../hooks/useRealtime";
+import { preloadPoseDetector, currentDelegate } from "../hooks/usePoseDetector";
+import { useVoiceCommands } from "../hooks/useVoiceCommands";
+import type { VoiceCommand } from "../lib/voiceCommands";
 import { useTrainingSession, type AnalysisMode, type FinishedSession } from "../hooks/useTrainingSession";
-import { EXERCISES, exerciseLabel } from "../lib/exercises";
+import { EXERCISES, EXERCISE_LIST, exerciseLabel } from "../lib/exercises";
 import { formatDuration } from "../lib/format";
 import { serverStateLabel } from "../lib/contract";
 import { saveLocalSession, syncPendingSessions } from "../lib/sessions";
@@ -71,6 +77,11 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
   // Variante del plan (p. ej. sentadilla sumo) que la cámara mide con el ejercicio base.
   const [variant, setVariant] = useState<CatalogId | null>(null);
 
+  // Descarga y calienta el modelo de pose mientras el usuario lee la pantalla: "Comenzar" queda casi inmediato.
+  useEffect(() => {
+    preloadPoseDetector();
+  }, []);
+
   useEffect(() => {
     const pending = takePendingExercise();
     if (pending) {
@@ -80,6 +91,51 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
     // Solo al abrir la pantalla.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Comandos de voz: se ejecutan con el estado más reciente de la sesión (el listener es persistente). */
+  const onVoiceCommand = (command: VoiceCommand) => {
+    const { actions, status, finished } = session;
+    switch (command) {
+      case "start":
+      case "resume":
+        if (status === "idle" || status === "paused") void actions.start();
+        else actions.speak(status === "running" ? "Ya estamos entrenando." : "Un momento, empezamos.");
+        break;
+      case "pause":
+        if (status === "running") actions.pause();
+        else actions.speak("No hay una serie en curso.");
+        break;
+      case "next":
+        void goNext();
+        break;
+      case "finish":
+        if (status !== "idle") {
+          const summary = actions.finish();
+          actions.speak(summary ? "Sesión terminada. Di guardar para guardarla." : "Sesión terminada.");
+        } else actions.speak("No hay una sesión activa.");
+        break;
+      case "save":
+        if (finished) void save(finished);
+        else actions.speak("No hay una sesión por guardar.");
+        break;
+      case "repeat":
+        actions.repeatLast();
+        break;
+      case "status":
+        actions.reportStatus();
+        break;
+      case "undo":
+        actions.speak(actions.undo() ? "Repetición deshecha." : "No hay repeticiones que deshacer.");
+        break;
+      case "mute":
+        actions.setVoiceEnabled(false);
+        break;
+      case "unmute":
+        actions.setVoiceEnabled(true);
+        break;
+    }
+  };
+  const commands = useVoiceCommands({ onCommand: onVoiceCommand, shouldIgnore: session.isCoachSpeaking });
 
   const meta = EXERCISES[session.exercise];
   const guideId: CatalogId = variant && CATALOG[variant].engine === session.exercise ? variant : session.exercise;
@@ -95,6 +151,30 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
     setSaving(false);
     onNavigate("progreso");
   };
+
+  /** Pasa al siguiente ejercicio; si hay una serie activa la guarda antes, sin pasar por el resumen. */
+  const goNext = async () => {
+    const { actions, status } = session;
+    if (status !== "idle") {
+      const summary = actions.finish();
+      if (summary) {
+        saveLocalSession(toPayload(summary));
+        if (token) void syncPendingSessions(token);
+        actions.dismissSummary();
+      }
+    }
+    const index = EXERCISE_LIST.findIndex((item) => item.id === session.exercise);
+    const next = EXERCISE_LIST[(index + 1) % EXERCISE_LIST.length]!;
+    actions.selectExercise(next.id);
+    setVariant(null);
+    actions.speak(`Siguiente ejercicio: ${next.label}. Di iniciar cuando estés listo.`);
+  };
+
+  const coachState: CoachPresenceState = session.speaking
+    ? "speaking"
+    : commands.enabled && commands.state === "listening"
+      ? "listening"
+      : "idle";
 
   return (
     <section className="stack" aria-labelledby="train-title">
@@ -147,6 +227,18 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
             </Button>
           </div>
 
+          <VoiceControls
+            voiceOn={session.voiceOn}
+            volume={session.volume}
+            onToggleVoice={session.actions.toggleVoice}
+            onVolume={session.actions.setVolume}
+            commandsSupported={commands.supported}
+            commandsEnabled={commands.enabled}
+            listenState={commands.state}
+            heard={commands.heard}
+            onToggleCommands={commands.toggle}
+          />
+
           <p
             className={`channel-status channel-status--${realtime.reconnecting ? "retry" : session.analysisMode}`}
             role="status"
@@ -188,12 +280,13 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
               <div className="bar__fill" style={{ width: `${progress}%` }} />
             </div>
 
-            <p aria-live="polite" style={{ fontWeight: 600 }}>
-              {session.cue}
-            </p>
+            <CoachPresence state={coachState} message={session.cue} count={session.reps} />
             <p className="muted" style={{ fontSize: 13 }}>
               Fase: {PHASE_LABEL[session.repPhase] ?? session.repPhase}
               {session.angle !== null && ` · Ángulo: ${session.angle}°`}
+              {session.inferMs !== null && session.status === "running" && (
+                <span className="camera__ai-badge"> · IA {session.inferMs} ms{currentDelegate() ? ` (${currentDelegate()})` : ""}</span>
+              )}
             </p>
 
             <div>
