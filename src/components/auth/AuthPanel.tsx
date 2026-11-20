@@ -289,6 +289,11 @@ export function AuthPanel({ onModeChange, onMood }: AuthPanelProps = {}) {
         Entrar como invitado
       </Button>
       <p className="muted auth-hint">El modo invitado no necesita datos; tu progreso se guarda solo en este dispositivo.</p>
+      <p className="muted auth-hint">
+        <a href="/privacidad/" target="_blank" rel="noopener">
+          Política de privacidad
+        </a>
+      </p>
     </div>
   );
 }
