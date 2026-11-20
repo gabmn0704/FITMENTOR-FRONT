@@ -483,20 +483,6 @@
   color: var(--on-cobalt);
 }
 
-/* ---------- Esqueleto ---------- */
-.skeleton {
-  border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.6s linear infinite;
-}
-
-@keyframes shimmer {
-  to {
-    background-position: -200% 0;
-  }
-}
-
 /* ---------- Gráficos (SVG propio) ---------- */
 .chart-axis {
   fill: var(--text-subtle);

@@ -1,6 +1,7 @@
 import { Component, Suspense, lazy, useEffect, type ErrorInfo, type ReactNode } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { Button } from "./components/ui";
+import { PageLoader, type LoaderLayout } from "./components/ui/PageLoader";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { ProfileProvider, useProfile } from "./hooks/useProfile";
 import { useHashRoute } from "./hooks/useHashRoute";
@@ -41,14 +42,18 @@ function preloadPages(): void {
   else window.setTimeout(run, 1500);
 }
 
-function PageFallback() {
-  return (
-    <div className="stack" aria-label="Cargando">
-      <div className="skeleton" style={{ height: 200 }} />
-      <div className="skeleton" style={{ height: 120 }} />
-      <div className="skeleton" style={{ height: 240 }} />
-    </div>
-  );
+const LOADER_LAYOUT: Partial<Record<RouteId, LoaderLayout>> = {
+  entrenar: "train",
+  progreso: "progress",
+  rutina: "routine",
+  logros: "achievements",
+  coach: "coach",
+  perfil: "profile",
+};
+
+function PageFallback({ route }: { route?: RouteId | "onboarding" }) {
+  if (route === "onboarding") return <PageLoader layout="onboarding" />;
+  return <PageLoader layout={(route && LOADER_LAYOUT[route]) || "home"} />;
 }
 
 /** Evita una pantalla en blanco si una página lanza un error inesperado. */
@@ -97,7 +102,7 @@ function Screens() {
   if (!token) return <LoginPage />;
   if (user && !profile && !skipped) {
     return (
-      <Suspense fallback={<PageFallback />}>
+      <Suspense fallback={<PageFallback route="onboarding" />}>
         <Onboarding />
       </Suspense>
     );
@@ -126,7 +131,7 @@ function Screens() {
     <AppShell route={route} user={user} onNavigate={navigate}>
       <div className="page-enter" key={route}>
         <ErrorBoundary>
-          <Suspense fallback={<PageFallback />}>{page(route)}</Suspense>
+          <Suspense fallback={<PageFallback route={route} />}>{page(route)}</Suspense>
         </ErrorBoundary>
       </div>
     </AppShell>
