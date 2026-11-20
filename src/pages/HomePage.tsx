@@ -1,8 +1,12 @@
 import { useMemo, type CSSProperties } from "react";
-import { ArrowRight, Flame, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button, Card, EmptyState } from "../components/ui";
 import { BarChart } from "../components/charts/BarChart";
 import { Odometer } from "../components/motion/Odometer";
+import { Mascot } from "../components/mascot/Mascot";
+import { ChallengesCard, Flame, GoalCard, LevelCard, MentorQuote, StreakCard } from "../components/engage/Engage";
+import { useEngagement } from "../components/engage/useEngagement";
+import type { MascotState } from "../lib/mascot";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
 import { useProfile } from "../hooks/useProfile";
@@ -18,21 +22,6 @@ import { weekdayLabel } from "../lib/format";
 import { achievementText, progressPercent, routineNote, routineReason } from "../lib/contract";
 import type { RouteId } from "../lib/routes";
 import type { Stats } from "../types";
-
-const MOTIVATION = [
-  "Una repetición más y ya eres otro.",
-  "La técnica de hoy es la fuerza de mañana.",
-  "No necesitas ganas, necesitas empezar.",
-  "Constancia le gana al talento.",
-  "Hazlo bien, hazlo lento, hazlo hoy.",
-  "Tu cuerpo sigue lo que tu cabeza repite.",
-  "Cada sesión suma, aunque no lo notes.",
-];
-
-function motivationOfTheDay(date: Date): string {
-  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86_400_000);
-  return MOTIVATION[dayOfYear % MOTIVATION.length];
-}
 
 function greeting(hour: number): string {
   if (hour < 13) return "Buenos días";
@@ -99,6 +88,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
   const data: Stats = stats.data ?? local;
   const goal = weeklyProgress(data);
+  const streak = Math.max(data.streakDays, local.streakDays);
+  const engage = useEngagement(user?.id, streak);
+  const heroMood: MascotState = streak >= 3 ? "cheer" : streak > 0 ? "wave" : engage.hasSessions ? "worried" : "wave";
+  const heroMessage =
+    streak >= 3
+      ? `¡${streak} días seguidos! No la vayamos a soltar.`
+      : streak > 0
+        ? "¡Ahí vamos! Hoy sumamos otro día."
+        : engage.hasSessions
+          ? "Se me extrañó por acá. Retomemos suave, ¿sí?"
+          : "¡Quiubo! Soy Rep. Yo cuento, usted se luce.";
   const suggestion = suggestNextExercise(data.byExercise);
   const name = user?.name?.split(" ")[0] ?? "";
   const topAchievements = (achievements.data ?? [])
@@ -120,18 +120,18 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </h1>
           <p className="race-hero__lead">
             {`${greeting(new Date().getHours())}${name ? `, ${name}` : ""}. `}
-            {data.streakDays > 0
-              ? `Llevas ${data.streakDays} ${data.streakDays === 1 ? "día" : "días"} seguidos. No la rompas.`
+            {streak > 0
+              ? `Llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. No la rompas.`
               : "Tu racha empieza con una sesión. Te acompañamos con la técnica."}
           </p>
           <div className="row">
             <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={20} />}>
               Entrenar ahora
             </Button>
-            {data.streakDays > 0 && (
-              <span className="streak-tag" aria-label={`Racha de ${data.streakDays} días`}>
-                <Flame size={20} aria-hidden="true" />
-                <Odometer value={data.streakDays} /> días
+            {streak > 0 && (
+              <span className="streak-tag" aria-label={`Racha de ${streak} días`}>
+                <Flame size={22} />
+                <Odometer value={streak} /> días
               </span>
             )}
           </div>
@@ -139,6 +139,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
         <div className="race-hero__media" aria-hidden="true">
           <img src="/img/studio.jpg" alt="" />
+        </div>
+
+        <div className="race-hero__mascot">
+          <Mascot state={heroMood} size={190} message={heroMessage} placement="top" interactive />
         </div>
 
         <div className="race-hero__bib" role="group" aria-label="Meta semanal">
@@ -159,9 +163,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
         <TodayCard profile={profile} level={user?.level ?? "BEGINNER"} onNavigate={onNavigate} />
       )}
 
-      <section className="motivation-strip" aria-label="Frase del día">
-        <p>{motivationOfTheDay(new Date())}</p>
-      </section>
+      <div className="engage-grid">
+        <StreakCard streak={streak} week={engage.week} />
+        <GoalCard goal={engage.goal} onGoal={engage.setGoal} />
+        <LevelCard level={engage.level} />
+        <ChallengesCard challenges={engage.challenges} />
+        <MentorQuote userId={user?.id} state={streak > 0 ? "cheer" : "idle"} />
+      </div>
 
       {stats.error && (
         <p className="muted" style={{ fontSize: 13 }}>

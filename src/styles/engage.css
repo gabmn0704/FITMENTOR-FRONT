@@ -1,0 +1,728 @@
+/* Constancia: racha, meta semanal, nivel, retos, frase del mentor y medallas. */
+.engage-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.engage-grid > .streak-card {
+  grid-column: span 5;
+}
+.engage-grid > .goal-card {
+  grid-column: span 4;
+}
+.engage-grid > .level-card {
+  grid-column: span 3;
+}
+.engage-grid > .challenges {
+  grid-column: span 7;
+}
+.engage-grid > .mentor-quote {
+  grid-column: span 5;
+}
+
+.engage-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
+  animation: page-in 640ms var(--ease-out) both;
+  transition:
+    transform 320ms var(--ease-out),
+    box-shadow 320ms var(--ease-out);
+}
+
+.engage-grid > :nth-child(1) {
+  animation-delay: 80ms;
+}
+.engage-grid > :nth-child(2) {
+  animation-delay: 160ms;
+}
+.engage-grid > :nth-child(3) {
+  animation-delay: 240ms;
+}
+.engage-grid > :nth-child(4) {
+  animation-delay: 320ms;
+}
+.engage-grid > :nth-child(5) {
+  animation-delay: 400ms;
+}
+
+.engage-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cobalt), var(--signal));
+  opacity: 0.9;
+  transform-origin: left;
+  animation: bar-in 900ms var(--ease-out) 400ms both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .engage-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--line);
+  }
+}
+
+.engage-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.engage-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.engage-note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ---------- Racha ---------- */
+.streak-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.streak-card__count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: clamp(56px, 5vw, 76px);
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.9;
+}
+
+.streak-card__count small {
+  font-size: 22px;
+  font-weight: 800;
+  font-stretch: 75%;
+  color: var(--text-muted);
+}
+
+.streak-card--warm,
+.streak-card--blaze {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--signal) 11%, var(--surface)), var(--surface) 62%);
+}
+
+.streak-card--blaze {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--signal) 20%, var(--surface)), var(--surface) 70%);
+}
+
+.streak-card--warm .flame,
+.streak-card--blaze .flame {
+  filter: drop-shadow(0 0 14px rgb(255 100 30 / 0.55));
+}
+
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-strip__day {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.week-strip__dot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 44px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+.week-strip__label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-subtle);
+}
+
+.week-strip__day.is-active .week-strip__dot {
+  background: var(--signal-soft);
+  box-shadow: inset 0 0 0 2px var(--signal);
+  animation: dot-pop 520ms var(--ease-settle) both;
+  animation-delay: calc(var(--i) * 70ms + 500ms);
+}
+
+.week-strip__day.is-today .week-strip__dot {
+  box-shadow: inset 0 0 0 2px var(--cobalt);
+}
+
+.week-strip__day.is-today .week-strip__label {
+  color: var(--accent-text);
+}
+
+.week-strip__day.is-today.is-active .week-strip__dot {
+  box-shadow: inset 0 0 0 2px var(--signal);
+}
+
+.week-strip__day.is-future {
+  opacity: 0.5;
+}
+
+/* ---------- Meta semanal ---------- */
+.goal-card {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.goal-card__ring {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.goal-card__ring svg {
+  transform: rotate(-90deg);
+}
+
+.goal-card__track {
+  stroke: var(--surface-3);
+}
+
+.goal-card__value {
+  stroke: url(#goal-grad);
+  animation: ring-in 1400ms var(--ease-out) 300ms both;
+}
+
+.goal-card.is-reached .goal-card__ring {
+  filter: drop-shadow(0 0 16px rgb(255 120 30 / 0.5));
+}
+
+.goal-card__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+}
+
+.goal-card__center strong {
+  display: flex;
+  align-items: baseline;
+  font-size: 46px;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 1;
+}
+
+.goal-card__center small {
+  font-size: 22px;
+  color: var(--text-subtle);
+}
+
+.goal-card__center > span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.goal-card__side {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.stepper span {
+  min-width: 84px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text);
+  transition:
+    background-color 160ms ease,
+    transform 140ms var(--ease-out);
+}
+
+.stepper button:hover:not(:disabled) {
+  background: var(--cobalt-soft);
+  color: var(--accent-text);
+}
+
+.stepper button:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.stepper button:disabled {
+  opacity: 0.35;
+}
+
+/* ---------- Nivel ---------- */
+.level-card {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+}
+
+.level-card .engage-label,
+.level-card .engage-note {
+  color: var(--on-cobalt-muted);
+}
+
+.level-card::before {
+  background: var(--signal);
+}
+
+.level-card__badge {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  min-width: 78px;
+  padding: 10px 8px 6px;
+  border-radius: var(--radius-md);
+  background: var(--on-cobalt);
+  color: var(--cobalt);
+  box-shadow: 0 14px 28px -14px rgb(0 0 0 / 0.6);
+  animation: bib-drop 760ms var(--ease-settle) 400ms both;
+}
+
+.level-card__badge > span {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.level-card__badge strong {
+  font-size: 56px;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.95;
+}
+
+.level-card__text {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.level-card__title {
+  font-size: 30px;
+  font-weight: 900;
+  font-stretch: 68%;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.level-card__bar {
+  height: 10px;
+  border-radius: 6px;
+  background: rgb(10 12 18 / 0.3);
+  overflow: hidden;
+}
+
+.level-card__bar span {
+  display: block;
+  height: 100%;
+  width: var(--fill);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #ffb100, var(--signal));
+  transform-origin: left;
+  animation: bar-in 1200ms var(--ease-out) 600ms both;
+}
+
+/* ---------- Retos ---------- */
+.challenge-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.challenge {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+  animation: page-in 520ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 90ms + 450ms);
+  transition:
+    background-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.challenge__check {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-subtle);
+}
+
+.challenge.is-done {
+  background: var(--good-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--good) 40%, transparent);
+}
+
+.challenge.is-done .challenge__check {
+  background: var(--good);
+  color: #fff;
+  box-shadow: none;
+  animation: dot-pop 520ms var(--ease-settle) both;
+}
+
+.challenge__body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.challenge__body strong {
+  font-size: 15px;
+}
+
+.challenge__bar {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.challenge__bar span {
+  display: block;
+  height: 100%;
+  width: var(--fill);
+  border-radius: 4px;
+  background: var(--cobalt);
+  transform-origin: left;
+  animation: bar-in 900ms var(--ease-out) 700ms both;
+}
+
+.challenge.is-done .challenge__bar span {
+  background: var(--good);
+}
+
+.challenge__xp {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--accent-text);
+}
+
+.challenge.is-done .challenge__xp {
+  color: var(--good);
+}
+
+/* ---------- Frase del mentor ---------- */
+.mentor-quote {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  background: var(--rail);
+  color: var(--on-ink);
+}
+
+.mentor-quote .engage-label {
+  color: var(--on-ink-muted);
+}
+
+.mentor-quote blockquote {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.mentor-quote p {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 850;
+  font-stretch: 72%;
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  animation: fade-up 700ms var(--ease-out) 500ms both;
+}
+
+.mentor-quote::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto -40px -60px auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(27 59 255 / 0.6), transparent 70%);
+}
+
+/* ---------- Medallas ---------- */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
+  animation: tile-in 640ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 70ms + 150ms);
+  transition:
+    transform 320ms var(--ease-out),
+    box-shadow 320ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .badge.is-unlocked:hover {
+    transform: translateY(-5px) rotate(-0.6deg);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--line);
+  }
+}
+
+.badge__medal {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-subtle);
+}
+
+.badge.is-unlocked {
+  background: linear-gradient(165deg, var(--cobalt-soft), var(--surface) 60%);
+}
+
+.badge.is-unlocked .badge__medal {
+  background: radial-gradient(circle at 30% 25%, #ffe27a, #ffb100 55%, #ff7a00);
+  color: #5a2d00;
+  box-shadow:
+    0 10px 22px -8px rgb(255 140 0 / 0.7),
+    inset 0 0 0 3px rgb(255 255 255 / 0.45);
+  animation: medal-spin 900ms var(--ease-settle) both;
+  animation-delay: calc(var(--i) * 70ms + 300ms);
+}
+
+.badge.is-unlocked::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / 0.35) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: shine 1400ms ease 900ms both;
+}
+
+.badge.is-locked .badge__medal {
+  filter: grayscale(1);
+}
+
+.badge.is-locked {
+  opacity: 0.88;
+}
+
+.badge strong {
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.badge__desc {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.badge__bar {
+  align-self: end;
+  width: 100%;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.badge__bar span {
+  display: block;
+  height: 100%;
+  width: var(--fill);
+  border-radius: 4px;
+  background: var(--cobalt);
+  transform-origin: left;
+  animation: bar-in 900ms var(--ease-out) 500ms both;
+}
+
+.badge.is-unlocked .badge__bar span {
+  background: #ffb100;
+}
+
+@keyframes medal-spin {
+  from {
+    opacity: 0;
+    transform: rotateY(-180deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shine {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+.badge.is-fresh {
+  animation:
+    tile-in 640ms var(--ease-out) both,
+    fresh-glow 1.6s ease-in-out 3;
+}
+
+@keyframes fresh-glow {
+  50% {
+    box-shadow:
+      0 0 0 4px rgb(255 177 0 / 0.5),
+      var(--shadow-2);
+  }
+}
+
+/* ---------- Adaptación ---------- */
+@media (max-width: 1200px) {
+  .engage-grid > .streak-card,
+  .engage-grid > .goal-card,
+  .engage-grid > .challenges,
+  .engage-grid > .mentor-quote {
+    grid-column: span 6;
+  }
+
+  .engage-grid > .level-card {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 760px) {
+  .engage-grid > * {
+    grid-column: 1 / -1 !important;
+  }
+
+  .goal-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .goal-card__side {
+    justify-items: center;
+  }
+
+  .stepper {
+    justify-self: center;
+  }
+
+  .mentor-quote {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+}
+
+.goal-card,
+.level-card,
+.mentor-quote {
+  align-content: center;
+}
+
+.mentor-quote {
+  align-items: center;
+}
+
+/* Mascota del héroe de Inicio */
+.race-hero__mascot {
+  position: absolute;
+  right: clamp(230px, 22vw, 330px);
+  bottom: 40px;
+  z-index: 3;
+  animation: fade-up 800ms var(--ease-out) 800ms both;
+}
+
+.race-hero__mascot .mascot__bubble {
+  max-width: 230px;
+}
+
+@media (max-width: 900px) {
+  .race-hero__mascot {
+    right: 12px;
+    bottom: 24px;
+  }
+
+  .race-hero__mascot .mascot__bubble {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .race-hero__mascot {
+    display: none;
+  }
+}

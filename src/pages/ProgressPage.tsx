@@ -1,3 +1,4 @@
+import { PageMascot } from "../components/mascot/PageMascot";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { CloudUpload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Card, EmptyState } from "../components/ui";
@@ -69,6 +70,7 @@ export function ProgressPage() {
   return (
     <div className="stack">
       <header className="page-header" data-banner="deadlift">
+        <PageMascot state="cheer" />
         <h1>Constancia y técnica</h1>
         <p>Cada sesión suma control, consistencia y técnica.</p>
       </header>

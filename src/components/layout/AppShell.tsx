@@ -1,7 +1,13 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { Activity, Bot, CalendarDays, Dumbbell, LayoutDashboard, Trophy, User, type LucideIcon } from "lucide-react";
 import { Avatar } from "../ui";
 import { Logo } from "../../brand/Logo";
+import { ConfettiHost } from "../motion/Confetti";
+import { EngagementHost } from "../engage/EngagementHost";
+import { Flame } from "../engage/Engage";
+import { levelFromXp, readEngagement, totalXp } from "../../lib/engagement";
+import { readLocalSessions } from "../../lib/sessions";
+import { computeLocalStats } from "../../lib/stats";
 import { ROUTES, routeHref, type RouteId } from "../../lib/routes";
 import { isGuest, levelLabel } from "../../lib/contract";
 import type { User as UserType } from "../../types";
@@ -49,6 +55,14 @@ function NavLink({ id, current, onNavigate }: { id: RouteId; current: RouteId; o
 
 export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
   const title = ROUTES.find((r) => r.id === route)?.label ?? "Inicio";
+  // Racha y nivel del encabezado: salen de las sesiones guardadas; se recalculan al cambiar de pantalla.
+  const pulse = useMemo(() => {
+    const sessions = readLocalSessions();
+    const streak = computeLocalStats(sessions).streakDays;
+    const level = levelFromXp(totalXp(sessions, readEngagement(user?.id).completed));
+    return { streak, level };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route, user?.id]);
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -88,10 +102,24 @@ export function AppShell({ route, user, onNavigate, children }: AppShellProps) {
             <span className="topbar__title" aria-hidden="true">
               Mi espacio · {title}
             </span>
+            <span className="topbar__pulse">
+              <span className={`pulse-chip ${pulse.streak > 0 ? "is-hot" : ""}`} title="Racha de días seguidos">
+                <Flame lit={pulse.streak > 0} size={16} />
+                <b className="tabular">{pulse.streak}</b>
+                <span className="sr-only">días de racha</span>
+              </span>
+              <span className="pulse-chip" title={`Nivel ${pulse.level.level}: ${pulse.level.title}`}>
+                <b className="tabular">NIV {pulse.level.level}</b>
+                <span className="pulse-chip__title">{pulse.level.title}</span>
+              </span>
+            </span>
           </div>
           {children}
         </div>
       </main>
+
+      <ConfettiHost />
+      <EngagementHost userId={user?.id} route={route} />
 
       <nav className="bottom-nav" aria-label="Navegación móvil">
         {MOBILE_ROUTES.map((id) => (

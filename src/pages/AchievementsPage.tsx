@@ -1,5 +1,8 @@
 import { useMemo, type CSSProperties } from "react";
 import { Award, Lock } from "lucide-react";
+import { PageMascot } from "../components/mascot/PageMascot";
+import { BadgeGrid } from "../components/engage/Engage";
+import { useEngagement } from "../components/engage/useEngagement";
 import { Card, EmptyState, Notice } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useAsync } from "../hooks/useAsync";
@@ -19,10 +22,14 @@ export function AchievementsPage() {
     [achievements.data],
   );
   const unlocked = sorted.filter((a) => a.unlocked).length;
+  const { user } = useAuth();
+  const engage = useEngagement(user?.id, 0);
+  const medals = engage.badges.filter((b) => b.percent >= 100).length;
 
   return (
     <div className="stack">
       <header className="page-header" data-banner="ropes">
+        <PageMascot state={medals > 0 ? "celebrate" : "cheer"} />
         <h1>Logros</h1>
         <p>
           {achievements.data
@@ -30,6 +37,16 @@ export function AchievementsPage() {
             : "Desbloquea insignias entrenando con constancia."}
         </p>
       </header>
+
+      <section className="stack" aria-labelledby="medals-title" style={{ gap: 14 }}>
+        <div className="row" style={{ justifyContent: "space-between" }}>
+          <h2 id="medals-title" style={{ fontSize: 28 }}>Medallas de Rep</h2>
+          <span className="chip chip--cobalt tabular">
+            {medals} / {engage.badges.length}
+          </span>
+        </div>
+        <BadgeGrid badges={engage.badges} />
+      </section>
 
       {!token && <Notice tone="info">Inicia sesión para ver tus logros.</Notice>}
       {token && achievements.loading && (
