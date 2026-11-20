@@ -155,7 +155,7 @@ export function analyzePose(points: Point[], exercise: ExerciseId): PoseMetrics 
     const limit = exercise === "squat" ? 55 : 28;
     if (torsoLean !== null && torsoLean > limit) {
       score -= Math.min(15, (torsoLean - limit) * 0.4);
-      issues.push(exercise === "squat" ? "Pecho arriba: te estás inclinando demasiado hacia adelante." : "Mantén el torso erguido al bajar.");
+      issues.push(exercise === "squat" ? "Pecho arriba, no te inclines tanto." : "Torso erguido al bajar.");
     }
     // Rodilla por delante de la punta del pie: solo se evalúa cuando se ve el pie.
     const toe = side.toe;
@@ -163,38 +163,38 @@ export function analyzePose(points: Point[], exercise: ExerciseId): PoseMetrics 
       const facing = Math.sign(toe.x - side.ankle.x) || 1;
       if ((side.knee.x - toe.x) * facing > 0.02 && knee < 130) {
         score -= 6;
-        issues.push("Lleva la cadera más atrás: las rodillas se pasan de las puntas de los pies.");
+        issues.push("Cadera atrás: las rodillas se pasan de los pies.");
       }
     }
-    if (knee > 125) issues.push("Desciende con control; flexiona las rodillas.");
-    else if (knee < 55) issues.push("Reduce un poco la profundidad y mantén el control.");
+    if (knee > 125) issues.push("Desciende más, flexiona las rodillas.");
+    else if (knee < 55) issues.push("Menos profundidad, con control.");
   }
 
   if (exercise === "push_up" && elbow !== null) {
     score = clamp(100 - Math.abs(elbow - 90) * 0.18 - (alignment ?? 0) * 180, 35, 98);
-    if (hipOffset !== null && hipOffset > 0.06) issues.push("La cadera está cayendo: aprieta abdomen y glúteos.");
-    if (hipOffset !== null && hipOffset < -0.06) issues.push("Baja la cadera: debe quedar en línea con hombros y talones.");
-    if (elbow < 75) issues.push("Baja hasta donde mantengas el cuerpo alineado.");
+    if (hipOffset !== null && hipOffset > 0.06) issues.push("Cadera caída: aprieta abdomen y glúteos.");
+    if (hipOffset !== null && hipOffset < -0.06) issues.push("Baja la cadera, en línea con hombros y talones.");
+    if (elbow < 75) issues.push("Baja solo hasta mantener el cuerpo alineado.");
   }
 
   if (exercise === "plank" && alignment !== null && hipOffset !== null) {
     score = clamp(100 - alignment * 260, 35, 98);
-    if (hipOffset > 0.05) issues.push("Sube la cadera: se está hundiendo y carga la zona lumbar.");
-    if (hipOffset < -0.05) issues.push("Baja la cadera: debe quedar en línea con hombros y tobillos.");
+    if (hipOffset > 0.05) issues.push("Sube la cadera, se está hundiendo.");
+    if (hipOffset < -0.05) issues.push("Baja la cadera, en línea con hombros y tobillos.");
   }
 
   if (exercise === "deadlift" && hip !== null) {
     score = clamp(100 - Math.abs(hip - 125) * 0.3, 45, 98);
     if (knee !== null && knee < 105) {
       score -= 8;
-      issues.push("Estás sentándote: dobla menos las rodillas y lleva la cadera hacia atrás.");
+      issues.push("Estás sentándote: menos rodilla, cadera atrás.");
     }
-    if (hip < 90) issues.push("Lleva la cadera atrás y conserva la espalda larga.");
+    if (hip < 90) issues.push("Cadera atrás y espalda larga.");
   }
 
   const front = seen(points[11], points[12]) && Math.abs(points[11].x - points[12].x) > 0.18;
   // De frente los ángulos se aplanan y la medición pierde fiabilidad: es lo primero que se corrige.
-  if (front) issues.unshift("Colócate de perfil a la cámara: así mido mejor tu técnica.");
+  if (front) issues.unshift("Colócate de perfil a la cámara.");
 
   return {
     score: Math.round(clamp(score, 30, 98)),
@@ -213,13 +213,13 @@ export function coachingCue(exercise: ExerciseId, data: PoseMetrics | null): str
   if (data.issues && data.issues.length) return data.issues[0];
   if (exercise === "squat" || exercise === "lunge")
     return (data.knee ?? 180) > 125
-      ? "Desciende con control; flexiona las rodillas."
+      ? "Desciende más, flexiona las rodillas."
       : (data.knee ?? 0) < 55
-        ? "Reduce un poco la profundidad y mantén el control."
+        ? "Menos profundidad, con control."
         : "Buena posición. Empuja el suelo para subir.";
   if (exercise === "push_up")
     return (data.movementAngle ?? 180) < 75
-      ? "Baja hasta donde mantengas el cuerpo alineado."
+      ? "Baja solo hasta mantener el cuerpo alineado."
       : (data.alignment ?? 0) > 0.12
         ? "Aprieta el abdomen y mantén cadera y hombros en línea."
         : "Buen control. Mantén el cuerpo firme al bajar.";
@@ -228,19 +228,23 @@ export function coachingCue(exercise: ExerciseId, data: PoseMetrics | null): str
       ? "Ajusta la cadera para alinear hombros, cadera y tobillos."
       : "Buena alineación. Respira sin perder la postura.";
   return (data.movementAngle ?? 180) < 90
-    ? "Lleva la cadera atrás y conserva la espalda larga."
+    ? "Cadera atrás y espalda larga."
     : "Buen patrón. Sube extendiendo la cadera con control.";
 }
 
 /** Duración mínima de una repetición real: más rápido suele ser ruido de la detección, no un movimiento. */
-export const MIN_REP_MS = 600;
+export const MIN_REP_MS = 500;
 
-/** Umbrales de ángulo por ejercicio para la máquina de estados de repeticiones. */
-const THRESHOLDS: Record<ExerciseId, { up: number; down: number; bottom: number; done: number }> = {
-  squat: { up: 150, down: 125, bottom: 105, done: 145 },
-  lunge: { up: 150, down: 125, bottom: 105, done: 145 },
-  push_up: { up: 150, down: 120, bottom: 90, done: 145 },
-  deadlift: { up: 155, down: 140, bottom: 115, done: 155 },
+/**
+ * Umbrales de ángulo por ejercicio. Histéresis: se arma por encima de `up`, baja por `down`,
+ * llega a `bottom` y cuenta al volver por encima de `done`. `done` < `up` para contar a tiempo
+ * (antes de extender del todo) sin poder contar dos veces: hay que volver a bajar de `down`.
+ */
+export const THRESHOLDS: Record<ExerciseId, { up: number; down: number; bottom: number; done: number }> = {
+  squat: { up: 150, down: 125, bottom: 105, done: 140 },
+  lunge: { up: 150, down: 125, bottom: 105, done: 140 },
+  push_up: { up: 150, down: 120, bottom: 95, done: 140 },
+  deadlift: { up: 155, down: 140, bottom: 118, done: 148 },
   plank: { up: 0, down: 0, bottom: 0, done: 0 },
 };
 
@@ -256,19 +260,61 @@ export function advanceRepPhase(
   if (exercise === "plank") return { phase, completed: false };
   const t = THRESHOLDS[exercise];
   let next = phase;
-  if (smoothedAngle > t.up && next === "ready") next = "up";
+  // Se arma al estar casi extendido (done), no solo del todo (up): quien arranca con la rodilla en 148° también cuenta.
+  if (smoothedAngle > t.done && next === "ready") next = "up";
   if (smoothedAngle < t.down && next === "up") next = "down";
   if (smoothedAngle < t.bottom && next === "down") next = "bottom";
+  // Bajada a medias: volvió arriba sin llegar al fondo, no cuenta y se reinicia.
+  if (smoothedAngle > t.done && next === "down") return { phase: "up", completed: false };
   if (smoothedAngle > t.done && next === "bottom") return { phase: "up", completed: true };
   return { phase: next, completed: false };
 }
 
+export interface RepUpdate {
+  phase: RepPhase;
+  completed: boolean;
+  /** Se completó el ciclo pero fue demasiado rápido para ser real. */
+  rejected: boolean;
+  /** La fase cambió en esta actualización. */
+  changed: boolean;
+}
+
+/** Contador de repeticiones por ángulo: fases con histéresis y filtro de duración mínima. */
+export class RepCounter {
+  phase: RepPhase = "ready";
+  private startedAt: number | null = null;
+
+  constructor(private readonly exercise: ExerciseId, private readonly minRepMs: number = MIN_REP_MS) {}
+
+  update(smoothedAngle: number, nowMs: number): RepUpdate {
+    const next = advanceRepPhase(this.phase, smoothedAngle, this.exercise);
+    const changed = next.phase !== this.phase;
+    if (next.phase === "down" && this.phase !== "down") this.startedAt = nowMs;
+    if (next.phase === "up" && this.phase === "down") this.startedAt = null;
+    this.phase = next.phase;
+    let completed = false;
+    let rejected = false;
+    if (next.completed) {
+      const took = this.startedAt === null ? Infinity : nowMs - this.startedAt;
+      this.startedAt = null;
+      if (took >= this.minRepMs) completed = true;
+      else rejected = true;
+    }
+    return { phase: this.phase, completed, rejected, changed };
+  }
+
+  reset(): void {
+    this.phase = "ready";
+    this.startedAt = null;
+  }
+}
+
 /**
- * Suaviza el ángulo con una ventana móvil (CircularBuffer) para que el
- * conteo no reaccione a ruido de un solo frame.
+ * Suaviza el ángulo con una ventana móvil corta (CircularBuffer): quita el ruido de un frame
+ * sin añadir más de ~2 frames de retraso.
  */
 export class AngleSmoother {
-  private readonly window = new CircularBuffer<number>(5);
+  private readonly window = new CircularBuffer<number>(3);
 
   push(value: number): number {
     this.window.push(value);
@@ -277,5 +323,41 @@ export class AngleSmoother {
 
   reset(): void {
     this.window.clear();
+  }
+}
+
+/**
+ * Suavizado adaptativo de landmarks (estilo One Euro simplificado): con poco movimiento filtra
+ * el temblor; con movimiento rápido casi no añade retraso.
+ */
+export class LandmarkSmoother {
+  private prev: Point[] | null = null;
+
+  smooth(points: Point[]): Point[] {
+    if (!points.length) {
+      this.prev = null;
+      return points;
+    }
+    const prev = this.prev;
+    if (!prev || prev.length !== points.length) {
+      this.prev = points.map((p) => ({ ...p }));
+      return points;
+    }
+    const out = points.map((p, i) => {
+      const q = prev[i]!;
+      const speed = Math.hypot(p.x - q.x, p.y - q.y);
+      const alpha = Math.min(1, 0.35 + speed * 10);
+      return {
+        ...p,
+        x: q.x + (p.x - q.x) * alpha,
+        y: q.y + (p.y - q.y) * alpha,
+      };
+    });
+    this.prev = out;
+    return out;
+  }
+
+  reset(): void {
+    this.prev = null;
   }
 }
