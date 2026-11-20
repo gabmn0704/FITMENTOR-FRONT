@@ -221,7 +221,7 @@ const MENTOR_QUOTES = [
   "El descanso también hace parte del entrenamiento.",
   "Constancia le gana al talento cuando el talento no madruga.",
   "Respira, aprieta el abdomen y baja con control.",
-  "Tu cuerpo escucha lo que tu cabeza repite. Háblale bonito.",
+  "Tu cuerpo escucha lo que tu mente repite. Háblale con confianza.",
   "Cada sesión suma, aunque hoy no lo sientas.",
   "No cuentes los días: haz que los días cuenten.",
   "La disciplina es hacerlo cuando no hay ganas y sonreír después.",
@@ -230,7 +230,7 @@ const MENTOR_QUOTES = [
   "Un día malo entrenando sigue siendo mejor que ninguno.",
   "Lo difícil no es entrenar, es volver mañana. Vuelve.",
   "Tus rodillas, tu espalda y tu futuro te lo agradecen.",
-  "Pa' lante, sin afán pero sin pausa.",
+  "Sin prisa, pero sin pausa.",
   "Entrenar es la única conversación donde tu cuerpo siempre te responde.",
 ];
 
