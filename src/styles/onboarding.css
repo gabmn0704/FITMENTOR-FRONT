@@ -10,8 +10,8 @@
 }
 
 .onboard__field {
-  --on-cobalt: var(--on-ink);
-  --on-cobalt-muted: var(--on-ink-muted);
+  --on-brand: var(--on-ink);
+  --on-brand-muted: var(--on-ink-muted);
   position: sticky;
   top: 0;
   height: 100dvh;
@@ -99,7 +99,7 @@
 
 .steps li.is-done::before,
 .steps li.is-current::before {
-  background: var(--cobalt);
+  background: var(--brand);
 }
 
 .steps li.is-current {
@@ -161,13 +161,13 @@
 }
 
 .choice.is-on {
-  border-color: var(--cobalt);
-  background: var(--cobalt-soft);
+  border-color: var(--brand);
+  background: var(--brand-soft);
 }
 
 .choice.is-on::before {
-  border-color: var(--cobalt);
-  background: var(--cobalt);
+  border-color: var(--brand);
+  background: var(--brand);
   box-shadow: inset 0 0 0 3px var(--surface);
 }
 
@@ -208,19 +208,19 @@
 }
 
 .chip-button.is-on {
-  border-color: var(--cobalt);
-  background: var(--cobalt);
-  color: var(--on-cobalt);
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand);
 }
 
 .field__error {
   font-size: 13px;
   font-weight: 600;
-  color: var(--signal-text);
+  color: var(--danger-text);
 }
 
 .input[aria-invalid="true"] {
-  border-color: var(--signal);
+  border-color: var(--danger);
 }
 
 .summary-grid {

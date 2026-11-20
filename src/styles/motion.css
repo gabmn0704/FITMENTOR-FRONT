@@ -220,7 +220,7 @@ body::before {
   z-index: -1;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--cobalt-soft), transparent 65%);
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--brand-soft), transparent 65%);
   transition: opacity 300ms ease;
 }
 
@@ -260,17 +260,17 @@ body::before {
 
   .routine-item:hover {
     transform: translateX(4px);
-    border-color: var(--cobalt);
+    border-color: var(--brand);
   }
 
   .suggestions .chip:hover:not(:disabled) {
     transform: translateY(-2px);
-    border-color: var(--cobalt);
-    background: var(--cobalt-soft);
+    border-color: var(--brand);
+    background: var(--brand-soft);
   }
 
   .exercise-option:hover:not(:disabled):not([aria-pressed="true"]) {
-    border-color: var(--cobalt);
+    border-color: var(--brand);
   }
 }
 

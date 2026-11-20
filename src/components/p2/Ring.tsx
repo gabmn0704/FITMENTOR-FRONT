@@ -6,14 +6,14 @@ interface RingProps {
   value: number;
   size?: number;
   stroke?: number;
-  tone?: "cobalt" | "signal" | "good" | "ink" | "gold";
+  tone?: "brand" | "signal" | "good" | "ink" | "gold";
   label: string;
   children?: ReactNode;
   className?: string;
 }
 
 /** Anillo de progreso: el arco se dibuja al entrar en pantalla; el centro lleva la cifra. */
-export function Ring({ value, size = 120, stroke = 10, tone = "cobalt", label, children, className = "" }: RingProps) {
+export function Ring({ value, size = 120, stroke = 10, tone = "brand", label, children, className = "" }: RingProps) {
   const root = useRef<HTMLDivElement>(null);
   const radius = (size - stroke) / 2;
   const circ = 2 * Math.PI * radius;

@@ -5,7 +5,7 @@ import { Button, Notice, ProgressRing } from "../components/ui";
 import { CameraStage } from "../components/training/CameraStage";
 import { ExercisePicker } from "../components/training/ExercisePicker";
 import { ExerciseGuide } from "../components/training/ExerciseGuide";
-import { CoachPresence, type CoachPresenceState } from "../components/training/CoachPresence";
+import { CoachCue, type CoachCueState } from "../components/training/CoachCue";
 import { VoiceControls } from "../components/training/VoiceControls";
 import { RestTimer } from "../components/training/RestTimer";
 import { SessionSummary } from "../components/training/SessionSummary";
@@ -172,7 +172,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
     actions.speak(`Siguiente ejercicio: ${next.label}. Di iniciar cuando estés listo.`);
   };
 
-  const coachState: CoachPresenceState = session.speaking
+  const coachState: CoachCueState = session.speaking
     ? "speaking"
     : commands.enabled && commands.state === "listening"
       ? "listening"
@@ -422,7 +422,7 @@ export function TrainPage({ onNavigate }: TrainPageProps) {
               <Sparkline values={session.trend} label="Tendencia de precisión reciente" />
             </div>
           </div>
-          <CoachPresence state={coachState} message={session.cue} count={session.reps} />
+          <CoachCue state={coachState} message={session.cue} />
         </div>
 
         <div className="cockpit-panel cockpit-rest">

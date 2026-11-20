@@ -140,7 +140,7 @@ export function PoseField() {
       ctx.lineJoin = "round";
       ctx.lineWidth = Math.max(3, 7 * scale);
       ctx.strokeStyle = "rgba(246,248,255,0.9)";
-      ctx.shadowColor = "rgba(27,59,255,0.9)";
+      ctx.shadowColor = "rgba(10,122,83,0.9)";
       ctx.shadowBlur = 22;
       for (const [a, b] of BONES) {
         const pa = P(a);
@@ -164,24 +164,24 @@ export function PoseField() {
         const p = P(key);
         ctx.beginPath();
         ctx.arc(p[0], p[1], Math.max(4, 7.5 * scale), 0, Math.PI * 2);
-        ctx.fillStyle = "#1b3bff";
+        ctx.fillStyle = "#0a7a53";
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#f6f8ff";
         ctx.stroke();
       }
 
-      // Rodilla: el punto bermellón de la marca, con anillo que late y lectura del ángulo.
+      // Rodilla: el punto lima de la marca, con anillo que late y lectura del ángulo.
       const knee = P("knee");
       const pulse = reduce ? 0.4 : (time % 1200) / 1200;
       ctx.beginPath();
       ctx.arc(knee[0], knee[1], (9 + pulse * 22) * scale, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255,61,31,${(1 - pulse) * 0.8})`;
+      ctx.strokeStyle = `rgba(212,255,58,${(1 - pulse) * 0.8})`;
       ctx.lineWidth = 2.5;
       ctx.stroke();
       ctx.beginPath();
       ctx.arc(knee[0], knee[1], Math.max(6, 11 * scale), 0, Math.PI * 2);
-      ctx.fillStyle = "#ff3d1f";
+      ctx.fillStyle = "#d4ff3a";
       ctx.fill();
 
       const angle = kneeAngle(j);
@@ -192,7 +192,7 @@ export function PoseField() {
       ctx.save();
       ctx.textAlign = "right";
       ctx.textBaseline = "alphabetic";
-      ctx.strokeStyle = "rgba(255,61,31,0.55)";
+      ctx.strokeStyle = "rgba(212,255,58,0.55)";
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 5]);
       ctx.beginPath();
@@ -207,7 +207,7 @@ export function PoseField() {
       ctx.fillStyle = "rgba(244,246,251,0.7)";
       ctx.fillText("RODILLA", rx, ry + 18 * scale + 4);
       if (reps > 0 || reduce) {
-        ctx.fillStyle = "#ff3d1f";
+        ctx.fillStyle = "#d4ff3a";
         ctx.fillText(`REP ${reduce ? 8 : reps}`, rx, ry - big - 2);
       }
       ctx.restore();
@@ -251,7 +251,7 @@ export function PoseField() {
       for (const n of nodes) {
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fillStyle = n.r > 2.2 ? "rgba(255,61,31,0.85)" : "rgba(244,246,251,0.5)";
+        ctx.fillStyle = n.r > 2.2 ? "rgba(212,255,58,0.85)" : "rgba(244,246,251,0.5)";
         ctx.fill();
       }
 
