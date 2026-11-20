@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 import { Award, Check, Lock, Minus, Plus, Sparkles, Target } from "lucide-react";
 import { Odometer } from "../motion/Odometer";
 import { fireConfetti } from "../motion/Confetti";
@@ -44,7 +44,9 @@ export function StreakCard({ streak, week }: { streak: number; week: WeekDay[] }
   return (
     <section className={`engage-card streak-card streak-card--${mood}`} aria-label="Racha de días">
       <div className="streak-card__head">
-        <Flame lit={streak > 0} size={52} />
+        <span className="streak-card__flame" aria-hidden="true">
+          <Flame lit={streak > 0} size={58} />
+        </span>
         <div>
           <span className="engage-label">Racha</span>
           <strong className="streak-card__count tabular">
@@ -68,9 +70,20 @@ export function StreakCard({ streak, week }: { streak: number; week: WeekDay[] }
 }
 
 /** Anillo de meta semanal (sesiones) con selector de meta. */
-export function GoalCard({ goal, onGoal }: { goal: Engagement["goal"]; onGoal: (value: number) => void }) {
-  const size = 150;
-  const stroke = 14;
+export function GoalCard({
+  goal,
+  onGoal,
+  reps,
+  size = 150,
+}: {
+  goal: Engagement["goal"];
+  onGoal: (value: number) => void;
+  /** Repeticiones de la semana frente a la meta de repeticiones (opcional, se muestra como barra). */
+  reps?: { done: number; total: number; percent: number };
+  size?: number;
+}) {
+  const gradientId = `goal-grad-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const stroke = Math.max(12, Math.round(size / 13));
   const radius = (size - stroke) / 2;
   const circ = 2 * Math.PI * radius;
   const offset = circ * (1 - goal.percent / 100);
@@ -89,9 +102,10 @@ export function GoalCard({ goal, onGoal }: { goal: Engagement["goal"]; onGoal: (
       <div className="goal-card__ring" role="img" aria-label={`${goal.done} de ${goal.goal} sesiones esta semana`}>
         <svg width={size} height={size} aria-hidden="true">
           <defs>
-            <linearGradient id="goal-grad" x1="0" y1="0" x2="1" y2="1">
+            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="#ff3d1f" />
-              <stop offset="1" stopColor="#ffb100" />
+              <stop offset="0.55" stopColor="#ff7a2e" />
+              <stop offset="1" stopColor="#ffb547" />
             </linearGradient>
           </defs>
           <circle className="goal-card__track" cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} />
@@ -105,6 +119,7 @@ export function GoalCard({ goal, onGoal }: { goal: Engagement["goal"]; onGoal: (
             strokeLinecap="round"
             strokeDasharray={circ}
             strokeDashoffset={offset}
+            stroke={`url(#${gradientId})`}
             style={{ "--circ": circ } as CSSProperties}
           />
         </svg>
@@ -138,6 +153,20 @@ export function GoalCard({ goal, onGoal }: { goal: Engagement["goal"]; onGoal: (
             <Plus size={16} aria-hidden="true" />
           </button>
         </div>
+        {reps && (
+          <div className="goal-card__reps">
+            <div className="goal-card__reps-row">
+              <span>Repeticiones de la semana</span>
+              <strong className="tabular">
+                {reps.done}
+                <small> / {reps.total}</small>
+              </strong>
+            </div>
+            <span className="goal-card__reps-track" aria-hidden="true">
+              <span style={{ "--fill": `${reps.percent}%` } as CSSProperties} />
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -201,15 +230,64 @@ export function ChallengesCard({ challenges }: { challenges: Engagement["challen
 }
 
 /** Frase del día dicha por la mascota. */
-export function MentorQuote({ userId, state = "idle" }: { userId?: string; state?: MascotState }) {
+export function MentorQuote({
+  userId,
+  state = "idle",
+  size = 132,
+  className = "",
+}: {
+  userId?: string;
+  state?: MascotState;
+  size?: number;
+  className?: string;
+}) {
+  const quote = quoteOfTheDay(new Date(), userId);
+  // Cada palabra en su propio span: Inicio las enciende una a una al desplazar (scrub).
+  const words = quote.split(/\s+/);
   return (
-    <section className="engage-card mentor-quote" aria-label="Frase del día del mentor">
-      <Mascot state={state} size={132} interactive />
+    <section className={`engage-card mentor-quote ${className}`.trim()} aria-label="Frase del día del mentor">
+      <Mascot state={state} size={size} interactive />
       <blockquote>
-        <span className="engage-label">Frase del día del mentor</span>
-        <p>{quoteOfTheDay(new Date(), userId)}</p>
+        <span className="engage-label">Frase del día de Rep</span>
+        <p>
+          {words.map((word, index) => (
+            <span className="scrub-word" key={`${index}-${word}`}>
+              {word}
+              {index < words.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </p>
       </blockquote>
     </section>
+  );
+}
+
+/** Tira compacta de medallas para Inicio: brillan las ganadas, las demás muestran su avance en anillo. */
+export function MedalStrip({ badges, limit = 6 }: { badges: Engagement["badges"]; limit?: number }) {
+  const sorted = badges
+    .slice()
+    .sort((a, b) => Number(b.percent >= 100) - Number(a.percent >= 100) || b.percent - a.percent)
+    .slice(0, limit);
+  return (
+    <ul className="medal-strip" aria-label="Medallas">
+      {sorted.map((badge, index) => {
+        const unlocked = badge.percent >= 100;
+        return (
+          <li
+            key={badge.id}
+            className={`medal ${unlocked ? "is-unlocked" : ""}`}
+            style={{ "--i": index, "--p": `${Math.min(100, badge.percent)}%` } as CSSProperties}
+            title={badge.description}
+          >
+            <span className="medal__coin" aria-hidden="true">
+              {unlocked ? <Award size={24} strokeWidth={2.2} /> : <Lock size={18} />}
+            </span>
+            <span className="medal__name">{badge.title}</span>
+            <span className="sr-only">{unlocked ? "Ganada" : `${badge.percent} por ciento`}</span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
