@@ -7,7 +7,7 @@ import { LineChart } from "../components/charts/LineChart";
 import { Sparkline } from "../components/charts/Sparkline";
 import { compareWeeks, percentChange, weeklyReps } from "../components/charts/insights";
 import { Odometer } from "../components/motion/Odometer";
-import { PageHero } from "../components/p2/PageHero";
+import { HeroWeek, PageHero } from "../components/p2/PageHero";
 import { Ring } from "../components/p2/Ring";
 import { gsap, useGSAP, useReveal, withMotion } from "../components/p2/motion";
 import { useAuth } from "../hooks/useAuth";
@@ -128,6 +128,11 @@ export function ProgressPage() {
         accent={1}
         kicker={`${data.totalSessions} ${data.totalSessions === 1 ? "sesión registrada" : "sesiones registradas"}`}
         lead="Cada sesión suma control y consistencia. Aquí ves cómo vas, día a día y semana a semana."
+        aside={
+          <HeroWeek
+            days={data.weekly.map((d, i) => ({ label: weekLabels[i], value: d.reps, today: i === data.weekly.length - 1 }))}
+          />
+        }
       >
         {pending > 0 ? (
           <div className="p2-sync">

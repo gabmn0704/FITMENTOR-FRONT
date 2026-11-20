@@ -101,9 +101,9 @@ export function GoalCard({
         <svg width={size} height={size} aria-hidden="true">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#d4ff3a" />
-              <stop offset="0.55" stopColor="#ff7a2e" />
-              <stop offset="1" stopColor="#ffb547" />
+              <stop offset="0" stopColor="#19e3a1" />
+              <stop offset="0.55" stopColor="#7df0a8" />
+              <stop offset="1" stopColor="#d4ff3a" />
             </linearGradient>
           </defs>
           <circle className="goal-card__track" cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} />

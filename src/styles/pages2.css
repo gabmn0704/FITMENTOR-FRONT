@@ -45,7 +45,6 @@
   align-content: end;
   min-height: clamp(240px, 30vw, 330px);
   padding: clamp(24px, 3.4vw, 48px) clamp(22px, 3.4vw, 52px);
-  padding-right: clamp(22px, 18vw, 300px);
   border-radius: calc(var(--p2-radius) + 6px);
   background: var(--surface);
   color: var(--text);
@@ -175,7 +174,6 @@
   .p2-hero {
     min-height: 0;
     padding: 22px 20px 24px;
-    padding-top: 112px;
   }
 }
 
@@ -1216,5 +1214,110 @@
 
   .p2-tile {
     transition: none;
+  }
+}
+
+/* ---------- Datos al costado de la cabecera ---------- */
+.p2-hero--aside {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: clamp(24px, 4vw, 64px);
+}
+
+.p2-hero__aside {
+  position: relative;
+  align-self: end;
+  min-width: 0;
+}
+
+.p2-figures {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding-left: clamp(20px, 3vw, 40px);
+  border-left: 1px solid var(--line-strong);
+}
+
+.p2-figures dt {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-subtle);
+}
+
+.p2-figures dd {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 2.6vw, 38px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.p2-hero--ink .p2-figures dt {
+  color: var(--on-ink-muted);
+}
+
+.p2-week {
+  display: grid;
+  grid-template-columns: repeat(7, 36px);
+  align-items: end;
+  gap: 10px;
+  height: 150px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.p2-week li {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.p2-week__bar {
+  width: 100%;
+  height: calc(var(--v, 0.1) * 92px);
+  border-radius: 8px 8px 4px 4px;
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+.p2-week .is-today .p2-week__bar {
+  background: var(--brand);
+  box-shadow: none;
+}
+
+.p2-week__num {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.p2-week__day {
+  font-size: var(--fs-2xs);
+  text-transform: capitalize;
+  color: var(--text-subtle);
+}
+
+@media (max-width: 700px) {
+  .p2-hero--aside {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-5);
+  }
+
+  .p2-figures {
+    grid-auto-flow: column;
+    padding-left: 0;
+    padding-top: var(--space-4);
+    border-left: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .p2-week {
+    grid-template-columns: repeat(7, 1fr);
+    height: 110px;
   }
 }

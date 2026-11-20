@@ -1,6 +1,9 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import { afterEach } from "vitest";
+
+// Las pantallas cargan con import() diferido: en frío tardan más de 1 s en transformarse.
+configure({ asyncUtilTimeout: 5000 });
 
 afterEach(() => {
   cleanup();

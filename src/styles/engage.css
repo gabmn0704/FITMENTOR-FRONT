@@ -131,7 +131,7 @@
 
 .streak-card--warm .flame,
 .streak-card--blaze .flame {
-  filter: drop-shadow(0 0 14px rgb(255 100 30 / 0.55));
+  filter: drop-shadow(0 0 14px rgb(25 227 161 / 0.55));
 }
 
 .week-strip {
@@ -214,7 +214,7 @@
 }
 
 .goal-card.is-reached .goal-card__ring {
-  filter: drop-shadow(0 0 16px rgb(255 120 30 / 0.5));
+  filter: drop-shadow(0 0 16px rgb(212 255 58 / 0.5));
 }
 
 .goal-card__center {

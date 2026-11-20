@@ -300,8 +300,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <p className="hero__lead">
               {name ? `${name}, ` : ""}
               {streak > 0
-                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. la cámara cuenta cada repetición y corrige tu técnica.`
-                : "tu racha empieza con una sesión. la cámara cuenta cada repetición y corrige tu técnica."}
+                ? `llevas ${streak} ${streak === 1 ? "día" : "días"} seguidos. La cámara cuenta cada repetición y corrige tu técnica.`
+                : "tu racha empieza con una sesión. La cámara cuenta cada repetición y corrige tu técnica."}
             </p>
             <div className="hero__actions">
               <Button variant="primary" large onClick={() => onNavigate("entrenar")} icon={<ArrowRight size={20} />}>
