@@ -13,6 +13,7 @@ import {
   type RepPhase,
 } from "../lib/pose";
 import { createBrowserVoice, VoicePriority, type BrowserVoice, type VoiceCoach } from "../lib/speech";
+import { checkFraming, FramingGate } from "../lib/poseGate";
 import { briefSpoken, CueGate, spanishNumber, praiseForRep, repCallout, restCallout, statusReport } from "../lib/voiceScript";
 import { STORAGE_KEYS, storage } from "../lib/storage";
 import { toRepPhase, type ServerPhase } from "../lib/realtime";
@@ -41,9 +42,9 @@ const SERVER_STALE_MS = 2_500;
 const IDLE_CHEER_MS = 25_000;
 const IDLE_CHEERS = ["Vas muy bien, sigue así.", "Mantén el ritmo y respira.", "Buen trabajo, no pierdas la técnica."];
 
-/** Espacio mínimo entre inferencias; se adapta a la velocidad real del equipo. */
-const MIN_DETECT_INTERVAL_MS = 40;
-const MAX_DETECT_INTERVAL_MS = 120;
+/** La interfaz (puntuación, tendencia, ángulo) se refresca como mucho a este ritmo; la detección corre en cada frame. */
+const UI_TICK_MS = 250;
+const ANGLE_TICK_MS = 100;
 const TREND_SIZE = 40;
 const COUNTDOWN_SECONDS = 3;
 
@@ -115,7 +116,13 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   const stream = useRef<MediaStream | null>(null);
   const detector = useRef<PoseLandmarker | null>(null);
   const frame = useRef<number | null>(null);
-  const lastDetect = useRef(0);
+  const frameKind = useRef<"video" | "raf" | null>(null);
+  const loopRef = useRef<() => void>(() => {});
+  const framingGate = useRef(new FramingGate());
+  /** Hay un problema de encuadre/postura confirmado: se ignora el feedback del servidor mientras dure. */
+  const framingBlocked = useRef(false);
+  const lastScoreUi = useRef(0);
+  const lastAngleUi = useRef(0);
   const statusRef = useRef<TrainingStatus>("idle");
   const exerciseRef = useRef<ExerciseId>("squat");
   const phaseRef = useRef<RepPhase>("ready");
@@ -184,6 +191,10 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     lastFeedbackAt.current = 0;
     setCompleteSpoken.current = false;
     cueGate.current.reset();
+    framingGate.current.reset();
+    framingBlocked.current = false;
+    lastScoreUi.current = 0;
+    lastAngleUi.current = 0;
     landmarkSmoother.current.reset();
     repCounter.current = new RepCounter(exerciseRef.current);
     serverModeRef.current = "pending";
@@ -204,9 +215,13 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   }, []);
 
   const stopLoop = useCallback(() => {
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    if (frame.current !== null) {
+      if (frameKind.current === "video") video.current?.cancelVideoFrameCallback?.(frame.current);
+      else cancelAnimationFrame(frame.current);
+    }
     frame.current = null;
-  }, []);
+    frameKind.current = null;
+  }, [video]);
 
   const stopTimers = useCallback(() => {
     if (timerId.current !== null) window.clearInterval(timerId.current);
@@ -270,6 +285,10 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   const recordScore = useCallback((value: number) => {
     scoreSum.current.total += value;
     scoreSum.current.count += 1;
+    // Las sumas son por frame; el estado de React solo se actualiza a ritmo de interfaz para no re-renderizar en cada frame.
+    const now = performance.now();
+    if (now - lastScoreUi.current < UI_TICK_MS) return;
+    lastScoreUi.current = now;
     scoreWindow.current.push(value);
     setScore(value);
     setTrend(scoreWindow.current.toArray());
@@ -291,8 +310,24 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       if (++inferFrames.current % 25 === 0) setInferMs(Math.round(inferAvg.current));
       detectErrors.current = 0;
       const points = landmarkSmoother.current.smooth(raw);
-      realtimeRef.current.sendPose(currentExercise, points, v.videoWidth || 16, v.videoHeight || 9);
       drawSkeleton(points);
+
+      // 1) Encuadre y postura inicial, 100% local y antes de contar o corregir. La plancha no tiene fase: siempre se valida.
+      const armed = currentExercise !== "plank" && repCounter.current.phase !== "ready";
+      const gate = framingGate.current.update(checkFraming(points, currentExercise, { armed }), now);
+      framingBlocked.current = gate.blocked;
+      if (gate.blocked) {
+        if (gate.changed) setCue(gate.message);
+        if (gate.speak) {
+          voice.current.say(gate.speak, { force: true, priority: VoicePriority.form, replace: true });
+          cueGate.current.noteSpoken(now);
+        }
+        return;
+      }
+      if (gate.changed) setCue("Te veo bien. Empieza cuando quieras.");
+
+      // El backend es opcional y asíncrono: solo recibe poses válidas y nunca bloquea el feedback local.
+      realtimeRef.current.sendPose(currentExercise, points, v.videoWidth || 16, v.videoHeight || 9);
 
       // Sin feedback a tiempo (nunca llegó, o dejó de llegar), el servidor no está analizando: pasa a local.
       const connected = realtimeRef.current.serverCounting;
@@ -318,11 +353,15 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       const movement = data.movementAngle;
       const smoothed = movement === null ? null : smoother.current.push(movement);
       if (smoothed !== null) {
-        setAngle(Math.round(smoothed));
-        // Sin IA del servidor el análisis local cuenta las repeticiones (sin doble conteo).
+        if (now - lastAngleUi.current >= ANGLE_TICK_MS) {
+          lastAngleUi.current = now;
+          setAngle(Math.round(smoothed));
+        }
+        // El contador local siempre avanza (la validación de postura depende de su fase); solo cuenta y
+        // muestra la fase si la IA del servidor no está contando (sin doble conteo).
+        // Histéresis + duración mínima: cuenta al volver arriba y nunca dos veces.
+        const update = repCounter.current.update(smoothed, now);
         if (countLocally) {
-          // Histéresis + duración mínima: cuenta al volver arriba y nunca dos veces.
-          const update = repCounter.current.update(smoothed, now);
           if (update.changed) {
             phaseRef.current = update.phase;
             setRepPhase(update.phase);
@@ -338,7 +377,7 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
       const issue = data.issues?.[0] ?? null;
       const spoken = cueGate.current.consider(issue, now);
       if (spoken) {
-        voice.current.say(spoken, { force: true, priority: VoicePriority.form });
+        voice.current.say(spoken, { force: true, priority: VoicePriority.form, replace: true });
       } else if (!issue && voice.current.msSinceSpoke() > IDLE_CHEER_MS && now - lastFeedbackAt.current > IDLE_CHEER_MS) {
         const cheer = IDLE_CHEERS[idleCheerIndex.current++ % IDLE_CHEERS.length]!;
         voice.current.say(cheer, { force: true, priority: VoicePriority.chatter });
@@ -352,32 +391,38 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     [drawSkeleton, recordScore, registerRep, setServerModeBoth, video],
   );
 
-  const loop = useCallback(
-    (time: number) => {
-      if (statusRef.current !== "running") return;
-      const interval = Math.min(MAX_DETECT_INTERVAL_MS, Math.max(MIN_DETECT_INTERVAL_MS, inferAvg.current * 1.5));
-      if (time - lastDetect.current >= interval) {
-        lastDetect.current = time;
-        try {
-          detectOnce(performance.now());
-        } catch (err) {
-          console.error(err);
-          // Si el delegate GPU falla en plena sesión, pasamos a CPU una sola vez.
-          if (++detectErrors.current >= 3 && !cpuFallback.current) {
-            cpuFallback.current = true;
-            reloadPoseDetectorOnCpu()
-              .then((next) => {
-                detector.current = next;
-                detectErrors.current = 0;
-              })
-              .catch(() => setError("La IA de postura dejó de responder. Recarga la página."));
-          }
-        }
+  /** Un paso por cada frame de video nuevo (requestVideoFrameCallback), o por animation frame como respaldo. */
+  const schedule = useCallback(() => {
+    const v = video.current;
+    if (v && typeof v.requestVideoFrameCallback === "function") {
+      frameKind.current = "video";
+      frame.current = v.requestVideoFrameCallback(() => loopRef.current());
+    } else {
+      frameKind.current = "raf";
+      frame.current = requestAnimationFrame(() => loopRef.current());
+    }
+  }, [video]);
+
+  const loop = useCallback(() => {
+    if (statusRef.current !== "running") return;
+    try {
+      detectOnce(performance.now());
+    } catch (err) {
+      console.error(err);
+      // Si el delegate GPU falla en plena sesión, pasamos a CPU una sola vez.
+      if (++detectErrors.current >= 3 && !cpuFallback.current) {
+        cpuFallback.current = true;
+        reloadPoseDetectorOnCpu()
+          .then((next) => {
+            detector.current = next;
+            detectErrors.current = 0;
+          })
+          .catch(() => setError("La IA de postura dejó de responder. Recarga la página."));
       }
-      frame.current = requestAnimationFrame(loop);
-    },
-    [detectOnce],
-  );
+    }
+    if (statusRef.current === "running") schedule();
+  }, [detectOnce, schedule]);
+  loopRef.current = loop;
 
   const startTimers = useCallback(() => {
     stopTimers();
@@ -397,8 +442,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
     setStatusBoth("running");
     setCue(`Vamos con la ${EXERCISES[exerciseRef.current].label.toLowerCase()}.`);
     startTimers();
-    frame.current = requestAnimationFrame(loop);
-  }, [loop, setStatusBoth, startTimers]);
+    schedule();
+  }, [schedule, setStatusBoth, startTimers]);
 
   const ensureDetector = useCallback(async () => {
     if (!detector.current) detector.current = await loadPoseDetector();
@@ -596,6 +641,8 @@ export function useTrainingSession({ realtime, video, canvas }: Options) {
   useEffect(() => {
     const message = realtime.feedback;
     if (!message || statusRef.current !== "running") return;
+    // Con un problema de encuadre/postura confirmado, el aviso local manda: no se pisa con el del servidor.
+    if (framingBlocked.current) return;
     lastFeedbackAt.current = performance.now();
     recordScore(message.score);
     setCue(message.message);
